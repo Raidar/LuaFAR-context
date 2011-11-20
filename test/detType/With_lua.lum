@@ -1,0 +1,41 @@
+-- LUM
+
+--local Def = farConfig.OemToDef
+--far.Message(Def, "Def")
+
+local Insert = { -- Binding Insert
+  text = "&J - Binding Insert",
+  MenuView = "RectMenu",
+  Props = {
+    RectMenu = { Cols = 2, MenuAlign = "CM" },
+  },
+  CfgData = { UMenu = { TextNamedKeys = false } },
+  Items = {
+    -- A -- 
+    { text = "a",
+      Plain = "a",
+      AccelKey = "a" },
+    { text = "A",
+      Plain = "A",
+      AccelKey = "A" },
+    -- B -- 
+    { text = "b",
+      Plain = "b",
+      AccelKey = "b" },
+    { text = "B",
+      Plain = "B",
+      AccelKey = "B" },
+  } -- Items
+} --- Insert
+
+local Data = {
+
+  Menu = { -- Главное меню
+    Title = Def"Меню",
+    Items = { Insert },
+  },
+  ["Insert"] = Insert,
+
+} --- Data
+
+return Data
