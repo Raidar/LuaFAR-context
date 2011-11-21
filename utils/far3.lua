@@ -232,27 +232,9 @@ end -- do
 
 -- INPUT_RECORD (build 1816, 1859):
 do
-  local keys  = require "Rh_Scripts.Utils.keyTypes"
-  local keyUt = require "Rh_Scripts.Utils.keyUtils"
+  local f3_key = require "context.utils.far3_key"
 
-function far.FarKeyToInputRecord (FarKey) --> (InputRecord)
-  local Fmod, Fkey = keyUt.ModFKey(FarKey)
-  local VirKey = keyUt.FKeyToVKey(FarKey)
-  local Vmod, Vkey = keyUt.ModVKey(VirKey)
-
-  local Input = {
-    EventType = F.KEY_EVENT,
-    bKeyDown = true,
-    wRepeatCount = 1,
-    wVirtualKeyCode = Vkey,
-    wVirtualScanCode = keys.VKEY_ScanCodes[Vkey] or 0x00,
-    --AsciiChar = ,
-    UnicodeChar = keyUt.isFKeyChar(Fkey) and
-                  keyUt.FKeyToChar(Fkey) or "",
-    dwControlKeyState = keyUt.VModToCState(Vmod),
-  } ---
-  return Input
-end ----
+far.FarKeyToInputRecord = f3_key.FarKeyToInputRecord
 
 -- ProcessKeyW: Key --> INPUT_RECORD -- build 1814.
 -- ProcessKeyW --> ProcessPanelInputW -- build 2027.
