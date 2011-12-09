@@ -15,28 +15,11 @@
 --------------------------------------------------------------------------------
 local _G = _G
 
+--local f3_key = require "context.utils.far3_key"
+
 ----------------------------------------
 local context = context
 
-----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
-
---------------------------------------------------------------------------------
--- DN_INPUT/DN_CONTROLINPUT: Param2 --> INPUT_RECORD
--- WARN: Вызывать far.ParseInput(param2) перед использованием param2.
-function far.ParseInput (Input) --> (FarKey, VirKey)
-  if type(Input) == 'table' then
-    if Input.dwButtonState then
-      Input.EventType = F.MOUSE_EVENT
-      return
-    end
-    return far.FarInputRecordToKey(Input), Input
-  else -- if type(Input) == 'number' then
-    return Input, far.FarKeyToInputRecord(Input)
-  end
-end ----
-
-----------------------------------------
 if context.use.LFVer == 3 then return end
 
 -- Check applying
@@ -44,12 +27,16 @@ if context.use.AsFAR3 then return end
 
 context.use.AsFAR3 = true
 
---------------------------------------------------------------------------------
-
+----------------------------------------
 --bit64 = bit
 local band, bor  = bit.band, bit.bor
 local bnot, bxor = bit.bnot, bit.bxor
 --local bshl, bshr = bit.lshift, bit.rshift
+
+----------------------------------------
+--local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+
+--------------------------------------------------------------------------------
 
 ---------------------------------------- Tables
 far.Keys   = require "farkeys" -- TODO: exclude!!!
@@ -77,10 +64,10 @@ end -- do
 
 -- PanelInfo (build 1812):
 do
-F.PFLAGS_PLUGIN           = 0x00000800
-F.PFLAGS_VISIBLE          = 0x00001000
-F.PFLAGS_FOCUS            = 0x00002000
-F.PFLAGS_ALTERNATIVENAMES = 0x00004000
+  F.PFLAGS_PLUGIN           = 0x00000800
+  F.PFLAGS_VISIBLE          = 0x00001000
+  F.PFLAGS_FOCUS            = 0x00002000
+  F.PFLAGS_ALTERNATIVENAMES = 0x00004000
 end -- do
 
 -- PKF_ (build 1815):
@@ -110,10 +97,10 @@ F.DN_GETDIALOGINFO = nil
 
 -- FarDialogItem (build 1836):
 do
-F.DIF_FOCUS         = 0x04000000 -- ??
---            0x0000000200000000
-F.DIF_DEFAULTBUTTON = 0x00100000 -- DIF_DROPDOWNLIST
---            0x0000000100000000
+  F.DIF_FOCUS         = 0x04000000 -- ??
+  --            0x0000000200000000
+  F.DIF_DEFAULTBUTTON = 0x00100000 -- DIF_DROPDOWNLIST
+  --            0x0000000100000000
 end -- do
 
 -- DM_ (build 1834):
@@ -174,7 +161,7 @@ F.ECF_TAB1 = 0x1
 F.EF_LOCKED         = 0x00000400
 F.EF_DISABLESAVEPOS = 0x00000800
 
----------------------------------------- API
+---------------------------------------- API functions
 -- Удаление / изменение функций.
 
 -- FAR Version (build 1808):
@@ -225,20 +212,9 @@ function far.CtrlGetPanelInfo (handle, whatpanel)
   Info.Flags = flags
   Info.OwnerGuid = ""
   --Info.PluginHandle = nil
+
   return Info
-end ----
-
-end -- do
-
--- INPUT_RECORD (build 1816, 1859):
-do
-  local f3_key = require "context.utils.far3_key"
-
-far.FarKeyToInputRecord = f3_key.FarKeyToInputRecord
-
--- ProcessKeyW: Key --> INPUT_RECORD -- build 1814.
--- ProcessKeyW --> ProcessPanelInputW -- build 2027.
--- ??? --> dll
+end ---- CtrlGetPanelInfo
 
 end -- do
 
@@ -253,6 +229,7 @@ function far.CtrlGetCurrentPanelItem (handle, whatpanel)
   end
   Item.FindData = nil
   --Item.ChangeTime = Item.LastWriteTime -- Нет в LuaFAR3!
+
   return Item
 end ----
 
@@ -283,7 +260,7 @@ function far.AdvControl (Command, Param)
   end
 
   return Result
-end ----
+end ---- AdvControl
 
 end -- do
 
@@ -296,8 +273,9 @@ function far.Dialog (Guid, ...)
   if type(Guid) == 'string' then
     return _Dialog(...)
   end
+
   return _Dialog(Guid, ...)
-end
+end ----
 
   local DlgInit = far.DialogInit
 
@@ -306,8 +284,9 @@ function far.DialogInit (Guid, ...)
   if type(Guid) == 'string' then
     return DlgInit(...)
   end
+
   return DlgInit(Guid, ...)
-end
+end ----
 
 end -- do
 
@@ -470,6 +449,7 @@ local function FarNumberToColor (Value) --> (table)
     ForegroundColor = band(Value, 0xF),
     BackgroundColor = band(bshl(Value, 4), 0xF),
   } ---
+
   return Result
 end --
 
@@ -544,11 +524,21 @@ end -- do
 -- FCTL_GETCURRENTPANELITEM; DM_GETDLGITEM (build 2019—2020):
 -- ???
 
+-- INPUT_RECORD (build 1816, 1859, 2103):
+-- ProcessKeyW: Key --> INPUT_RECORD -- build 1814.
+-- ProcessKeyW --> ProcessPanelInputW -- build 2027.
+-- ??? --> dll
+-- TODO: Полное исключение FarInputRecordToKey и FarKeyToInputRecord:
+--far.FarInputRecordToKey = nil
+-- FarKeyToName --> FarInputRecordToName
+-- FarNameToKey --> FarNameToInputRecord
+
 -- ClosePanelW, ConfigureW, ProcessDialogEventW,
 -- ProcessEditorEventW, ProcessPanelEventW, ProcessPanelInputW,
 -- ProcessSynchroEventW, ProcessViewerEventW (build 2082):
 -- ???
 
 --[[ TODO: build 2103—2104, 2105, 2106+2108, > 2108 ]]--
+--[[ TODO: Checking FAR builds: 2108, 2246 ]]--
 
 --------------------------------------------------------------------------------

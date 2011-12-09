@@ -49,7 +49,7 @@ for k = 1, #modules do
   package.loaded[modules[k]] = nil
 end
 
----------------------------------------- -- FAR23
+---------------------------------------- -- FAR23 begin
 --[[
   Блок кода работы скриптов для LuaFAR3 под LuaFAR2.
   Внимание: не гарантируется работа всех скриптов,
@@ -59,6 +59,8 @@ end
 context.use.LFVer = far.LuafarVersion(true)
 if context.use.LFVer ~= 3 then bit64 = bit end
 
+require "context.utils.far3_grp"
+--[[
 -- Таблица системных функций (beta 3).
 if not rawget(_G, 'win') then
   win = {}
@@ -119,8 +121,9 @@ end -- if
 if not rawget(_G, 'export') then
   export = far -- TEMP: Только для упрощения!
 end
+--]]
 --]==]
----------------------------------------- -- FAR23
+---------------------------------------- -- FAR23 end
 
 -- Load preload packages.
 for k = 1, packnum do require(modules[k]) end

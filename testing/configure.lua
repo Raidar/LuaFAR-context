@@ -307,20 +307,24 @@ local function dlgProc (hndl, msg, p1, p2)
 
     local dlgargs = history[#history]
     local dialog = dlgargs.dialog
-    p1=p1+1
+
+    p1 = p1+1
     if msg == flags.DN_DRAWDIALOG then
         if dlgargs.focus then
             handle:focus(dlgargs.focus)
             return true
         end
+
     elseif msg == flags.DN_EDITCHANGE then
         return dialog[p1].line:editChange(handle, p1, p2)
+
     elseif msg == flags.DN_CONTROLINPUT then -- FAR3: p2 теперь InputRecord.
-        local FarKey, VirKey = far.ParseInput(Input) -- FAR23
+        local VirKey, FarKey = far.ParseInput(Input) -- FAR23
         if not FarKey then return false end
         --if not FarKey then return DlgMouseClick(hDlg, ProcItem, Input) end
-        local key=far.FarKeyToName(p2)
-        if key=='BS' then
+
+        local key = far.FarKeyToName(p2)
+        if key == 'BS' then
             if dialog[p1].Type~='DI_EDIT' and dialog[p1].Type~='DI_COMBOBOX' and #history>1 then
                 table.remove(history, #history)
                 dialog=history[#history].dialog
@@ -329,13 +333,14 @@ local function dlgProc (hndl, msg, p1, p2)
                 handle:close()
                 return true
             end
-        elseif key=='Enter' then
+        elseif key == 'Enter' then
             return iterateElement(handle, p1, dialog[p1])
-        elseif key=='Ins' then
+        elseif key == 'Ins' then
             return addNewElement(handle)
         end
         return false
-    elseif msg==flags.DN_BTNCLICK then
+
+    elseif msg == flags.DN_BTNCLICK then
         if dialog[p1].tbl then
            dlgargs.focus=p1-1
            configure(dialog[p1].tbl, dialog[p1].dsc)
@@ -348,10 +353,12 @@ local function dlgProc (hndl, msg, p1, p2)
         elseif dialog[p1].new then
            return addNewElement(handle)
         end
+
     elseif msg==flags.DN_GOTFOCUS then
         if dialog[p1].edt then
             dlgargs.lastFocus=p1-1
         end
+
     elseif msg==flags.DN_KILLFOCUS then
         if dialog[p1].line then
             return dialog[p1].line:editCheck(handle, p1, p2)
@@ -360,7 +367,7 @@ local function dlgProc (hndl, msg, p1, p2)
     end
 end
 
-configure=function(tbl, dsc, show)
+configure = function(tbl, dsc, show)
     local dlgLines, activeElement = {}
     if show and show=='opts' or dsc.options then
         local opts,opt=dsc.options
