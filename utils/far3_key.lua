@@ -207,14 +207,13 @@ function unit.FarKeyToInputRecord (FarKey) --> (InputRecord)
 
   local VKey, VState, VChar, VScan = FarKeyToRecFields(FarKey)
   return { -- InputRecord
-    EventType         = F.KEY_EVENT,
-    bKeyDown          = true,
-    wRepeatCount      = 1,
-    wVirtualKeyCode   = VKey or 0x00,
-    wVirtualScanCode  = VScan or 0x00,
-    --AsciiChar         = "",
-    UnicodeChar       = VChar or "",
-    dwControlKeyState = VState or 0x00,
+    EventType       = F.KEY_EVENT,
+    KeyDown         = true,
+    RepeatCount     = 1,
+    VirtualKeyCode  = VKey or 0x00,
+    VirtualScanCode = VScan or 0x00,
+    UnicodeChar     = VChar or "",
+    ControlKeyState = VState or 0x00,
   } ---
 end ---- FarKeyToInputRecord
 
@@ -254,21 +253,21 @@ local function NameToKeyState (KeyName) --> (number)
         farMatch(KeyName, "((R?Ctrl)?(R?Alt)?(Shift)?)(.*)", 1)
   if not mod or mod == "" then return KeyState, key or "" end
 
-  if c then
+  if c and c ~= "" then
     if c == 'RCtrl' then
       KeyState = bor(KeyState, vksts.RIGHT_CTRL_PRESSED)
     else
       KeyState = bor(KeyState, vksts.LEFT_CTRL_PRESSED)
     end
   end
-  if a then
+  if a and a ~= "" then
     if c == 'RAlt' then
       KeyState = bor(KeyState, vksts.RIGHT_ALT_PRESSED)
     else
       KeyState = bor(KeyState, vksts.LEFT_ALT_PRESSED)
     end
   end
-  if s then -- 'Shift'
+  if s and s ~= "" then -- 'Shift'
     KeyState = bor(KeyState, vksts.SHIFT_PRESSED)
   end
 
@@ -368,7 +367,7 @@ local Key_Names = {
 --unit.Key_Names = Key_Names
 
 function unit.FarInputRecordToName (Rec) --> (string)
-  local VKey, SKey = Rec.wVirtualKeyCode
+  local VKey, SKey = Rec.VirtualKeyCode
   if inseg(VKey, 0x30, 0x39) or inseg(VKey, 0x41, 0x5A) then
     SKey = string.char(VKey)
   end
@@ -377,7 +376,7 @@ function unit.FarInputRecordToName (Rec) --> (string)
     SKey = Key_Names[SKey] or SKey
   end
 
-  local VMod, SMod = Rec.dwControlKeyState, ""
+  local VMod, SMod = Rec.ControlKeyState, ""
   if VMod ~= 0 then
     SMod = KeyStateToName(VMod) or ""
   end
@@ -391,14 +390,13 @@ function unit.FarNameToInputRecord (Name) --> (table)
   local VKey = VKeys[VName] or 0x00
 
   return {
-    EventType         = F.KEY_EVENT,
-    bKeyDown          = true,
-    wRepeatCount      = 1,
-    wVirtualKeyCode   = VKey,
-    wVirtualScanCode  = keys.VKEY_ScanCodes[VKey] or 0x00,
-    --AsciiChar         = "",
-    UnicodeChar       = "", -- TODO
-    dwControlKeyState = VState,
+    EventType       = F.KEY_EVENT,
+    KeyDown         = true,
+    RepeatCount     = 1,
+    VirtualKeyCode  = VKey,
+    VirtualScanCode = keys.VKEY_ScanCodes[VKey] or 0x00,
+    UnicodeChar     = "", -- TODO
+    ControlKeyState = VState,
   }
 end ---- FarNameToInputRecord
 
@@ -406,6 +404,8 @@ local farMatch = far.match
 
 -- Преобразование BreakKeys для работы с меню в FAR2.
 function unit.MenuBreakKeysToOld (BreakKeys) --|> (BreakKeys)
+  if type(BreakKeys) ~= 'table' then return BreakKeys end
+
   for k, b in ipairs(BreakKeys) do
     local m, s = farMatch(b.BreakKey,
                           "((?:R?Ctrl)?(?:R?Alt)?(?:Shift)?)(.*)", 1)

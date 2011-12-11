@@ -18,15 +18,88 @@ local _G = _G
 ----------------------------------------
 local context = context
 
+----------------------------------------
+local f3_key --= require "context.utils.far3_key"
+
+--------------------------------------------------------------------------------
+do
+  --local f3_key = require "context.utils.far3_keys"
+
+-- DN_INPUT/DN_CONTROLINPUT: Param2 --> INPUT_RECORD
+-- WARN: Call far.ParseInput(param2) before param2 using in InputEvent.
+function far.ParseInput (Input) --> (VirKey, FarKey)
+  f3_key = f3_key or require "context.utils.far3_key" -- Lazy require
+
+  if type(Input) == 'table' then
+    if Input.dwButtonState then
+      Input.EventType = F.MOUSE_EVENT
+      return
+    end
+
+    return
+    --return Input, far23.FarInputRecordToKey(Input) -- Exclude FarKey
+
+  else -- if type(Input) == 'number' then
+    return f3_key.FarKeyToInputRecord(Input) --, Input -- Exclude FarKey
+  end
+end ---- ParseInput
+
+  local keyTp --= require "Rh_Scripts.Utils.keyTypes"
+  local keyUt --= require "Rh_Scripts.Utils.keyUtils"
+  local VKEY_Keys --= keyTp.VKEY_Keys
+
+-- WARN: Call far.RepairInput(Input) before Input using in ProcessInput.
+function far.RepairInput (Input) --> (Input)
+
+  if keyTp == nil then
+    keyTp = require "Rh_Scripts.Utils.keyTypes"
+    keyUt = require "Rh_Scripts.Utils.keyUtils"
+    VKEY_Keys = keyTp.VKEY_Keys
+  end
+
+  if Input.wVirtualKeyCode then
+    if EventType == F.KEY_EVENT then
+      Input.KeyDown,     Input.bKeyDown     = Input.bKeyDown, nil
+      Input.RepeatCount, Input.wRepeatCount = Input.wRepeatCount, nil
+      Input.VirtualScanCode, Input.wVirtualScanCode  = Input.wVirtualScanCode, nil
+      Input.ControlKeyState, Input.dwControlKeyState = Input.dwControlKeyState, nil
+
+      Input.VirtualKeyCode = VKEY_Keys[Input.wVirtualKeyCode] or 0x00
+      Input.wVirtualKeyCode = nil
+
+    elseif EventType == F.MOUSE_EVENT then
+      Input.MousePositionX, Input.dwMousePositionX = Input.dwMousePositionX, nil
+      Input.MousePositionY, Input.dwMousePositionY = Input.dwMousePositionY, nil
+      Input.ButtonState, Input.dwButtonState         = Input.dwButtonState, nil
+      Input.EventFlags, Input.dwEventFlags           = Input.dwEventFlags, nil
+      Input.ControlKeyState, Input.dwControlKeyState = Input.dwControlKeyState, nil
+
+    elseif EventType == F.WINDOW_BUFFER_SIZE_EVENT then
+      Input.SizeX, Input.dwSizeX = Input.dwSizeX, nil
+      Input.SizeY, Input.dwSizeY = Input.dwSizeY, nil
+
+    elseif EventType == F.MENU_EVENT then
+      Input.CommandId, Input.dwCommandId = Input.dwCommandId, nil
+
+    elseif EventType == F.FOCUS_EVENT then
+      Input.SetFocus, Input.bSetFocus = Input.bSetFocus, nil
+    end
+  end
+
+  Input.Name = far.FarInputRecordToName(Input)
+  return Input
+end ---- RepairInput
+
+end -- do
+--------------------------------------------------------------------------------
+
+----------------------------------------
 if context.use.LFVer == 3 then return end
 
 -- Check applying
 if context.use.AsFAR3spc then return end
 
 context.use.AsFAR3spc = true
-----------------------------------------
-
-local f3_key --= require "context.utils.far3_key"
 
 ----------------------------------------
 local far23 = {} -- FAR23
@@ -105,29 +178,4 @@ end -- if
 if not rawget(_G, 'export') then
   export = far -- TEMP: Только для упрощения!
 end
-
---------------------------------------------------------------------------------
-do
-  --local f3_key = require "context.utils.far3_keys"
-
--- DN_INPUT/DN_CONTROLINPUT: Param2 --> INPUT_RECORD
--- WARN: Call far.ParseInput(param2) before param2 using.
-function far.ParseInput (Input) --> (VirKey, FarKey)
-  f3_key = f3_key or require "context.utils.far3_key" -- Lazy require
-
-  if type(Input) == 'table' then
-    if Input.dwButtonState then
-      Input.EventType = F.MOUSE_EVENT
-      return
-    end
-
-    return
-    --return Input, far23.FarInputRecordToKey(Input) -- Exclude FarKey
-
-  else -- if type(Input) == 'number' then
-    return f3_key.FarKeyToInputRecord(Input) --, Input -- Exclude FarKey
-  end
-end ---- ParseInput
-
-end -- do
 --------------------------------------------------------------------------------
