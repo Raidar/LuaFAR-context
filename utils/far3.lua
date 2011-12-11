@@ -533,8 +533,8 @@ do
 far.FarInputRecordToKey = nil
 far.FarKeyToName = nil
 far.FarNameToKey = nil
-far.FarInputRecordToName = f3_key.FarInputRecordToName
-far.FarNameToInputRecord = f3_key.FarNameToInputRecord
+far.InputRecordToName = f3_key.InputRecordToName
+far.NameToInputRecord = f3_key.NameToInputRecord
 
   do
     local farMenu = far.Menu

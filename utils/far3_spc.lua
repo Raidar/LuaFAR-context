@@ -86,7 +86,7 @@ function far.RepairInput (Input) --> (Input)
     end
   end
 
-  Input.Name = far.FarInputRecordToName(Input)
+  Input.Name = far.InputRecordToName(Input)
   return Input
 end ---- RepairInput
 

@@ -366,7 +366,7 @@ local Key_Names = {
 } ---
 --unit.Key_Names = Key_Names
 
-function unit.FarInputRecordToName (Rec) --> (string)
+function unit.InputRecordToName (Rec) --> (string)
   local VKey, SKey = Rec.VirtualKeyCode
   if inseg(VKey, 0x30, 0x39) or inseg(VKey, 0x41, 0x5A) then
     SKey = string.char(VKey)
@@ -382,9 +382,9 @@ function unit.FarInputRecordToName (Rec) --> (string)
   end
 
   return SMod..SKey
-end ---- FarInputRecordToName
+end ---- InputRecordToName
 
-function unit.FarNameToInputRecord (Name) --> (table)
+function unit.NameToInputRecord (Name) --> (table)
   local VState, VName = NameToKeyState(Name)
   VName = tfind(Key_Names, VName) or VName
   local VKey = VKeys[VName] or 0x00
@@ -398,7 +398,7 @@ function unit.FarNameToInputRecord (Name) --> (table)
     UnicodeChar     = "", -- TODO
     ControlKeyState = VState,
   }
-end ---- FarNameToInputRecord
+end ---- NameToInputRecord
 
 local farMatch = far.match
 

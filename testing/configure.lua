@@ -324,7 +324,7 @@ local function dlgProc (hndl, msg, p1, p2)
         if not VirKey then return false end
         --if not VirKey then return DlgMouseClick(hDlg, p1, p2) end
 
-        local key = far.FarInputRecordToName(VirKey)
+        local key = far.InputRecordToName(VirKey)
         if key == 'BS' then
             if dialog[p1].Type~='DI_EDIT' and dialog[p1].Type~='DI_COMBOBOX' and #history>1 then
                 table.remove(history, #history)
