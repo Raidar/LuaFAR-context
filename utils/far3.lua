@@ -15,8 +15,6 @@
 --------------------------------------------------------------------------------
 local _G = _G
 
---local f3_key = require "context.utils.far3_key"
-
 ----------------------------------------
 local context = context
 
@@ -359,7 +357,7 @@ end
 
 end -- do
 
--- EditorControl/ViewerControl (build 1851, 1852):
+-- EditorControl/ViewerControl (build 1851, 1852, ..., 2184):
 do
   local Functions = {
     -- Editor Control
@@ -379,7 +377,6 @@ do
     EditorGetColor      = true,
 
     EditorProcessInput  = true,
-    EditorProcessKey    = true,
     --EditorReadInput     = true,
 
     EditorExpandTabs    = true,
@@ -427,6 +424,8 @@ do
                return Functions[k](...)
              end ----
   end -- for
+
+far.EditorProcessKey = nil -- ~= far.EditorProcessInput
 
 end -- do
 
@@ -528,17 +527,34 @@ end -- do
 -- ProcessKeyW: Key --> INPUT_RECORD -- build 1814.
 -- ProcessKeyW --> ProcessPanelInputW -- build 2027.
 -- ??? --> dll
--- TODO: Полное исключение FarInputRecordToKey и FarKeyToInputRecord:
---far.FarInputRecordToKey = nil
--- FarKeyToName --> FarInputRecordToName
--- FarNameToKey --> FarNameToInputRecord
+do
+  local f3_key = require "context.utils.far3_key"
+
+far.FarInputRecordToKey = nil
+far.FarKeyToName = nil
+far.FarNameToKey = nil
+far.FarInputRecordToName = f3_key.FarInputRecordToName
+far.FarNameToInputRecord = f3_key.FarNameToInputRecord
+
+  do
+    local farMenu = far.Menu
+    local MenuBreakKeysToOld = f3_key.MenuBreakKeysToOld
+
+    function far.Menu (Properties, Items, BreakKeys)
+      --return farMenu(Properties, Items, BreakKeys)
+      return farMenu(Properties, Items, MenuBreakKeysToOld(BreakKeys))
+    end ----
+
+  end -- do
+
+end -- do
 
 -- ClosePanelW, ConfigureW, ProcessDialogEventW,
 -- ProcessEditorEventW, ProcessPanelEventW, ProcessPanelInputW,
 -- ProcessSynchroEventW, ProcessViewerEventW (build 2082):
 -- ???
 
---[[ TODO: build 2103—2104, 2105, 2106+2108, > 2108 ]]--
+--[[ TODO: build 2105, 2106+2108, > 2108 ]]--
 --[[ TODO: Checking FAR builds: 2108, 2246 ]]--
 
 --------------------------------------------------------------------------------

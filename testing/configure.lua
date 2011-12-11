@@ -1,3 +1,4 @@
+local far23 = context.use.far23
 local dlgHandler=require 'context.utils.dlgHandler'
 
 local flags = far.Flags
@@ -319,11 +320,11 @@ local function dlgProc (hndl, msg, p1, p2)
         return dialog[p1].line:editChange(handle, p1, p2)
 
     elseif msg == flags.DN_CONTROLINPUT then -- FAR3: p2 теперь InputRecord.
-        local VirKey, FarKey = far.ParseInput(Input) -- FAR23
-        if not FarKey then return false end
-        --if not FarKey then return DlgMouseClick(hDlg, ProcItem, Input) end
+        local VirKey = far.ParseInput(Input) -- FAR23
+        if not VirKey then return false end
+        --if not VirKey then return DlgMouseClick(hDlg, p1, p2) end
 
-        local key = far.FarKeyToName(p2)
+        local key = far.FarInputRecordToName(VirKey)
         if key == 'BS' then
             if dialog[p1].Type~='DI_EDIT' and dialog[p1].Type~='DI_COMBOBOX' and #history>1 then
                 table.remove(history, #history)

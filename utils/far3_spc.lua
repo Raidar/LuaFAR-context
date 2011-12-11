@@ -21,9 +21,9 @@ local context = context
 if context.use.LFVer == 3 then return end
 
 -- Check applying
-if context.use.AsFAR3g then return end
+if context.use.AsFAR3spc then return end
 
-context.use.AsFAR3g = true
+context.use.AsFAR3spc = true
 ----------------------------------------
 
 local f3_key --= require "context.utils.far3_key"
@@ -35,15 +35,18 @@ context.use.far23 = far23
 ----------------------------------------
 local far = far
 
+far23.FarKeyToName = far.FarKeyToName
+far23.FarNameToKey = far.FarNameToKey
 far23.FarInputRecordToKey = far.FarInputRecordToKey
 
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 
 --------------------------------------------------------------------------------
--- Таблица системных функций (build ????).
-if not rawget(_G, 'win') then
+-- Пространства, выделенные из far.
 
+---------------------------------------- win (build ????)
+if not rawget(_G, 'win') then
   win = {}
 
   local far_to_win = {
@@ -98,10 +101,11 @@ if not rawget(_G, 'win') then
 
 end -- if
 
--- Таблица экспортируемых функций (build ????).
+---------------------------------------- export (build ????)
 if not rawget(_G, 'export') then
   export = far -- TEMP: Только для упрощения!
 end
+
 --------------------------------------------------------------------------------
 do
   --local f3_key = require "context.utils.far3_keys"
@@ -117,10 +121,11 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
       return
     end
 
-    return Input, far23.FarInputRecordToKey(Input) -- TODO: Exclude FarKey
+    return
+    --return Input, far23.FarInputRecordToKey(Input) -- Exclude FarKey
 
   else -- if type(Input) == 'number' then
-    return f3_key.FarKeyToInputRecord(Input), Input
+    return f3_key.FarKeyToInputRecord(Input) --, Input -- Exclude FarKey
   end
 end ---- ParseInput
 
