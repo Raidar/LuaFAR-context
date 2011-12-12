@@ -230,16 +230,15 @@ end ---- FarKeyToInputRecord
 end -- do
 
 do
-  local VKeyToChar, CharToVKey = string.char, string.byte
 
 local function KeyStateToName (KeyState)
   local t = {}
 
-  if ismod(KeyState, vksts.RIGHT_ALT_PRESSED)   then t[#t+1] = "RAlt"   end
-  if ismod(KeyState, vksts.LEFT_ALT_PRESSED)    then t[#t+1] = "Alt"    end
-  if ismod(KeyState, vksts.RIGHT_CTRL_PRESSED)  then t[#t+1] = "RCtrl"  end
-  if ismod(KeyState, vksts.LEFT_CTRL_PRESSED)   then t[#t+1] = "Ctrl"   end
-  if ismod(KeyState, vksts.SHIFT_PRESSED)       then t[#t+1] = "Shift"  end
+  if ismod(KeyState, vksts.RIGHT_ALT_PRESSED)  then t[#t+1] = "RAlt"  end
+  if ismod(KeyState, vksts.LEFT_ALT_PRESSED)   then t[#t+1] = "Alt"   end
+  if ismod(KeyState, vksts.RIGHT_CTRL_PRESSED) then t[#t+1] = "RCtrl" end
+  if ismod(KeyState, vksts.LEFT_CTRL_PRESSED)  then t[#t+1] = "Ctrl"  end
+  if ismod(KeyState, vksts.SHIFT_PRESSED)      then t[#t+1] = "Shift" end
 
   return tconcat(t)
 end --function KeyStateToName
