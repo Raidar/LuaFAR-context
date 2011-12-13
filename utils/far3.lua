@@ -79,8 +79,9 @@ F.PKF_PREPROCESS = nil
 F.WIF_MODIFIED = 0x00000001
 F.WIF_CURRENT  = 0x00000002
 
--- FCTL_ (build 1825):
+-- FCTL_ (build 1825, 2202):
 F.FCTL_GETCMDLINESELECTEDTEXT = nil
+F.FCTL_GETPANELPREFIX = 34
 
 -- ECTL_ (build 2041):
 --F.ECTL_DELCOLOR = F.ECTL_ADDCOLOR
@@ -90,8 +91,9 @@ F.FCTL_GETCMDLINESELECTEDTEXT = nil
 --F.OPIF_USESORTGROUPS   --> not F.OPIF_DISABLESORTGROUPS
 --F.OPIF_USEHIGHLIGHTING --> not F.OPIF_DISABLEHIGHLIGHTING
 
--- DialogInfo (build 1830):
+-- DialogInfo (build 1830, 2199, 2220, 2246):
 F.DN_GETDIALOGINFO = nil
+F.DN_GETVALUE = 4118
 
 -- FarDialogItem (build 1836):
 do
@@ -101,9 +103,10 @@ do
   --            0x0000000100000000
 end -- do
 
--- DM_ (build 1834):
+-- DM_ (build 1834, 2116):
 F.DM_SETREDRAW = F.DM_REDRAW
 F.DM_SETTEXTLENGTH = F.DM_SETMAXTEXTLENGTH
+--F.DM_LISTSETMOUSEREACTION = nil --> DIF_LISTTRACKMOUSE / DIF_LISTTRACKMOUSEINFOCUS
 
 -- MacroControl (build 1849):
 do
@@ -151,9 +154,11 @@ F.ACTL_GETPOLICIES = nil -- ??
 F.ACTL_GETFARMANAGERVERSION = F.ACTL_GETFARVERSION
 --F.ACTL_GETFARVERSION = nil
 
--- ECF_ (build 1898):
+-- ECF_ (build 1898, 2191):
 O.ECF_TAB1 = F.ECF_TAB1
-F.ECF_TAB1 = 0x1
+F.ECF_TAB1 = nil -- 0x1
+F.ECF_TABMARKFIRST   = 0x1
+F.ECF_TABMARKCURRENT = 0x2
 
 -- EF_ (build 2046):
 F.EF_LOCKED         = 0x00000400
@@ -312,7 +317,7 @@ end -- do
 -- far.MakeFarVersion
 -- ??? -->
 
--- MacroControl (build 1849):
+-- MacroControl (build 1849, 2106, 2108, 2208):
 do
   local farAdvControl = far.AdvControl
   local ActlKeyMacro = O.ACTL_KEYMACRO
@@ -339,11 +344,12 @@ function far.MacroGetState () --> (number)
   return farAdvControl(ActlKeyMacro, AcmdGetState)
 end ----
 
-function far.MacroPost (macro) --> (bool)
+function far.MacroPost (SequenceText, Flags, AKey) --> (bool)
+  -- AKey is not used in FAR2.
   return farAdvControl(ActlKeyMacro, {
                        Command = AcmdPostMacro,
-                       SequenceText = macro.SequenceText,
-                       Flags = macro.Flags }) == 1
+                       SequenceText = SequenceText,
+                       Flags = Flags }) == 1
 end
 
 function far.MacroCheck (macro) --> (table)
@@ -429,13 +435,14 @@ far.EditorProcessKey = nil -- ~= far.EditorProcessInput
 
 end -- do
 
--- FarColor (build 1898, 2041, 2070—2075):
+-- FarColor (build 1898, 2041, 2070—2075, 2130):
 do
 
 local function FarColorToNumber (Value) --> (number)
   if type(Value) ~= 'table' then return Value end
 
-  local Result = band(Value.Flags or 0, F.ECF_TAB1) ~= 0 and O.ECF_TAB1 or 0
+  local Result = band(Value.Flags or 0,
+                      F.ECF_TABMARKFIRST) ~= 0 and O.ECF_TAB1 or 0
   return Result + band(Value.ForegroundColor, 0xF) +
                   band(Value.BackgroundColor, 0xF) * 0x10
 end --
@@ -444,7 +451,7 @@ local function FarNumberToColor (Value) --> (table)
   if type(Value) == 'table' then return Value end
 
   local Result = {
-    Flags = band(Value or 0, O.ECF_TAB1) ~= 0 and F.ECF_TAB1 or 0,
+    Flags = band(Value or 0, O.ECF_TAB1) ~= 0 and F.ECF_TABMARKFIRST or 0,
     ForegroundColor = band(Value, 0xF),
     BackgroundColor = band(bshl(Value, 4), 0xF),
   } ---
@@ -523,9 +530,9 @@ end -- do
 -- FCTL_GETCURRENTPANELITEM; DM_GETDLGITEM (build 2019—2020):
 -- ???
 
--- INPUT_RECORD (build 1816, 1859, 2103):
--- ProcessKeyW: Key --> INPUT_RECORD -- build 1814.
--- ProcessKeyW --> ProcessPanelInputW -- build 2027.
+-- INPUT_RECORD (build 1816, 1859, 2103—2104):
+-- ProcessKeyW: Key --> INPUT_RECORD (build 1814).
+-- ProcessKeyW --> ProcessPanelInputW (build 2027).
 -- ??? --> dll
 do
   local f3_key = require "context.utils.far3_key"
@@ -554,7 +561,13 @@ end -- do
 -- ProcessSynchroEventW, ProcessViewerEventW (build 2082):
 -- ???
 
---[[ TODO: build 2105, 2106+2108, > 2108 ]]--
---[[ TODO: Checking FAR builds: 2108, 2246 ]]--
+-- PluginStartupInfo (build 1842, 1871, 2105, 2107):
+-- ???
+
+-- SettingsControl (build 2232)
+-- ???
+
+--[[ TODO: build > 2246 ]]--
+--[[ TODO: Checking FAR builds: 2246 ]]--
 
 --------------------------------------------------------------------------------

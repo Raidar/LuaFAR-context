@@ -171,7 +171,7 @@ local types = {
   lng_far   = { inherit = 'config', desc = 'FAR lng',
                 masks = {'%.lng$'}, firstline = {'^%.Language'} },
     ini_far   = { inherit = 'ini', desc = 'FAR ini',
-                  masks = {'%.farini$','%.lu[im]$'}, firstline = {lines.ini} },
+                  masks = {'%.farini$'}, firstline = {lines.ini} },
     reg_far   = { inherit = 'reg', desc = 'FAR reg', masks = {'%.farreg$'} },
 
               -- System config:

@@ -92,7 +92,6 @@ item_map = {
 end
 
 local item_defs
-
 if LFVer == 3 then
 item_defs = {
   Type=1, X1=-1, Y1=-1, X2=-1, Y2=-1,
@@ -243,7 +242,7 @@ local dialog_meta = {
           -- MaxLen is 12.
         end -- if
 
-        -- NEW: Correct item parameters
+        -- NEW: Correct item parameters!!!
         --far.Show(unpack(item))
         for k, v in pairs(item_map) do
           if item[k] ~= nil then

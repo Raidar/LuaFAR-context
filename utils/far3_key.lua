@@ -10,7 +10,7 @@ local _G = _G
 
 local pairs = pairs
 
--- INPUT_RECORD (build 2103): -- TODO: 2104
+-- INPUT_RECORD (build 2103—2104):
 
 local keyUt = require "Rh_Scripts.Utils.keyUtils"
 
