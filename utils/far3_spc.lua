@@ -44,17 +44,15 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
   end
 end ---- ParseInput
 
-  local keyTp --= require "Rh_Scripts.Utils.keyTypes"
   local keyUt --= require "Rh_Scripts.Utils.keyUtils"
-  local VKEY_Keys --= keyTp.VKEY_Keys
+  local VKEY_Keys --= keyUt.VKEY_Keys
 
 -- WARN: Call far.RepairInput(Input) before Input using in ProcessInput.
 function far.RepairInput (Input) --> (Input)
 
-  if keyTp == nil then
-    keyTp = require "Rh_Scripts.Utils.keyTypes"
+  if keyUt == nil then
     keyUt = require "Rh_Scripts.Utils.keyUtils"
-    VKEY_Keys = keyTp.VKEY_Keys
+    VKEY_Keys = keyUt.VKEY_Keys
   end
 
   if Input.wVirtualKeyCode then
