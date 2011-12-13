@@ -231,7 +231,7 @@ function unit.language () --> (table)
 end ----
 
 do
-  local GetPanelInfo = far.CtrlGetPanelInfo
+  local GetPanelInfo = panel.GetPanelInfo
 
 -- Check panel as plugin panel.
 -- Проверка панели на панель плагина.

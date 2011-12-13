@@ -98,13 +98,13 @@ function unit.readFileFirstLine (filename) --> (string, string|nil | nil)
 end --
 
 do
-  local EditorGetStr = far.EditorGetString
+  local EditorGetStr = editor.GetString
 
 -- Read a first line from file in editor.
 -- Чтение первой линии из файла в редакторе.
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
   local k, line, assumed = 0
-  local Info = far.EditorGetInfo()
+  local Info = editor.GetInfo()
 
   repeat
     line = EditorGetStr(nil, k, 2)
@@ -113,7 +113,7 @@ function unit.readEditorFirstLine () --> (string, string|nil | nil)
     k = k + 1
   until check == nil
 
-  far.EditorSetPosition(nil, Info) -- Restore cursor pos!
+  editor.SetPosition(nil, Info) -- Restore cursor pos!
   --far.Message(tostring(Info.CurLine)..'\n'..tostring(Info.CurPos), 'Info')
 
   return line, assumed
@@ -283,10 +283,10 @@ function areaFileType.panels (f)
   local f = f or {}
 
   if not f.filename then
-    local Info = far.CtrlGetPanelInfo(nil, 1)
+    local Info = panel.GetPanelInfo(nil, 1)
     if Info.ItemNumbers == 0 then return 'empty' end
-    local Item = far.CtrlGetCurrentPanelItem(nil, 1)
-    f.path, f.name = far.CtrlGetPanelDir(nil, 1), Item.FileName
+    local Item = panel.GetCurrentPanelItem(nil, 1)
+    f.path, f.name = panel.GetPanelDir(nil, 1), Item.FileName
     --far.Message(f.name, "Current item name")
     if Item.FileAttributes:find('d', 1, true) then
       return f.name == '..' and 'back' or 'dir'
@@ -309,7 +309,7 @@ function areaFileType.editor (f)
   local f = f or {}
 
   if not f.filename then
-    local fullname = far.EditorGetInfo().FileName
+    local fullname = editor.GetInfo().FileName
     f.path, f.name = fullname:match(PathNamePattern)
   end
 
@@ -325,7 +325,7 @@ function areaFileType.viewer (f)
   local f = f or {}
 
   if not f.filename then
-    local fullname = far.ViewerGetInfo().FileName
+    local fullname = viewer.GetInfo().FileName
     f.path, f.name = fullname:match(PathNamePattern)
   end
 

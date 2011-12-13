@@ -191,11 +191,11 @@ do
 function unit.editorEvent (event, param)
   local eid = param
   if event == EE_READ then
-    eid = far.EditorGetInfo().EditorID
+    eid = editor.GetInfo().EditorID
     reloadEditorConfig(eid)
     --far.Message(('%i %s'):format(eid, editors.current.type))
   elseif event == EE_SAVE then
-    eid = far.EditorGetInfo().EditorID
+    eid = editor.GetInfo().EditorID
     if editors.current.type == 'none' then
       reloadEditorConfig(eid)
     end
@@ -221,7 +221,7 @@ do
 function unit.viewerEvent (event, param)
   local vid = param
   if event == VE_READ then
-    vid = far.ViewerGetInfo().ViewerID
+    vid = viewer.GetInfo().ViewerID
     reloadViewerConfig(vid)
     --far.Message( ('%i %s'):format(vid, viewers.current.type) )
   elseif event == VE_GOTFOCUS then

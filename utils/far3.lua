@@ -191,9 +191,9 @@ end ----
 
 -- PanelInfo (build 1812):
 do
-  local GetPanelInfo = far.CtrlGetPanelInfo
+  local GetPanelInfo = panel.GetPanelInfo
 
-function far.CtrlGetPanelInfo (handle, whatpanel)
+function panel.GetPanelInfo (handle, whatpanel)
   local Info = GetPanelInfo(handle, whatpanel)
   local flags = Info.Flags
   if Info.Plugin then
@@ -217,15 +217,15 @@ function far.CtrlGetPanelInfo (handle, whatpanel)
   --Info.PluginHandle = nil
 
   return Info
-end ---- CtrlGetPanelInfo
+end ---- GetPanelInfo
 
 end -- do
 
 -- PluginPanelItem (build 1821):
 do
-  local GetCurPanelItem = far.CtrlGetCurrentPanelItem
+  local GetCurPanelItem = panel.GetCurrentPanelItem
 
-function far.CtrlGetCurrentPanelItem (handle, whatpanel)
+function panel.GetCurrentPanelItem (handle, whatpanel)
   local Item = GetCurPanelItem(handle, whatpanel)
   for k, v in pairs(Item.FindData) do
     Item[k] = v
@@ -321,8 +321,8 @@ end -- do
 do
   local farAdvControl = far.AdvControl
   local ActlKeyMacro = O.ACTL_KEYMACRO
-  local AcmdLoadAll = { Command = O.MCMD_LOADALL }
-  local AcmdSaveAll = { Command = O.MCMD_SAVEALL }
+  local AcmdLoadAll  = { Command = O.MCMD_LOADALL }
+  local AcmdSaveAll  = { Command = O.MCMD_SAVEALL }
   local AcmdGetArea  = { Command = O.MCMD_GETAREA }
   local AcmdGetState = { Command = O.MCMD_GETSTATE }
   local AcmdPostMacro  = O.MCMD_POSTMACROSTRING
@@ -420,6 +420,8 @@ do
     ViewerSelect        = true,
 
   } ---
+  local sFarEditor = "^Editor(.+)$"
+  local sFarViewer = "^Viewer(.+)$"
 
   for k, _ in pairs(Functions) do
     Functions[k] = far[k]
@@ -429,6 +431,14 @@ do
                end
                return Functions[k](...)
              end ----
+    local s = k:match(sFarEditor)
+    if s then
+      editor[s] = far[k]
+    end
+    local s = k:match(sFarViewer)
+    if s then
+      editor[s] = far[k]
+    end
   end -- for
 
 far.EditorProcessKey = nil -- ~= far.EditorProcessInput
@@ -460,15 +470,15 @@ local function FarNumberToColor (Value) --> (table)
 end --
 
   local farText = far.Text
-  local _EditorAddColor = far.EditorAddColor
-  local _EditorGetColor = far.EditorGetColor
+  local _EditorAddColor = editor.AddColor
+  local _EditorGetColor = editor.GetColor
 
 function far.Text (X, Y, Color, Str)
   return farText(X, Y, FarColorToNumber(Color), Str)
 end ----
 
-function far.EditorAddColor (EditorId, StringNumber,
-                             StartPos, EndPos, Flags, Color, Priority)
+function editor.AddColor (EditorId, StringNumber,
+                          StartPos, EndPos, Flags, Color, Priority)
   --far.Show(EditorId, StringNumber, StartPos, EndPos, Flags, Color, Priority)
   if type(Color) == 'table' then
     return _EditorAddColor(EditorId, StringNumber,
@@ -479,13 +489,13 @@ function far.EditorAddColor (EditorId, StringNumber,
   end
 end ----
 
-function far.EditorDelColor (EditorId, StringNumber, StartPos)
+function editor.DelColor (EditorId, StringNumber, StartPos)
   --far.Show(EditorId, StringNumber, StartPos)
-  return far.EditorAddColor(EditorId, StringNumber, StartPos, StartPos, 0)
+  return editor.AddColor(EditorId, StringNumber, StartPos, StartPos, 0)
 end ----
 
-function far.EditorGetColor (EditorId, StringNumber,
-                             StartPos, EndPos, ColorItem, Flags)
+function editor.GetColor (EditorId, StringNumber,
+                          StartPos, EndPos, ColorItem, Flags)
   local Result = _EditorGetColor(EditorId, StringNumber,
                                  StartPos, EndPos, ColorItem)
   if type(Result) ~= 'table' then

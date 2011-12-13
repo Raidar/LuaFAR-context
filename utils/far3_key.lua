@@ -604,7 +604,7 @@ local function KeyStateToName (KeyState)
   return tconcat(t)
 end --function KeyStateToName
 
-local farMatch = far.match
+local farMatch = regex.match
 
 local function NameToKeyState (KeyName) --> (number)
   local KeyState = 0
@@ -667,8 +667,6 @@ function unit.NameToInputRecord (Name) --> (table)
     ControlKeyState = VState,
   }
 end ---- NameToInputRecord
-
-local farMatch = far.match
 
 -- Преобразование BreakKeys для работы с меню в FAR2.
 function unit.MenuBreakKeysToOld (BreakKeys) --|> (BreakKeys)

@@ -2,8 +2,8 @@
 
 ----------------------------------------
 --[[ description:
-  -- FAR3 compability script for temporary use.
-  -- Скрипт совместимости с FAR3 для временного использования.
+  -- LuaFAR3 compability script for temporary use.
+  -- Скрипт совместимости с LuaFAR3 для временного использования.
 --]]
 ----------------------------------------
 --[[ uses:
@@ -18,12 +18,9 @@ local _G = _G
 ----------------------------------------
 local context = context
 
-----------------------------------------
-local f3_key --= require "context.utils.far3_key"
-
 --------------------------------------------------------------------------------
 do
-  --local f3_key = require "context.utils.far3_keys"
+  local f3_key --= require "context.utils.far3_key"
 
 -- DN_INPUT/DN_CONTROLINPUT: Param2 --> INPUT_RECORD
 -- WARN: Call far.ParseInput(param2) before param2 using in InputEvent.
@@ -44,6 +41,8 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
   end
 end ---- ParseInput
 
+end -- do
+do
   local keyUt --= require "Rh_Scripts.Utils.keyUtils"
   local VKEY_Keys --= keyUt.VKEY_Keys
 
@@ -90,13 +89,10 @@ end ---- RepairInput
 
 end -- do
 --------------------------------------------------------------------------------
-
-----------------------------------------
 if context.use.LFVer == 3 then return end
 
 -- Check applying
 if context.use.AsFAR3spc then return end
-
 context.use.AsFAR3spc = true
 
 ----------------------------------------
@@ -117,63 +113,128 @@ far23.FarInputRecordToKey = far.FarInputRecordToKey
 -- Пространства, выделенные из far.
 
 ---------------------------------------- win (build ????)
-if not rawget(_G, 'win') then
-  win = {}
+win = {}
 
-  local far_to_win = {
-    wcscmp = true,
-    CompareString = true,
-    OemToUtf8 = true,
-    Utf8ToOem = true,
-    Utf16ToUtf8 = true,
-    Utf8ToUtf16 = true,
-    MultiByteToWideChar = true,
+local far_to_win = {
+  wcscmp = true,
+  CompareString = true,
+  OemToUtf8 = true,
+  Utf8ToOem = true,
+  Utf16ToUtf8 = true,
+  Utf8ToUtf16 = true,
+  MultiByteToWideChar = true,
 
-    GetEnv = true,
-    SetEnv = true,
+  GetEnv = true,
+  SetEnv = true,
 
-    Uuid = true, -- FAR3
-    ShellExecute = true,
+  Uuid = true, -- FAR3
+  ShellExecute = true,
 
-    CopyFile = true,
-    MoveFile = true,
-    RenameFile = true,
-    DeleteFile = true,
-    CreateDir = true,
-    RemoveDir = true,
-    SearchPath = true,
+  CopyFile = true,
+  MoveFile = true,
+  RenameFile = true,
+  DeleteFile = true,
+  CreateDir = true,
+  RemoveDir = true,
+  SearchPath = true,
 
-    GetDriveType = true,
-    GetFileInfo = true,
-    GetLogicalDriveStrings = true,
-    
-    GetACP = true,
-    GetOEMCP = true,
-    GetCPInfo = true,
-    EnumSystemCodePages = true,
+  GetDriveType = true,
+  GetFileInfo = true,
+  GetLogicalDriveStrings = true,
+  
+  GetACP = true,
+  GetOEMCP = true,
+  GetCPInfo = true,
+  EnumSystemCodePages = true,
 
-    ExtractKey = true,
-    GetVirtualKeys = true,
-    GetConsoleScreenBufferInfo = true,
-    
-    GetSystemTime = true,
-    FileTimeToSystemTime = true,
-    SystemTimeToFileTime = true,
-    GetTimeZoneInformation = true,
-  } --- far_to_win
+  ExtractKey = true,
+  GetVirtualKeys = true,
+  GetConsoleScreenBufferInfo = true,
+  
+  GetSystemTime = true,
+  FileTimeToSystemTime = true,
+  SystemTimeToFileTime = true,
+  GetTimeZoneInformation = true,
+} --- far_to_win
 
-  -- Перенос ряда функций из far в win.
-  for k, _ in pairs(far_to_win) do
-    if not win[k] and far[k] then
-      win[k], far[k] = far[k], nil
-    end
+-- Перенос ряда функций из far в win.
+for k, _ in pairs(far_to_win) do
+  if not win[k] and far[k] then
+    win[k], far[k] = far[k], nil
   end
-  far.Uuid = win.Uuid -- TEMP: Совместимость со встроенными скриптами
-
-end -- if
+end
+far.Uuid = win.Uuid -- TEMP: Совместимость со встроенными скриптами
 
 ---------------------------------------- export (build ????)
-if not rawget(_G, 'export') then
-  export = far -- TEMP: Только для упрощения!
+export = far -- TEMP: Только для упрощения!
+
+---------------------------------------- panel (build ????)
+panel = {}
+
+do
+  --local t = {}
+  local sFarCtrl = "^Ctrl(.+)$"
+
+for k, v in pairs(far) do
+  local s = k:match(sFarCtrl)
+  if s then
+    panel[s] = v
+    --t[#t+1] = s
+    --far[k] = nil
+  end
 end
+--table.sort(t)
+--far.Show(unpack(t))
+
+end -- do
+
+---------------------------------------- editor (build ????)
+editor = {}
+
+do
+  --local t = {}
+  local sFarEditor = "^Editor(.+)$"
+
+for k, v in pairs(far) do
+  local s = k:match(sFarEditor)
+  if s then
+    editor[s] = v
+    --t[#t+1] = s
+  end
+end
+--table.sort(t)
+--far.Show(unpack(t))
+
+end -- do
+
+---------------------------------------- viewer (build ????)
+viewer = {}
+
+do
+  --local t = {}
+  local sFarViewer = "^Viewer(.+)$"
+
+for k, v in pairs(far) do
+  local s = k:match(sFarViewer)
+  if s then
+    viewer[s] = v
+    --t[#t+1] = s
+  end
+end
+--table.sort(t)
+--far.Show(unpack(t))
+
+end -- do
+
+---------------------------------------- viewer (build ????)
+regex = {}
+
+do
+  regex.new     = far.regex
+  regex.find    = far.find
+  regex.gmatch  = far.gmatch
+  regex.gsub    = far.gsub
+  regex.match   = far.match
+end -- do
+
 --------------------------------------------------------------------------------
