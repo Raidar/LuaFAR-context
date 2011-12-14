@@ -18,6 +18,9 @@ local _G = _G
 ----------------------------------------
 local context = context
 
+----------------------------------------
+local F = far.GetFlags()
+
 --------------------------------------------------------------------------------
 do
   local f3_key --= require "context.utils.far3_key"
@@ -47,7 +50,7 @@ do
   local VKEY_Keys --= keyUt.VKEY_Keys
 
 -- WARN: Call far.RepairInput(Input) before Input using in ProcessInput.
-function far.RepairInput (Input) --> (Input)
+function far.RepairInput (Input) --|> (Input)
 
   if keyUt == nil then
     keyUt = require "Rh_Scripts.Utils.keyUtils"
@@ -55,7 +58,8 @@ function far.RepairInput (Input) --> (Input)
   end
 
   if Input.wVirtualKeyCode then
-    if EventType == F.KEY_EVENT then
+    if Input.EventType == F.KEY_EVENT or
+       Input.EventType == F.FARMACRO_KEY_EVENT then
       Input.KeyDown,     Input.bKeyDown     = Input.bKeyDown, nil
       Input.RepeatCount, Input.wRepeatCount = Input.wRepeatCount, nil
       Input.VirtualScanCode, Input.wVirtualScanCode  = Input.wVirtualScanCode, nil
@@ -64,26 +68,26 @@ function far.RepairInput (Input) --> (Input)
       Input.VirtualKeyCode = VKEY_Keys[Input.wVirtualKeyCode] or 0x00
       Input.wVirtualKeyCode = nil
 
-    elseif EventType == F.MOUSE_EVENT then
+    elseif Input.EventType == F.MOUSE_EVENT then
       Input.MousePositionX, Input.dwMousePositionX = Input.dwMousePositionX, nil
       Input.MousePositionY, Input.dwMousePositionY = Input.dwMousePositionY, nil
       Input.ButtonState, Input.dwButtonState         = Input.dwButtonState, nil
-      Input.EventFlags, Input.dwEventFlags           = Input.dwEventFlags, nil
+      Input.EventFlags,  Input.dwEventFlags          = Input.dwEventFlags, nil
       Input.ControlKeyState, Input.dwControlKeyState = Input.dwControlKeyState, nil
 
-    elseif EventType == F.WINDOW_BUFFER_SIZE_EVENT then
+    elseif Input.EventType == F.WINDOW_BUFFER_SIZE_EVENT then
       Input.SizeX, Input.dwSizeX = Input.dwSizeX, nil
       Input.SizeY, Input.dwSizeY = Input.dwSizeY, nil
 
-    elseif EventType == F.MENU_EVENT then
+    elseif Input.EventType == F.MENU_EVENT then
       Input.CommandId, Input.dwCommandId = Input.dwCommandId, nil
 
-    elseif EventType == F.FOCUS_EVENT then
+    elseif Input.EventType == F.FOCUS_EVENT then
       Input.SetFocus, Input.bSetFocus = Input.bSetFocus, nil
     end
   end
 
-  Input.Name = far.InputRecordToName(Input)
+  --Input.Name = far.InputRecordToName(Input)
   return Input
 end ---- RepairInput
 

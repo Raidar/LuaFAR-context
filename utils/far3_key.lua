@@ -634,7 +634,14 @@ local function NameToKeyState (KeyName) --> (number)
   return KeyState, key or ""
 end -- NameToKeyState
 
-function unit.InputRecordToName (Rec) --> (string)
+function unit.InputRecordToName (Rec, isSeparate) --> (string)
+  if isSeparate then
+    local KeyName = unit.InputRecordToName(Rec) -- , false
+    local c, a, s, key =
+          farMatch(KeyName, "(R?Ctrl)?(R?Alt)?(Shift)?(.*)", 1)
+    return c, a, s, key ~= "" and key or false
+  end
+
   local VKey, SKey = Rec.VirtualKeyCode
   if inseg(VKey, 0x30, 0x39) or inseg(VKey, 0x41, 0x5A) then
     SKey = string.char(VKey)
