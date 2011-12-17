@@ -158,6 +158,7 @@ local types = {
     ini_cfg   = { inherit = 'ini', desc = 'Other config',
                   masks = {'%.ctl$','%.tpl$','%.srg$','%.lng$',
                            --'%.conf$', -- xml-based config
+                           '%.gitconfig$',
                            '%.types$','%.tab$'},
                   firstline = {lines.ini_ext} },
               -- Lua somes:

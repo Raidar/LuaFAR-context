@@ -8,7 +8,7 @@
 --------------------------------------------------------------------------------
 local _G = _G
 
-local pairs = pairs
+local pairs, ipairs = pairs, ipairs
 
 -- INPUT_RECORD (build 2103—2104):
 
@@ -676,17 +676,26 @@ function unit.NameToInputRecord (Name) --> (table)
 end ---- NameToInputRecord
 
 -- Преобразование BreakKeys для работы с меню в FAR2.
-function unit.MenuBreakKeysToOld (BreakKeys) --|> (BreakKeys)
+function unit.MenuBreakKeysToOld (BreakKeys) --> (BreakKeys)
   if type(BreakKeys) ~= 'table' then return BreakKeys end
 
-  for k, b in ipairs(BreakKeys) do
+  local OldBKeys = {}
+
+  local Len = #BreakKeys
+  for i = 1, Len do
+    local b = BreakKeys[i]
     local m, s = farMatch(b.BreakKey,
                           "((?:R?Ctrl)?(?:R?Alt)?(?:Shift)?)(.*)", 1)
-    local k = tfind(VKey_Names, s)
-    if k then b.BreakKey = m..k end
+    local k = tfind(VKey_Names, s) or s
+    local t = {}
+    for fn, fv in pairs(b) do
+      t[fn] = fv
+    end
+    t.BreakKey = m..k
+    OldBKeys[i] = t
   end
 
-  return BreakKeys
+  return OldBKeys
 end ---- MenuBreakKeysToOld
 
 end -- do

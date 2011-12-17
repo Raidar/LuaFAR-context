@@ -559,6 +559,7 @@ far.NameToInputRecord = f3_key.NameToInputRecord
 
     function far.Menu (Properties, Items, BreakKeys)
       --return farMenu(Properties, Items, BreakKeys)
+      --far.Message('far.Menu')
       return farMenu(Properties, Items, MenuBreakKeysToOld(BreakKeys))
     end ----
 
