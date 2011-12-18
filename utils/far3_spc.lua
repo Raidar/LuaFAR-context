@@ -19,7 +19,10 @@ local _G = _G
 local context = context
 
 ----------------------------------------
-local F = far.GetFlags()
+if context.use.LFVer ~= 3 then
+  far.Flags = far.GetFlags()
+end
+local F = far.Flags
 
 --------------------------------------------------------------------------------
 do

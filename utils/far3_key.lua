@@ -23,7 +23,7 @@ local bshl, bshr = bit.lshift, bit.rshift
 ----------------------------------------
 local far = far
 
-local F = far.GetFlags()
+local F = far.Flags
 
 ----------------------------------------
 local context = context

@@ -43,9 +43,7 @@ far.Colors = require "farcolor"
 ---------------------------------------- Flags
 -- Удаление / переименование флагов.
 
-local F = far.GetFlags()
-far.Flags = F
-
+local F = far.Flags
 local O = {} -- old flags
 F.OldFlags = O
 

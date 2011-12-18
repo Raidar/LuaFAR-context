@@ -98,7 +98,7 @@ end ----
 end -- do
 
 ---------------------------------------- Flags
-local F = far.Flags or far.GetFlags() -- FAR23
+local F = far.Flags
 
 do
 --[[ Параметры:

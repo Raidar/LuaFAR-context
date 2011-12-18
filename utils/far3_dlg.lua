@@ -7,7 +7,7 @@
 --]]
 --------------------------------------------------------------------------------
 local Package = {}
-local F = far.GetFlags()
+local F = far.Flags
 local SendDlgMessage = far.SendDlgMessage
 
 local LFVer = context.use.LFVer
