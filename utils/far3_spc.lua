@@ -19,35 +19,13 @@ local _G = _G
 local context = context
 
 ----------------------------------------
-if context.use.LFVer ~= 3 then
+local LFVer = context.use.LFVer
+if LFVer ~= 3 then
   far.Flags = far.GetFlags()
 end
 local F = far.Flags
 
 --------------------------------------------------------------------------------
-do
-  local f3_key --= require "context.utils.far3_key"
-
--- DN_INPUT/DN_CONTROLINPUT: Param2 --> INPUT_RECORD
--- WARN: Call far.ParseInput(param2) before param2 using in InputEvent.
-function far.ParseInput (Input) --> (VirKey, FarKey)
-  f3_key = f3_key or require "context.utils.far3_key" -- Lazy require
-
-  if type(Input) == 'table' then
-    if Input.dwButtonState then
-      Input.EventType = F.MOUSE_EVENT
-      return
-    end
-
-    return
-    --return Input, far23.FarInputRecordToKey(Input) -- Exclude FarKey
-
-  else -- if type(Input) == 'number' then
-    return f3_key.FarKeyToInputRecord(Input) --, Input -- Exclude FarKey
-  end
-end ---- ParseInput
-
-end -- do
 do
   local keyUt --= require "Rh_Scripts.Utils.keyUtils"
   local VKEY_Keys --= keyUt.VKEY_Keys
@@ -55,49 +33,87 @@ do
 -- WARN: Call far.RepairInput(Input) before Input using in ProcessInput.
 function far.RepairInput (Input) --|> (Input)
 
+  if LFVer == 3 then return Input end
+
   if keyUt == nil then
     keyUt = require "Rh_Scripts.Utils.keyUtils"
     VKEY_Keys = keyUt.VKEY_Keys
   end
 
+  if Input.bKeyDown then
+    Input.KeyDown, Input.bKeyDown = Input.bKeyDown, nil
+  end
+  if Input.wRepeatCount then
+    Input.RepeatCount, Input.wRepeatCount = Input.wRepeatCount, nil
+  end
+  if Input.wVirtualScanCode then
+    Input.VirtualScanCode, Input.wVirtualScanCode  = Input.wVirtualScanCode, nil
+  end
+  if Input.dwControlKeyState then
+    Input.ControlKeyState, Input.dwControlKeyState = Input.dwControlKeyState, nil
+  end
+
   if Input.wVirtualKeyCode then
-    if Input.EventType == F.KEY_EVENT or
-       Input.EventType == F.FARMACRO_KEY_EVENT then
-      Input.KeyDown,     Input.bKeyDown     = Input.bKeyDown, nil
-      Input.RepeatCount, Input.wRepeatCount = Input.wRepeatCount, nil
-      Input.VirtualScanCode, Input.wVirtualScanCode  = Input.wVirtualScanCode, nil
-      Input.ControlKeyState, Input.dwControlKeyState = Input.dwControlKeyState, nil
+    Input.VirtualKeyCode, Input.wVirtualKeyCode = VKEY_Keys[Input.wVirtualKeyCode] or 0x00, nil
+  end
 
-      Input.VirtualKeyCode = VKEY_Keys[Input.wVirtualKeyCode] or 0x00
-      Input.wVirtualKeyCode = nil
-
-    elseif Input.EventType == F.MOUSE_EVENT then
-      Input.MousePositionX, Input.dwMousePositionX = Input.dwMousePositionX, nil
-      Input.MousePositionY, Input.dwMousePositionY = Input.dwMousePositionY, nil
-      Input.ButtonState, Input.dwButtonState         = Input.dwButtonState, nil
-      Input.EventFlags,  Input.dwEventFlags          = Input.dwEventFlags, nil
-      Input.ControlKeyState, Input.dwControlKeyState = Input.dwControlKeyState, nil
-
-    elseif Input.EventType == F.WINDOW_BUFFER_SIZE_EVENT then
-      Input.SizeX, Input.dwSizeX = Input.dwSizeX, nil
-      Input.SizeY, Input.dwSizeY = Input.dwSizeY, nil
-
-    elseif Input.EventType == F.MENU_EVENT then
-      Input.CommandId, Input.dwCommandId = Input.dwCommandId, nil
-
-    elseif Input.EventType == F.FOCUS_EVENT then
-      Input.SetFocus, Input.bSetFocus = Input.bSetFocus, nil
-    end
+  if Input.dwMousePositionX then
+    Input.MousePositionX, Input.dwMousePositionX = Input.dwMousePositionX, nil
+  end
+  if Input.dwMousePositionY then
+    Input.MousePositionY, Input.dwMousePositionY = Input.dwMousePositionY, nil
+  end
+  if Input.dwButtonState then
+    Input.ButtonState, Input.dwButtonState = Input.dwButtonState, nil
+  end
+  if Input.dwEventFlags then
+    Input.EventFlags,  Input.dwEventFlags = Input.dwEventFlags, nil
+  end
+  if Input.dwSizeX then
+    Input.SizeX, Input.dwSizeX = Input.dwSizeX, nil
+  end
+  if Input.dwSizeY then
+    Input.SizeY, Input.dwSizeY = Input.dwSizeY, nil
+  end
+  if Input.dwCommandId then
+    Input.CommandId, Input.dwCommandId = Input.dwCommandId, nil
+  end
+  if Input.bSetFocus then
+    Input.SetFocus, Input.bSetFocus = Input.bSetFocus, nil
   end
 
   --Input.Name = far.InputRecordToName(Input)
   return Input
 end ---- RepairInput
+do
+  local f3_key --= require "context.utils.far3_key"
+
+-- DN_INPUT/DN_CONTROLINPUT: Param2 --> INPUT_RECORD
+-- WARN: Call far.ParseInput(param2) before param2 using in InputEvent.
+function far.ParseInput (Input) --> (VirKey, FarKey)
+
+  if LFVer == 3 then return Input end
+
+  f3_key = f3_key or require "context.utils.far3_key" -- Lazy require
+
+  if type(Input) == 'table' then
+    far.RepairInput(Input)
+    if Input.ButtonState then
+      Input.EventType = F.MOUSE_EVENT
+      return
+    end
+
+    return Input
+
+  else -- if type(Input) == 'number' then
+    return f3_key.FarKeyToInputRecord(Input)
+  end
+end ---- ParseInput
+
+end -- do
 
 end -- do
 --------------------------------------------------------------------------------
-if context.use.LFVer == 3 then return end
-
 -- Check applying
 if context.use.AsFAR3spc then return end
 context.use.AsFAR3spc = true
@@ -105,6 +121,9 @@ context.use.AsFAR3spc = true
 ----------------------------------------
 local far23 = {} -- FAR23
 context.use.far23 = far23
+
+----------------------------------------
+if LFVer == 3 then return end
 
 ----------------------------------------
 local far = far
