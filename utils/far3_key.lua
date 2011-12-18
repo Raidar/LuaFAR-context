@@ -331,6 +331,7 @@ local VKey_Chars = {
   Subtract  = "-",
   Decimal   = ".",
   Divide    = "/",
+  BackSlash = "\\",
 } --- VKey_Chars
 
 local VKey_Names = {
@@ -492,6 +493,7 @@ local function FarKeyToVir (key, state, name, loc) --> (Key, State, Name, Scan)
     else
       -- Символ с Shift.
       local aKey = AKEY_Shifts[key]
+      --far.Message(hex(key), name)
       if aKey then
         --far.Message(hex(key), hex(aKey))
         key, state = aKey, bor(state, VKCS_.SHIFT_PRESSED)
@@ -515,6 +517,7 @@ function unit.FarKeyToRecFields (FarKey) --> (key, state, char)
   local KeyState = FarModToKeyState(FMod) -- Управляющее состояние
   local KeyName = FarKeyToName(FKey) -- Локализованное имя
 
+  --far.Message(hex(FKey).."\n"..hex(KeyState), KeyName)
   if KeyName == nil then return nil, KeyState, nil end
   if not inseg(FKey, FKB_.KEY_CHAR_EXT, FKB_.KEY_CHAR_END) then
     --far.Message(hex(FKey).."\n"..hex(KeyState), KeyName)
@@ -526,8 +529,8 @@ function unit.FarKeyToRecFields (FarKey) --> (key, state, char)
   local LatKey, LatChar
   -- Без модификаторов или только Shift:
   if FMod == 0 or isShift(FMod) then
-    --far.Message(KeyName, "KeyName")
     LatKey = LocNameToLatKey(KeyName)
+    --far.Message(KeyName.."\n"..tostring(LatKey), "KeyName")
     if LatKey == -1 then -- ??
       far.Message(KeyName, "-1")
       return nil, KeyState, nil
