@@ -33,7 +33,12 @@ do
 -- WARN: Call far.RepairInput(Input) before Input using in ProcessInput.
 function far.RepairInput (Input) --|> (Input)
 
-  if LFVer == 3 then return Input end
+  if LFVer == 3 then
+    if type(Input.UnicodeChar) == 'number' then
+      Input.UnicodeChar = ("").char(Input.UnicodeChar)
+    end
+    return Input
+  end
 
   if keyUt == nil then
     keyUt = require "Rh_Scripts.Utils.keyUtils"
@@ -82,6 +87,10 @@ function far.RepairInput (Input) --|> (Input)
     Input.SetFocus, Input.bSetFocus = Input.bSetFocus, nil
   end
 
+  if type(Input.UnicodeChar) == 'number' then
+    Input.UnicodeChar = ("").char(Input.UnicodeChar)
+  end
+
   --Input.Name = far.InputRecordToName(Input)
   return Input
 end ---- RepairInput
@@ -92,7 +101,12 @@ do
 -- WARN: Call far.ParseInput(param2) before param2 using in InputEvent.
 function far.ParseInput (Input) --> (VirKey, FarKey)
 
-  if LFVer == 3 then return Input end
+  if LFVer == 3 then
+    if type(Input.UnicodeChar) == 'number' then
+      Input.UnicodeChar = ("").char(Input.UnicodeChar)
+    end
+    return Input
+  end
 
   f3_key = f3_key or require "context.utils.far3_key" -- Lazy require
 
@@ -101,6 +115,9 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
     if Input.ButtonState then
       Input.EventType = F.MOUSE_EVENT
       return
+    end
+    if type(Input.UnicodeChar) == 'number' then
+      Input.UnicodeChar = ("").char(Input.UnicodeChar)
     end
 
     return Input
