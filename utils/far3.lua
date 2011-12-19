@@ -162,6 +162,12 @@ F.ECF_TABMARKCURRENT = 0x2
 F.EF_LOCKED         = 0x00000400
 F.EF_DISABLESAVEPOS = 0x00000800
 
+-- FCF_ (FarColor) (build 2130):
+F.FCF_NONE     = 0x0
+F.FCF_FG_4BIT  = 0x1
+F.FCF_BG_4BIT  = 0x2
+F.FCF_4BITMASK = F.FCF_FG_4BIT + F.FCF_BG_4BIT
+
 ---------------------------------------- API functions
 -- Удаление / изменение функций.
 
@@ -449,8 +455,9 @@ do
 local function FarColorToNumber (Value) --> (number)
   if type(Value) ~= 'table' then return Value end
 
-  local Result = band(Value.Flags or 0,
-                      F.ECF_TABMARKFIRST) ~= 0 and O.ECF_TAB1 or 0
+  --local Result = band(Value.Flags or 0,
+  --                    F.ECF_TABMARKFIRST) ~= 0 and O.ECF_TAB1 or 0
+  local Result = 0
   return Result + band(Value.ForegroundColor, 0xF) +
                   band(Value.BackgroundColor, 0xF) * 0x10
 end --
@@ -459,7 +466,8 @@ local function FarNumberToColor (Value) --> (table)
   if type(Value) == 'table' then return Value end
 
   local Result = {
-    Flags = band(Value or 0, O.ECF_TAB1) ~= 0 and F.ECF_TABMARKFIRST or 0,
+    --Flags = band(Value or 0, O.ECF_TAB1) ~= 0 and F.ECF_TABMARKFIRST or 0,
+    Flags = F.FCF_4BITMASK,
     ForegroundColor = band(Value, 0xF),
     BackgroundColor = band(bshl(Value, 4), 0xF),
   } ---
