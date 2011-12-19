@@ -23,6 +23,10 @@ local bnot, bxor = bit.bnot, bit.bxor
 local bshl, bshr = bit.lshift, bit.rshift
 
 ----------------------------------------
+local far = far
+local F = far.Flags
+
+----------------------------------------
 --[[
 local logUt = (require "Rh_Scripts.Utils.Logging")
 local logMsg = logUt.Message
@@ -42,6 +46,7 @@ local TColors = {
   DefFG  = 0xF,
   DefBG  = 0x0,
 
+  Flags  = 'Flags',
   FGName = 'ForegroundColor',
   BGName = 'BackgroundColor',
 } ---
@@ -136,6 +141,7 @@ function TColors.totable (color) --> (table)
   return {
     [self.FGName] = band(     color, self.FGMask             ),
     [self.BGName] = band(bshl(color, self.Shift), self.BGMask),
+    [self.Flags]  = F.FCF_4BITMASK,
   }
 end --
 
@@ -198,7 +204,11 @@ end ----
 -- Формирование цвета (по значениям).
 function TColors.make (fg, bg, kind) --> (color)
   if (kind or 'table') == 'table' then
-    return { [TColors.FGName] = fg, [TColors.BGName] = bg, }
+    return {
+      [TColors.FGName] = fg,
+      [TColors.BGName] = bg,
+      [TColors.Flags]  = F.FCF_4BITMASK,
+    }
   else
     return bor(fg, bshl(bg, TColors.Shift))
   end
@@ -211,6 +221,7 @@ function TColors.cmake (fg, bg, kind) --> (color)
     return {
       [TColors.FGName] = type(fg) == 'table' and fg[TColors.FGName] or fg,
       [TColors.BGName] = type(bg) == 'table' and bg[TColors.FGName] or bg,
+      [TColors.Flags]  = F.FCF_4BITMASK,
     }
   else
     return bor(band(fg, TColors.FGMask), band(bg, TColors.BGMask))
@@ -222,7 +233,11 @@ end ----
 -- Формирование нового цвета (по значениям).
 function TColors:newColor (fg, bg, kind) --> (color)
   if (kind or 'table') == 'table' then
-    return { [self.FGName] = fg, [self.BGName] = bg }
+    return {
+      [self.FGName] = fg,
+      [self.BGName] = bg,
+      [self.Flags]  = F.FCF_4BITMASK,
+    }
   else
     return bor(fg, bshl(bg, self.Shift))
   end
