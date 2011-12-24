@@ -34,8 +34,9 @@ do
 function far.RepairInput (Input) --|> (Input)
 
   if LFVer == 3 then
-    if type(Input.UnicodeChar) == 'number' then
-      Input.UnicodeChar = ("").char(Input.UnicodeChar)
+    local c = Input.UnicodeChar
+    if type(c) == 'number' then
+      Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
     end
     return Input
   end
@@ -87,8 +88,9 @@ function far.RepairInput (Input) --|> (Input)
     Input.SetFocus, Input.bSetFocus = Input.bSetFocus, nil
   end
 
-  if type(Input.UnicodeChar) == 'number' then
-    Input.UnicodeChar = ("").char(Input.UnicodeChar)
+  local c = Input.UnicodeChar
+  if type(c) == 'number' then
+    Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
   end
 
   --Input.Name = far.InputRecordToName(Input)
@@ -102,8 +104,9 @@ do
 function far.ParseInput (Input) --> (VirKey, FarKey)
 
   if LFVer == 3 then
-    if type(Input.UnicodeChar) == 'number' then
-      Input.UnicodeChar = ("").char(Input.UnicodeChar)
+    local c = Input.UnicodeChar
+    if type(c) == 'number' then
+      Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
     end
     return Input
   end
@@ -116,8 +119,10 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
       Input.EventType = F.MOUSE_EVENT
       return
     end
-    if type(Input.UnicodeChar) == 'number' then
-      Input.UnicodeChar = ("").char(Input.UnicodeChar)
+
+    local c = Input.UnicodeChar
+    if type(c) == 'number' then
+      Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
     end
 
     return Input

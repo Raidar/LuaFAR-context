@@ -3,7 +3,7 @@
 ----------------------------------------
 --[[ description:
   -- Using in LuaFAR plugin.
-  -- �ᯮ�짮����� � LuaFAR-�������.
+  -- Использование в LuaFAR-плагине.
 --]]
 ----------------------------------------
 --[[ uses:
@@ -35,9 +35,9 @@ local _PluginVersion = "1.0.0"
 local _ReqLuafarVer = { 2, 0, 1 }
 
 --------------------------------------------------------------------------------
---[[ Initial processing ]]--[[ ��ࢮ��砫쭠� ��ࠡ�⪠ ]]--
+--[[ Initial processing ]]--[[ Первоначальная обработка ]]--
 
-local _FirstRun = not _LFP -- ���� �����
+local _FirstRun = not _LFP -- Первый запуск
 
 --far.OnError = require "far2.errormessage"
 
@@ -77,7 +77,7 @@ if _FirstRun then -- LuaFAR context:
 end --
 
 --------------------------------------------------------------------------------
---[[ Special processing ]]--[[ ���樠�쭠� ��ࠡ�⪠ ]]--
+--[[ Special processing ]]--[[ Специальная обработка ]]--
 
 if _FirstRun then
   _LFP = {}
@@ -95,7 +95,7 @@ function lfp.version ()
 end
 
 --------------------------------------------------------------------------------
---[[ Event handlers ]]--[[ ��ࠡ��稪� ᮡ�⨩ ]]--
+--[[ Event handlers ]]--[[ Обработчики событий ]]--
 
 local handle = context.handle
 
@@ -114,7 +114,7 @@ function far.ProcessViewerEvent (event, param)
 end --
 
 --------------------------------------------------------------------------------
---[[ Plugin functions ]]--[[ �㭪樨 ������� ]]--
+--[[ Plugin functions ]]--[[ Функции плагина ]]--
 
 function far.Config()
   far.Message("Configuration")
@@ -135,5 +135,5 @@ function far.OpenPlugin (From, Item) -- from lf_history.lua
   if item then item.action() end
 end ----
 
---[[ Plugin functions ]]--[[ �㭪樨 ������� ]]--
+--[[ Plugin functions ]]--[[ Функции плагина ]]--
 --------------------------------------------------------------------------------
