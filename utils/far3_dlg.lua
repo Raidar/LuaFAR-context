@@ -11,7 +11,7 @@ local F = far.Flags
 local SendDlgMessage = far.SendDlgMessage
 
 local LFVer = context.use.LFVer
-local bit = LFVer == 3 and bit64 or bit
+local bit = LFVer >= 3 and bit64 or bit
 local band, bor  = bit.band, bit.bor
 local bnot, bxor = bit.bnot, bit.bxor
 
@@ -62,7 +62,7 @@ end
 -- Bind dialog item names (see struct FarDialogItem) to their indexes.
 
 local item_map
-if LFVer == 3 then
+if LFVer >= 3 then
 item_map = {
   Type=1, X1=2, Y1=3, X2=4, Y2=5,
   --[[Focus=6,]] -- (build 1836)
@@ -92,7 +92,7 @@ item_map = {
 end
 
 local item_defs
-if LFVer == 3 then
+if LFVer >= 3 then
 item_defs = {
   Type=1, X1=-1, Y1=-1, X2=-1, Y2=-1,
   --[[Focus=6,]] -- (build 1836)
@@ -189,7 +189,7 @@ local dialog_meta = {
         item.id = #self --> id is 0-based
 
         -- Change numbering of elements for support LuaFAR3 in LuaFAR2:
-        if LFVer ~= 3 then
+        if LFVer < 3 then
           -- Indexes 1, 2--5 are equivalent.
 
           -- Selected is 6 now (was 7).

@@ -20,7 +20,7 @@ local context = context
 
 ----------------------------------------
 local LFVer = context.use.LFVer
-if LFVer ~= 3 then
+if LFVer < 3 then
   far.Flags = far.GetFlags()
 end
 local F = far.Flags
@@ -33,7 +33,7 @@ do
 -- WARN: Call far.RepairInput(Input) before Input using in ProcessInput.
 function far.RepairInput (Input) --|> (Input)
 
-  if LFVer == 3 then
+  if LFVer >= 3 then
     local c = Input.UnicodeChar
     if type(c) == 'number' then
       Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
@@ -103,7 +103,7 @@ do
 -- WARN: Call far.ParseInput(param2) before param2 using in InputEvent.
 function far.ParseInput (Input) --> (VirKey, FarKey)
 
-  if LFVer == 3 then
+  if LFVer >= 3 then
     local c = Input.UnicodeChar
     if type(c) == 'number' then
       Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
@@ -145,7 +145,7 @@ local far23 = {} -- FAR23
 context.use.far23 = far23
 
 ----------------------------------------
-if LFVer == 3 then return end
+if LFVer >= 3 then return end
 
 ----------------------------------------
 local far = far

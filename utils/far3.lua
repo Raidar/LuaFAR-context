@@ -18,7 +18,7 @@ local _G = _G
 ----------------------------------------
 local context = context
 
-if context.use.LFVer == 3 then return end
+if context.use.LFVer >= 3 then return end
 
 -- Check applying
 if context.use.AsFAR3 then return end

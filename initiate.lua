@@ -57,7 +57,7 @@ end
 --]]
 -- [==[
 context.use.LFVer = far.LuafarVersion(true)
-if context.use.LFVer ~= 3 then bit64 = bit end
+if context.use.LFVer < 3 then bit64 = bit end
 
 require "context.utils.far3_spc"
 
