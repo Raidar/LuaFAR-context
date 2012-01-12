@@ -24,22 +24,26 @@ local handle = context.handle
 ctxdata.isResident = true
 
 ----------------------------------------
-local resident = {} -- Resident functions
-
-function resident.ProcessEditorEvent (event, param)
+function ProcessEditorEvent (event, param)
   handle.editorEvent(event, param)
   return 0
 end --
 
-function resident.ProcessViewerEvent (event, param)
+function ProcessViewerEvent (event, param)
   handle.viewerEvent(event, param)
   return 0
 end --
 
-function resident.ExitScript ()
+function ExitScript ()
   ctxdata.events = nil -- ?!
   ctxdata = nil
 end --
+
+local resident = {
+  ProcessEditorEvent = ProcessEditorEvent,
+  ProcessViewerEvent = ProcessViewerEvent,
+  ExitScript = ExitScript,
+} --- resident
 
 --------------------------------------------------------------------------------
 return resident
