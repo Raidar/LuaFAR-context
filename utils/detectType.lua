@@ -31,7 +31,7 @@ local Null = tables.Null
 
 ----------------------------------------
 --local useprofiler = false
---local useprofiler = true
+local useprofiler = true
 
 if useprofiler then require "profiler" end -- Lua Profiler
 
@@ -167,13 +167,14 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
                                --  ('none',   detKind, detInfo)   or (nil)
   local fname, f_ext = f.name or f.filename, f.ext
   local fline = f.firstline
+  local fsine = fline and fline:sub(1, f.strongmax or 80)
 
   -- 1. Расчёт подходящих типов.
 
   if useprofiler then profiler.start("detectType.log") end
   --local t = os.time()
 
-  -- Хранение лучших типов:
+  -- Хранение лучших типов (b - best, d - double):
   local bmaskwei, bmasklen, bmask, bmaskidx = 1, 0 -- по маске без наличия 1-й линии
   local blinewei, blinelen, bline, blineidx = 1, 0 -- по 1-й линии без учёта маски
   local dtypewei, dmasklen, dmask,                 -- сразу по маске и 1-й линии
@@ -200,8 +201,8 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     end
 
     local sines, slen, sine = v.strongline  -- Учёт строгих линий
-    if fline and sines and w >= blinewei then
-      slen, sine = checkValueOver(fline, sines)     -- Строгая линия
+    if fsine and sines and w >= blinewei then
+      slen, sine = checkValueOver(fsine, sines)     -- Строгая линия
     end
 
     --local t = { k, mlen, mask, llen, line } -- DEBUG
@@ -221,6 +222,7 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
       if not (sines or lines) and mlen > bmasklen then
         bmasklen, bmask, bmaskwei, bmaskidx = mlen, mask, w, k
       end
+
       -- Учёт сразу маски и 1-й линии:
       if not lines or mlen >= dmasklen then         -- Учёт длины маски
         --[[
