@@ -29,6 +29,12 @@ local cfgpairs = datas.cfgpairs
 
 local Null = tables.Null
 
+----------------------------------------
+--local useprofiler = false
+--local useprofiler = true
+
+if useprofiler then require "profiler" end -- Lua Profiler
+
 --------------------------------------------------------------------------------
 local unit = {}
 
@@ -64,6 +70,8 @@ local function pfind (s, pattern) --> (number, number | nil)
   if isOk then return findpos, findend end -- Успешный поиск
 end --
 
+--local pfind = sfind -- TEST
+
 -- Check skipped lines of file.
 -- Проверка на пропускаемые линии файла.
 local function checkSkipLines (line) --> (string | nil)
@@ -95,7 +103,7 @@ function unit.readFileFirstLine (filename) --> (string, string|nil | nil)
   --far.Message(line, assumed)
 
   return line, assumed
-end --
+end -- readFileFirstLine
 
 do
   local EditorGetStr = editor.GetString
@@ -117,11 +125,18 @@ function unit.readEditorFirstLine () --> (string, string|nil | nil)
   --far.Message(tostring(Info.CurLine)..'\n'..tostring(Info.CurPos), 'Info')
 
   return line, assumed
-end --
+end -- readEditorFirstLine
 
 end -- do
 
 ---------------------------------------- Pass
+local function lenfind (s, pat)
+  local findpos, findend = pfind(s, pat)
+  if findpos then
+    return findend - findpos + 1 -- real length
+  end
+end --
+
 -- Check a value by values table.
 -- Проверка значения по таблице значений.
 local function checkValueOver (value, values) --> (number | nil)
@@ -130,10 +145,16 @@ local function checkValueOver (value, values) --> (number | nil)
 
   for k = 1, #values do
     local v = values[k]
+    -- [[
     local findpos, findend = pfind(value, v)
     if findpos then
       return findend - findpos + 1, v -- + 1 for real length
     end
+    --]]
+    --[[
+    local l = lenfind(value, v)
+    if l then return l, v end
+    --]]
   end
 end --function checkValueOver
 unit.checkValueOver = checkValueOver
@@ -145,6 +166,9 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
   local fname, f_ext, fline = f.name or f.filename, f.ext, f.firstline
 
   -- 1. Расчёт подходящих типов.
+
+  if useprofiler then profiler.start("detectType.log") end
+  --local t = os.time()
 
   -- Хранение лучших типов:
   local bmaskwei, bmasklen, bmask, bmaskidx = 1, 0 -- по маске без наличия 1-й линии
@@ -165,18 +189,14 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
   -- Отбор по всем параметрам типов.
   for k, v in cfgpairs(types) do
     local w = v.weight or 1                         -- Учёт веса
-    local lines, sines = v.firstline, v.strongline  -- Учёт линий
 
     -- Текущая длина совпадения и подошедший шаблон:
     local mlen, mask
     if w >= bmaskwei or w >= dtypewei then
       mlen, mask = checkValueOver(fname, v.masks)   -- Маска
     end
-    local llen, line
-    if fline and lines and w >= blinewei then
-      llen, line = checkValueOver(fline, lines)     -- Обычная линия
-    end
-    local slen, sine
+
+    local sines, slen, sine = v.strongline  -- Учёт строгих линий
     if fline and sines and w >= blinewei then
       slen, sine = checkValueOver(fline, sines)     -- Строгая линия
     end
@@ -189,6 +209,11 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     --]]
 
     if mlen then
+      local lines, llen, line = v.firstline   -- Учёт обычных линий
+      if fline and lines and w >= blinewei then
+        llen, line = checkValueOver(fline, lines)     -- Обычная линия
+      end
+
       -- Учёт только маски:
       if not (sines or lines) and mlen > bmasklen then
         bmasklen, bmask, bmaskwei, bmaskidx = mlen, mask, w, k
@@ -219,7 +244,10 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
       --if checkname and fname == checkname then logMsg(t, "Types: pass ["..fname.."]", 1) end
       blinelen, bline, blinewei, blineidx = slen, sine, w, k
     end -- if llen
-  end --
+  end -- for
+
+  --far.Message(tostring(os.time() - t), "detTypePass main loop")
+  if useprofiler then profiler.stop() end
 
   --[[
   if checkname and fname == checkname then
@@ -308,6 +336,7 @@ end --
 function areaFileType.editor (f)
   local f = f or {}
 
+  --if useprofiler then profiler.start("detectType.log") end
   if not f.filename then
     local fullname = editor.GetInfo().FileName
     f.path, f.name = fullname:match(PathNamePattern)
@@ -316,6 +345,7 @@ function areaFileType.editor (f)
   if not f.firstline then
     f.firstline, f.assumed = unit.readEditorFirstLine()
   end
+  --if useprofiler then profiler.stop() end
 
   return detectType(f)
 end --
