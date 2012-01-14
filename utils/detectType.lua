@@ -30,8 +30,8 @@ local cfgpairs = datas.cfgpairs
 local Null = tables.Null
 
 ----------------------------------------
---local useprofiler = false
-local useprofiler = true
+local useprofiler = false
+--local useprofiler = true
 
 if useprofiler then require "profiler" end -- Lua Profiler
 
@@ -319,7 +319,7 @@ function areaFileType.panels (f)
     local Info = panel.GetPanelInfo(nil, 1)
     if Info.ItemNumbers == 0 then return 'empty' end
     local Item = panel.GetCurrentPanelItem(nil, 1)
-    f.path, f.name = panel.GetPanelDirectory(nil, 1), Item.FileName
+    f.path, f.name = panel.GetPanelDirectory(nil, 1).Name, Item.FileName
     --far.Message(f.name, "Current item name")
     if Item.FileAttributes:find('d', 1, true) then
       return f.name == '..' and 'back' or 'dir'

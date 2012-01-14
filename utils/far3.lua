@@ -562,10 +562,23 @@ end -- do
 
 -- Panel Dir (build 2343):
 do
-  panel.GetPanelDirectory = panel.GetPanelDir
+  local GetPanelDir = panel.GetPanelDir
   panel.GetPanelDir = nil
-  panel.SetPanelDirectory = panel.SetPanelDir
+
+  function panel.GetPanelDirectory (handle, whatpanel)
+    return { Name = GetPanelDir(handle, whatpanel) }
+  end
+
+  local SetPanelDir = panel.SetPanelDir
   panel.SetPanelDir = nil
+
+  function panel.SetPanelDirectory (handle, whatpanel, dir)
+    if type(dir) == 'string' then
+      return SetPanelDir(handle, whatpanel, dir)
+    else
+      return SetPanelDir(handle, whatpanel, dir.Name)
+    end
+  end
 end -- do
 
 -- SettingsControl (...):
