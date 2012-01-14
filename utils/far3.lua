@@ -533,19 +533,6 @@ end ----
 
 end -- do
 
--- SettingsControl (...):
--- ??
-
--- sqlite (...):
--- ??
-
--- ACTL_GETCOLOR, ACTL_SETCURRENTWINDOW,
--- ACTL_SETPROGRESSSTATE, ACTL_WAITKEY (build 1988):
--- ???
--- FCTL_GETPANELITEM, FCTL_GETSELECTEDPANELITEM,
--- FCTL_GETCURRENTPANELITEM; DM_GETDLGITEM (build 2019—2020):
--- ???
-
 -- INPUT_RECORD (build 1816, 1859, 2103—2104):
 -- ProcessKeyW: Key --> INPUT_RECORD (build 1814).
 -- ProcessKeyW --> ProcessPanelInputW (build 2027).
@@ -572,6 +559,27 @@ far.NameToInputRecord = f3_key.NameToInputRecord
   end -- do
 
 end -- do
+
+-- Panel Dir (build 2343):
+do
+  panel.GetPanelDirectory = panel.GetPanelDir
+  panel.GetPanelDir = nil
+  panel.SetPanelDirectory = panel.SetPanelDir
+  panel.SetPanelDir = nil
+end -- do
+
+-- SettingsControl (...):
+-- ??
+
+-- sqlite (...):
+-- ??
+
+-- ACTL_GETCOLOR, ACTL_SETCURRENTWINDOW,
+-- ACTL_SETPROGRESSSTATE, ACTL_WAITKEY (build 1988):
+-- ???
+-- FCTL_GETPANELITEM, FCTL_GETSELECTEDPANELITEM,
+-- FCTL_GETCURRENTPANELITEM; DM_GETDLGITEM (build 2019—2020):
+-- ???
 
 -- ClosePanelW, ConfigureW, ProcessDialogEventW,
 -- ProcessEditorEventW, ProcessPanelEventW, ProcessPanelInputW,

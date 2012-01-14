@@ -130,12 +130,14 @@ end -- readEditorFirstLine
 end -- do
 
 ---------------------------------------- Pass
+--[[ -- TEST
 local function lenfind (s, pat)
   local findpos, findend = pfind(s, pat)
   if findpos then
     return findend - findpos + 1 -- real length
   end
 end --
+--]]
 
 -- Check a value by values table.
 -- Проверка значения по таблице значений.
@@ -163,7 +165,8 @@ unit.checkValueOver = checkValueOver
 -- Определяет тип по имени файла и первой линии (при одном проходе).
 local function detTypePass (f) --> (typeName, detKind, detValues) or
                                --  ('none',   detKind, detInfo)   or (nil)
-  local fname, f_ext, fline = f.name or f.filename, f.ext, f.firstline
+  local fname, f_ext = f.name or f.filename, f.ext
+  local fline = f.firstline
 
   -- 1. Расчёт подходящих типов.
 
@@ -314,7 +317,7 @@ function areaFileType.panels (f)
     local Info = panel.GetPanelInfo(nil, 1)
     if Info.ItemNumbers == 0 then return 'empty' end
     local Item = panel.GetCurrentPanelItem(nil, 1)
-    f.path, f.name = panel.GetPanelDir(nil, 1), Item.FileName
+    f.path, f.name = panel.GetPanelDirectory(nil, 1), Item.FileName
     --far.Message(f.name, "Current item name")
     if Item.FileAttributes:find('d', 1, true) then
       return f.name == '..' and 'back' or 'dir'
@@ -459,7 +462,7 @@ end --
 --[[ Warning:
   These functions is only for unregistered config data tables.
   They provide a simple mechanism for using types with such tables.
-  They don't use inheritance in config tables, but in types only.
+  They use inheritance in types only, not in config tables.
 --]]
 
 -- Find ctype as cfg type with inheritance and equivalence.
