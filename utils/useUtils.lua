@@ -222,11 +222,12 @@ unit.PluginPath = unit.pluginPath() -- Current plugin path
   Help (string) - язык справки.
 --]]
 function unit.language () --> (table)
-  --return { Main = far.GetRegKey("Language", "Main") or "Default", -- Interface
-  --         Help = far.GetRegKey("Language", "Help") or "Default", } -- Help
+  local key = "Software\\Far Manager\\Language"
+  --return { Main = win.GetRegKey(key, "Main") or "Default", -- Interface
+  --         Help = win.GetRegKey(key, "Help") or "Default", } -- Help
   return {
     Main = win.GetEnv("FARLANG") or "Default",  -- Interface
-    Help = far.GetRegKey("Language", "Help") or "Default",  -- Help -- FAR23
+    Help = win.GetRegKey(key, "Help") or "Default",  -- Help -- FAR23
   } ----
 end ----
 
