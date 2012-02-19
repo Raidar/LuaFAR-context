@@ -581,9 +581,6 @@ do
   end
 end -- do
 
--- TODO: Editor/Viewer events (build 2435, 2438, 2439):
--- ??
-
 --[[ TODO: build > 2459; 2435, 2438 ]]--
 --[[ TODO: Checking FAR builds: 2246 ]]--
 

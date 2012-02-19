@@ -30,7 +30,7 @@ do
   local keyUt --= require "Rh_Scripts.Utils.keyUtils"
   local VKEY_Keys --= keyUt.VKEY_Keys
 
--- WARN: Call far.RepairInput(Input) before Input using in ProcessInput.
+-- WARN: Call far.RepairInput(Input) before using Input in ProcessInput.
 function far.RepairInput (Input) --|> (Input)
 
   if LFVer >= 3 then
@@ -131,6 +131,8 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
     return f3_key.FarKeyToInputRecord(Input)
   end
 end ---- ParseInput
+
+-- WARN: Call far.Parse...Event(...) before using args in Process...Event.
 
 local EE_REDRAW = F.EE_REDRAW
 local EE_REDRAW_ALL = 0
