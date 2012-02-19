@@ -101,14 +101,14 @@ local handle = context.handle
 
 -- Action functions
 
-function far.ProcessEditorEvent (event, param)
-  handle.editorEvent(event, param)
+function far.ProcessEditorEvent (id, event, param)
+  handle.editorEvent(id, event, param)
   -- Do something here --
   return 0
 end --
 
-function far.ProcessViewerEvent (event, param)
-  handle.viewerEvent(event, param)
+function far.ProcessViewerEvent (id, event, param)
+  handle.viewerEvent(id, event, param)
   -- Do something here --
   return 0
 end --

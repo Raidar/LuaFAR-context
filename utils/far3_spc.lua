@@ -247,6 +247,8 @@ local far_to_win = {
   GetCPInfo = true,
   EnumSystemCodePages = true,
 
+  GetRegKey = true,
+  SetRegKey = true,
   ExtractKey = true,
   GetVirtualKeys = true,
   GetConsoleScreenBufferInfo = true,

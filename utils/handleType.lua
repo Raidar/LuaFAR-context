@@ -161,7 +161,7 @@ end --
 local function reloadViewerConfig (id) --| viewers
   viewers.current = nil           -- reset
   local current = viewers.current -- new config via mt
-  viewers.current = current       
+  viewers.current = current
   -- Alternative code using indexes directly
   --local current = e_index(viewers, 'current')
   --ev_newindex(viewers, 'current', current)
@@ -186,6 +186,7 @@ do
   local EE_SAVE     = F.EE_SAVE
   local EE_CLOSE    = F.EE_CLOSE
   local EE_GOTFOCUS = F.EE_GOTFOCUS
+  local EE_CHANGE   = F.EE_CHANGE
 
 -- Process type autodetection for editor.
 function unit.editorEvent (id, event, param)
