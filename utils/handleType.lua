@@ -188,14 +188,14 @@ do
   local EE_GOTFOCUS = F.EE_GOTFOCUS
 
 -- Process type autodetection for editor.
-function unit.editorEvent (event, param)
-  local eid = param
+function unit.editorEvent (id, event, param)
+  local eid = id
   if event == EE_READ then
-    eid = editor.GetInfo().EditorID
+    eid = editor.GetInfo().EditorID -- TEST and DELETE
     reloadEditorConfig(eid)
     --far.Message(('%i %s'):format(eid, editors.current.type))
   elseif event == EE_SAVE then
-    eid = editor.GetInfo().EditorID
+    eid = editor.GetInfo().EditorID -- TEST and DELETE
     if editors.current.type == 'none' then
       reloadEditorConfig(eid)
     end
@@ -218,8 +218,8 @@ do
   local VE_GOTFOCUS = F.VE_GOTFOCUS
 
 -- Process type autodetection for viewer.
-function unit.viewerEvent (event, param)
-  local vid = param
+function unit.viewerEvent (id, event, param)
+  local vid = id
   if event == VE_READ then
     vid = viewer.GetInfo().ViewerID
     reloadViewerConfig(vid)

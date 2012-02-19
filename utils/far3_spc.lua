@@ -96,7 +96,7 @@ function far.RepairInput (Input) --|> (Input)
   --Input.Name = far.InputRecordToName(Input)
   return Input
 end ---- RepairInput
-do
+
   local f3_key --= require "context.utils.far3_key"
 
 -- DN_INPUT/DN_CONTROLINPUT: Param2 --> INPUT_RECORD
@@ -132,7 +132,57 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
   end
 end ---- ParseInput
 
-end -- do
+local EE_REDRAW = F.EE_REDRAW
+local EE_REDRAW_ALL = 0
+local EE_CLOSE = F.EE_CLOSE
+local VE_CLOSE = F.VE_CLOSE
+
+local NullParamEditorEvents = {
+  [F.EE_GOTFOCUS]  = true,
+  [F.EE_KILLFOCUS] = true,
+  [F.EE_CLOSE]     = true,
+} ---
+
+local NullParamViewerEvents = {
+  [F.VE_GOTFOCUS]  = true,
+  [F.VE_KILLFOCUS] = true,
+  [F.VE_CLOSE]     = true,
+} ---
+
+function far.ParseEditorEvent (id, event, param)
+  if LFVer >= 3 then
+    return id, event, param
+  end
+
+  event, param = id, event
+  local id
+  if NullParamEditorEvents[event] then
+    id, param = param, nil
+  else
+    if event == EE_REDRAW then
+      id = editor.GetInfo().EditorID
+      --param = EE_REDRAW_ALL -- TEST and FIX
+    end
+  end
+
+  return id, event, param
+end ----
+
+function far.ParseViewerEvent (id, event, param)
+  if LFVer >= 3 then
+    return id, event, param
+  end
+
+  event, param = id, event
+  local id
+  if NullParamViewerEvents[event] then
+    id, param = param, nil
+  else
+    id = viewer.GetInfo().ViewerID
+  end
+
+  return id, event, param
+end ----
 
 end -- do
 --------------------------------------------------------------------------------

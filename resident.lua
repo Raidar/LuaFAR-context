@@ -24,13 +24,15 @@ local handle = context.handle
 ctxdata.isResident = true
 
 ----------------------------------------
-function ProcessEditorEvent (event, param)
-  handle.editorEvent(event, param)
+function ProcessEditorEvent (id, event, param)
+  id, event, param = far.ParseEditorEvent(id, event, param)
+  handle.editorEvent(id, event, param)
   return 0
 end --
 
-function ProcessViewerEvent (event, param)
-  handle.viewerEvent(event, param)
+function ProcessViewerEvent (id, event, param)
+  id, event, param = far.ParseViewerEvent(id, event, param)
+  handle.viewerEvent(id, event, param)
   return 0
 end --
 

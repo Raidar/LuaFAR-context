@@ -581,31 +581,10 @@ do
   end
 end -- do
 
--- SettingsControl (...):
+-- TODO: Editor/Viewer events (build 2435, 2438, 2439):
 -- ??
 
--- sqlite (...):
--- ??
-
--- ACTL_GETCOLOR, ACTL_SETCURRENTWINDOW,
--- ACTL_SETPROGRESSSTATE, ACTL_WAITKEY (build 1988):
--- ???
--- FCTL_GETPANELITEM, FCTL_GETSELECTEDPANELITEM,
--- FCTL_GETCURRENTPANELITEM; DM_GETDLGITEM (build 2019—2020):
--- ???
-
--- ClosePanelW, ConfigureW, ProcessDialogEventW,
--- ProcessEditorEventW, ProcessPanelEventW, ProcessPanelInputW,
--- ProcessSynchroEventW, ProcessViewerEventW (build 2082):
--- ???
-
--- PluginStartupInfo (build 1842, 1871, 2105, 2107):
--- ???
-
--- SettingsControl (build 2232)
--- ???
-
---[[ TODO: build > 2246 ]]--
+--[[ TODO: build > 2459; 2435, 2438 ]]--
 --[[ TODO: Checking FAR builds: 2246 ]]--
 
 --------------------------------------------------------------------------------
