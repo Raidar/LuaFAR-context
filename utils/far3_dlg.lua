@@ -249,6 +249,13 @@ local dialog_meta = {
            item[v] = item[k]
           elseif item[v] == nil then
             item[v] = item_defs[k]
+            --[[
+            if item[v] == nil and v == 6 and
+               item.Type ~= F.DI_LISTBOX and
+               item.Type ~= F.DI_COMBOBOX then
+              item[v] = 0
+            end
+            --]]
           end
         end
 

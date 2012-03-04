@@ -1,10 +1,10 @@
 LuaFAR context pack 3.0x
 
-Ver. : 3.0.2.0
-Date : 2012-02-19
+Ver. : 3.0.2.1
+Date : 2012-03-04
 Ware : Freeware
 Lic. : Lua License
-Reqs : FAR v.3.0.2459, LuaFAR v.3.0.4
+Reqs : FAR v.3.0.2516, LuaFAR v.3.0.5
 Type : Plugin for FAR Manager (Script package)
 Desc : LuaFAR context package for LuaFAR plugins and scripts
 
