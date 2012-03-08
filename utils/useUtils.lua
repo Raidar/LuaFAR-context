@@ -215,8 +215,6 @@ end --
 
 unit.PluginPath = unit.pluginPath() -- Current plugin path
 
-local GetRegKey = win.GetRegKey or far.GetRegKey
-
 -- Used interface and help language.
 -- Используемый язык интерфейса и справки.
 --[[ Результаты: таблица с полями:
@@ -227,7 +225,7 @@ function unit.language () --> (table)
   local key = "Software\\Far Manager\\Language"
   return {
     Main = win.GetEnv("FARLANG") or "Default",  -- Interface
-    Help = GetRegKey(key, "Help") or "Default", -- Help -- FAR23
+    Help = GetRegKey("HKCU", key, "Help") or "Default", -- Help -- FAR23
   } ----
 end ----
 
