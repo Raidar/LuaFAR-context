@@ -409,7 +409,7 @@ local VKey_Names = {
   LAUNCH_APP1       = "LaunchApp1",
   LAUNCH_APP2       = "LaunchApp2",
 
-  OEM_1         = ":",      -- ";:"
+  OEM_1         = ";",      -- ";:"
   OEM_PLUS      = "=",      -- "+="
   OEM_COMMA     = ",",      -- ",<"
   OEM_MINUS     = "-",      -- "-_"
@@ -419,7 +419,7 @@ local VKey_Names = {
   OEM_4         = "[",      -- "[{"
   OEM_5         = "\\",     -- "\\|"
   OEM_6         = "]",      -- "]}"
-  OEM_7         = "\"",     -- "'"..'"'
+  OEM_7         = "'",     -- "'"..'"'
   --OEM_8         = "",       -- ""
 } --- VKey_Names
 
