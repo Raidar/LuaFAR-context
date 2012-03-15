@@ -267,6 +267,15 @@ for k, _ in pairs(far_to_win) do
 end
 far.Uuid = win.Uuid -- TEMP: Совместимость со встроенными скриптами
 
+do
+  local WinGetRegKey = win.GetRegKey
+
+function win.GetRegKey (Root, Key, ValueName)
+  return WinGetRegKey(Key, ValueName) -- Root = "HKCU"
+end ----
+
+end -- do
+
 ---------------------------------------- export (build ????)
 export = far -- TEMP: Только для упрощения!
 
