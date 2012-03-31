@@ -581,7 +581,18 @@ do
   end
 end -- do
 
---[[ TODO: build > 2459; 2435, 2438 ]]--
---[[ TODO: Checking FAR builds: 2246 ]]--
+--[[ TODO: build > 2574;
+           2435 (EEREDRAW), 2438 (EE_CHANGE),
+           2478—2479, 2541 (переход на FSSF_…),
+           2542, 2544, 2546 (FSSF_…),
+           2515 (PROGRESSTATE),
+           2531 (ShellExecuteEx),
+           2539 (WIF_MODAL),
+           2556 (OPIF_SHORTCUT),
+           2551 (удалена KMFLAGS_SAVEMACRO),
+           2559 (ECTL_TURNOFFMARKINGBLOCK убрана),
+           2564 (sqlite 3.7.11),
+… ]]--
+--[[ TODO: Checking FAR builds: 2246; 2516;  ]]--
 
 --------------------------------------------------------------------------------
