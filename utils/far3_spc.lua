@@ -262,7 +262,8 @@ local far_to_win = {
 -- Перенос ряда функций из far в win.
 for k, _ in pairs(far_to_win) do
   if not win[k] and far[k] then
-    win[k], far[k] = far[k], nil
+    win[k] = far[k]
+    --far[k] = nil
   end
 end
 far.Uuid = win.Uuid -- TEMP: Совместимость со встроенными скриптами

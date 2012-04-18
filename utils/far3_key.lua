@@ -302,24 +302,20 @@ local FKEY_to_VKEY = {
 } -- FKEY_to_VKEY
 
 ---------------------------------------- VK Chars & Names
--- Различие символов для клавиш с Shift.
-local SKEY_Shifts = {
-  ['!'] = '1', ['@'] = '2', ['#'] = '3', ['$'] = '4', ['%%'] = '5',
-  ['^'] = '6', ['&'] = '7', ['*'] = '8', ['('] = '9', [')']  = '0',
-  ['_'] = '-', ['+'] = '=', ['~'] = '`',
-  ['{'] = '[', ['}'] = ']', ['|'] = '\\',
-  [':'] = ';', ['"'] = "'",
-  ['<'] = ',', ['>'] = '.', ['?'] = '/',
-} -- SKEY_Shifts
+local SKEY_Names  = keyUt.SKEY_SymNames
+local SKEY_Shifts = keyUt.SKEY_SymShifts
+local SKEY_Invers = keyUt.SKEY_SymInvers
 
+local AKEY_Shifts = {}
+do
   local charkey = string.byte
 
--- Различие кодов символов для клавиш с Shift.
-local AKEY_Shifts = {}
-for k, v in pairs(SKEY_Shifts) do
-  AKEY_Shifts[charkey(k)] = charkey(v)
-end
---logMsg(AKEY_Shifts, "AKEY_Shifts", "h2")
+  -- Различие кодов символов для клавиш с Shift.
+  for k, v in pairs(SKEY_Shifts) do
+    AKEY_Shifts[charkey(k)] = charkey(v)
+  end
+  --logMsg(AKEY_Shifts, "AKEY_Shifts", "h2")
+end -- do
 
 local VKey_Chars = {
   --Back      = "BS",
@@ -502,8 +498,12 @@ local function FarKeyToVir (key, state, name, loc) --> (Key, State, Name, Scan)
     end
   end
   --far.Message(hex(key).."\n"..hex(state), name)
-  if loc and loc:len() > 1 then loc = nil end
-  if name:len() > 1 then name = VKey_Chars[name] or "" end
+  if loc and loc:len() > 1 then
+    loc = nil
+  end
+  if name:len() > 1 then
+    name = VKey_Chars[name] or ""
+  end
 
   --far.Message(hex(key), hex(state))
   return key, state, loc or name, scan or keyUt.VKEY_ScanCodes[key] or 0x00
@@ -598,10 +598,10 @@ do
 local function KeyStateToName (KeyState)
   local t = {}
 
-  if ismod(KeyState, VKCS_.RIGHT_ALT_PRESSED)  then t[#t+1] = "RAlt"  end
-  if ismod(KeyState, VKCS_.LEFT_ALT_PRESSED)   then t[#t+1] = "Alt"   end
   if ismod(KeyState, VKCS_.RIGHT_CTRL_PRESSED) then t[#t+1] = "RCtrl" end
   if ismod(KeyState, VKCS_.LEFT_CTRL_PRESSED)  then t[#t+1] = "Ctrl"  end
+  if ismod(KeyState, VKCS_.RIGHT_ALT_PRESSED)  then t[#t+1] = "RAlt"  end
+  if ismod(KeyState, VKCS_.LEFT_ALT_PRESSED)   then t[#t+1] = "Alt"   end
   if ismod(KeyState, VKCS_.SHIFT_PRESSED)      then t[#t+1] = "Shift" end
 
   return tconcat(t)
@@ -614,7 +614,9 @@ local function NameToKeyState (KeyName) --> (number)
 
   local mod, c, a, s, key =
         farMatch(KeyName, "((R?Ctrl)?(R?Alt)?(Shift)?)(.*)", 1)
-  if not mod or mod == "" then return KeyState, key or "" end
+  if not mod or mod == "" then
+    return KeyState, key or ""
+  end
 
   if c and c ~= "" then
     if c == 'RCtrl' then
@@ -646,15 +648,42 @@ function unit.InputRecordToName (Rec, isSeparate) --> (string)
   end
 
   local VKey, SKey = Rec.VirtualKeyCode
-  if inseg(VKey, 0x30, 0x39) or inseg(VKey, 0x41, 0x5A) then
+  local VMod, SMod = Rec.ControlKeyState, ""
+  --far.Message(tostring(VKey).."\n"..tostring(VMod), "InputRecordToName")
+
+  if inseg(VKey, 0x30, 0x39) then
     SKey = string.char(VKey)
+
+  elseif inseg(VKey, 0x41, 0x5A) then
+    SKey = string.char(VKey)
+    -- Учёт Shift+<буква>:
+    if VMod == VKCS_.SHIFT_PRESSED then
+      VMod = 0
+    elseif VMod == 0 then
+      SKey = SKey:lower()
+    end
   end
+
   if not SKey then
     SKey = tfind(VK_, VKey) or ""
     SKey = VKey_Names[SKey] or SKey
   end
+  --far.Message(tostring(VKey).."\n"..tostring(VMod).."\n"..tostring(SKey or "nil"), "InputRecordToName")
 
-  local VMod, SMod = Rec.ControlKeyState, ""
+  -- Учёт Shift+<символ/цифра>:
+  if VMod == VKCS_.SHIFT_PRESSED then
+    local HKey = SKEY_Invers[SKey]
+    if HKey then
+      VMod = 0
+      SKey = HKey
+    end
+  end
+
+  -- Учёт спец. названий клавиш-символов
+  if VMod == 0 then
+    SKey = SKEY_Names[SKey] or SKey
+  end
+
   if VMod ~= 0 then
     SMod = KeyStateToName(VMod) or ""
   end
@@ -663,9 +692,13 @@ function unit.InputRecordToName (Rec, isSeparate) --> (string)
 end ---- InputRecordToName
 
 function unit.NameToInputRecord (Name) --> (table)
+  local k = 0 / 0
   local VState, VName = NameToKeyState(Name)
+
   VName = tfind(VKey_Names, VName) or VName
   local VKey = VK_[VName] or 0x00
+
+  -- TODO: Не учитываются буквы и цифры!!!
 
   return {
     EventType       = F.KEY_EVENT,

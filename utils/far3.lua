@@ -47,18 +47,20 @@ local F = far.Flags
 local O = {} -- old flags
 F.OldFlags = O
 
+-- KMFLAGS_ (build 1844, 2551):
 do
-  -- KSFLAGS_ --> KMFLAGS_ (build 1844):
+  -- KSFLAGS_ --> KMFLAGS_:
   for k, v in pairs(F) do
     if k:find("^KSFLAGS_") then
       local flag = k:match("^KSFLAGS_(.*)")
-      F["KMFLAGS_"..flag] = v
-      F[k] = nil
+      F["KMFLAGS_"..flag], F[k] = v, nil
     end
   end
+
+  F.KMFLAGS_SAVEMACRO = nil
 end -- do
 
--- PanelInfo (build 1812):
+-- PFLAGS_ (Panel info flag) (build 1812):
 do
   F.PFLAGS_PLUGIN           = 0x00000800
   F.PFLAGS_VISIBLE          = 0x00001000
@@ -66,34 +68,43 @@ do
   F.PFLAGS_ALTERNATIVENAMES = 0x00004000
 end -- do
 
--- PKF_ (build 1815):
---FAR_PKF_FLAGS = nil
-F.PKF_CONTROL    = nil
-F.PKF_ALT        = nil
-F.PKF_SHIFT      = nil
-F.PKF_PREPROCESS = nil
+-- PKF_ (? flag) (build 1815):
+do
+  --FAR_PKF_FLAGS = nil
+  F.PKF_CONTROL    = nil
+  F.PKF_ALT        = nil
+  F.PKF_SHIFT      = nil
+  F.PKF_PREPROCESS = nil
+end -- do
 
--- WindowInfo (build 1823):
-F.WIF_MODIFIED = 0x00000001
-F.WIF_CURRENT  = 0x00000002
+-- WIF_ (Window info flag) (build 1823, 2539):
+do
+  F.WIF_MODIFIED = 0x00000001
+  F.WIF_CURRENT  = 0x00000002
+  F.WIF_MODAL    = nil
+end -- do
 
--- FCTL_ (build 1825, 2202):
+-- FCTL_ (File control) (build 1825, 2202):
 F.FCTL_GETCMDLINESELECTEDTEXT = nil
 F.FCTL_GETPANELPREFIX = 34
 
--- ECTL_ (build 2041):
+-- ECTL_ (Editor control) (build 2041):
 --F.ECTL_DELCOLOR = F.ECTL_ADDCOLOR
 
--- OPIF_ (build 1825, 1826):
---F.OPIF_USEFILTER       --> not F.OPIF_DISABLEFILTER
---F.OPIF_USESORTGROUPS   --> not F.OPIF_DISABLESORTGROUPS
---F.OPIF_USEHIGHLIGHTING --> not F.OPIF_DISABLEHIGHLIGHTING
+-- OPIF_ (Open plugin info) (build 1825, 1826, 1835, 2556):
+do
+  --F.OPIF_USEFILTER       --> not F.OPIF_DISABLEFILTER
+  --F.OPIF_USESORTGROUPS   --> not F.OPIF_DISABLESORTGROUPS
+  --F.OPIF_USEHIGHLIGHTING --> not F.OPIF_DISABLEHIGHLIGHTING
+  F.OPIF_USEFREESIZE    = 0x00020000
+  F.OPIF_SHORTCUT       = 0x00040000
+end -- do
 
 -- DialogInfo (build 1830, 2199, 2220, 2246):
 F.DN_GETDIALOGINFO = nil
 F.DN_GETVALUE = 4118
 
--- FarDialogItem (build 1836):
+-- DIF_ (FarDialogItem) (build 1836):
 do
   F.DIF_FOCUS         = 0x04000000 -- ??
   --            0x0000000200000000
@@ -146,27 +157,46 @@ do
   F.DN_MOUSECLICK = nil -- == F.DN_CONTROLINPUT
 end -- do
 
--- ACTL_ (build 1860, 1864, 1906):
+-- ACTL_ (Advanced control) (build 1860, 1864, 1906):
 F.ACTL_GETSHORTWINDOWINFO = nil
 F.ACTL_GETPOLICIES = nil -- ??
 F.ACTL_GETFARMANAGERVERSION = F.ACTL_GETFARVERSION
 --F.ACTL_GETFARVERSION = nil
 
--- ECF_ (build 1898, 2191):
-O.ECF_TAB1 = F.ECF_TAB1
-F.ECF_TAB1 = nil -- 0x1
-F.ECF_TABMARKFIRST   = 0x1
-F.ECF_TABMARKCURRENT = 0x2
+-- ECF_ (Editor control flag) (build 1898, 2191):
+do
+  O.ECF_TAB1 = F.ECF_TAB1
+  F.ECF_TAB1 = nil -- 0x1
+  F.ECF_TABMARKFIRST   = 0x1
+  F.ECF_TABMARKCURRENT = 0x2
+end -- do
 
--- EF_ (build 2046):
+-- EF_ (Editor flag) (build 2046):
 F.EF_LOCKED         = 0x00000400
 F.EF_DISABLESAVEPOS = 0x00000800
 
--- FCF_ (FarColor) (build 2130):
-F.FCF_NONE     = 0x0
-F.FCF_FG_4BIT  = 0x1
-F.FCF_BG_4BIT  = 0x2
-F.FCF_4BITMASK = F.FCF_FG_4BIT + F.FCF_BG_4BIT
+-- FCF_ (FarColor flag) (build 2130):
+do
+  F.FCF_NONE     = 0x0
+  F.FCF_FG_4BIT  = 0x1
+  F.FCF_BG_4BIT  = 0x2
+  F.FCF_4BITMASK = F.FCF_FG_4BIT + F.FCF_BG_4BIT
+end -- do
+
+-- PS_ --> TBPS_ (ProgressState) (build 2515):
+do
+  local PS_Flags = {
+    PS_NOPROGRESS = true,
+    PS_INDETERMINATE = true,
+    PS_NORMAL = true,
+    PS_ERROR = true,
+    PS_PAUSED = true,
+  } ---
+  for k, _ in pairs(PS_Flags) do
+    F["TB"..k] = F[k]
+    F[k] = nil
+  end
+end -- do
 
 ---------------------------------------- API functions
 -- Удаление / изменение функций.
@@ -367,7 +397,7 @@ end
 
 end -- do
 
--- EditorControl/ViewerControl (build 1851, 1852, ..., 2184):
+-- EditorControl/ViewerControl (build 1851, 1852, ..., 2184, 2559):
 do
   local Functions = {
     -- Editor Control
@@ -380,7 +410,6 @@ do
     EditorSetParam      = true,
     EditorSetPosition   = true,
     EditorSetTitle      = true,
-    --EditorTurnOffMarkingBlock   = true,
     EditorUndoRedo      = true,
 
     EditorAddColor      = true,
@@ -445,7 +474,8 @@ do
     end
   end -- for
 
-far.EditorProcessKey = nil -- ~= far.EditorProcessInput
+far.EditorProcessKey = nil -- ~= far.EditorProcessInput -- ECTL_PROCESSKEY
+far.TurnOffMarkingBlock = nil -- ECTL_TURNOFFMARKINGBLOCK
 
 end -- do
 
@@ -581,17 +611,12 @@ do
   end
 end -- do
 
---[[ TODO: build > 2574;
-           2435 (EEREDRAW), 2438 (EE_CHANGE),
+--[[ TODO: build > 2574, excluding:
+---- TODO: Учитывать в скриптах:
+           2435 (EEREDRAW_), 2438 (EE_CHANGE),
            2478—2479, 2541 (переход на FSSF_…),
            2542, 2544, 2546 (FSSF_…),
-           2515 (PROGRESSTATE),
-           2531 (ShellExecuteEx),
-           2539 (WIF_MODAL),
-           2556 (OPIF_SHORTCUT),
-           2551 (удалена KMFLAGS_SAVEMACRO),
-           2559 (ECTL_TURNOFFMARKINGBLOCK убрана),
-           2564 (sqlite 3.7.11),
+           2564 (sqlite 3.7.11).
 … ]]--
 --[[ TODO: Checking FAR builds: 2246; 2516;  ]]--
 
