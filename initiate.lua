@@ -33,13 +33,13 @@ local modules = {
   -- Preload modules:
   'context.utils.useUtils',
   'context.utils.useNumber',
-  'context.utils.useTables',
-  'context.utils.useDatas',
+  'context.utils.useTable',
+  'context.utils.useData',
   'context.utils.useLocale',
   -- Other modules:
   'context.utils.handleType',
   'context.utils.manageData',
-  'context.utils.useColors',
+  'context.utils.useColor',
   'context.utils.useHistory',
 } ---
 local packnum = 5 -- Number of preload modules
