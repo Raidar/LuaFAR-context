@@ -355,7 +355,6 @@ end --
   This version of 'pairs' supports using metatables for merging & inheritance.
   Use this function instead of 'pairs' for right search of all config fields.
 --]]
-
 do
   local t_list = unit.list
 

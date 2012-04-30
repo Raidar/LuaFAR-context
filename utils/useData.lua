@@ -11,6 +11,11 @@
   LF context.
   -- group: Datas.
 --]]
+----------------------------------------
+--[[ some code from:
+  serial.lua -- for serialize
+  (c) Shmuel Zeigerman.
+--]]
 --------------------------------------------------------------------------------
 local _G = _G
 
@@ -205,35 +210,69 @@ end --
 -- Serialize data with write.
 -- Сериализация данных с помощью write.
 --[[ Параметры:
-  name (string) - (полное) имя файла.
-  data  (table) - таблица данных.
-  kind (string) - вид хранения.
+  name (string) - название для данных.
+  data  (table) - сохраняемые данные.
+  kind  (table) - вид хранения: format, saved etc.
   write  (func) - функция записи строки данных.
   -- Результаты:
   isOk (bool) - успешность операции.
 --]]
-function unit.serialize (name, data, kind, write) --> (bool)
+local function serialize (name, data, kind, write) --> (bool)
   -- TODO
   return false, 'TODO'
 end --
+unit.serialize = serialize
 
 -- Save data to file.
 -- Сохранение данных в файл.
 --[[ Параметры:
   fullname (string) - полное имя файла.
+  name     (string) - название таблицы данных.
   data  (table|nil) - обрабатываемая таблица данных.
-  kind     (string) - вид хранения.
+  kind      (table) - вид хранения.
   -- Результаты:
   isOk (bool) - успешность операции.
 --]]
-function unit.save (fullname, data, kind) --> (bool)
+function unit.save (fullname, name, data, kind) --> (bool)
   local f, s, res = io_open(fullname, 'w')
   if f == nil then return nil, s end
-  res, s = unit.serialize(fullname, data, kind,
-                          function (...) fh:write (...) end)
+  local res, s =
+      serialize(name, data, kind,
+                function (...)
+                  fh:write (...)
+                end)
   f:close()
   return res, s
 end --
+
+do
+  local tconcat = table.concat
+
+-- Save data to string.
+-- Сохранение данных в строку.
+--[[ Параметры:
+  name     (string) - название таблицы данных.
+  data  (table|nil) - обрабатываемая таблица данных.
+  kind      (table) - вид хранения.
+  -- Результаты:
+  isOk (bool) - успешность операции.
+--]]
+function unit.tostring (name, data, kind) --> (bool)
+  local t, n = {}, 0
+  local res, s =
+      serialize(name, data, kind,
+                function (...)
+                  for i = 1, select("#", ...) do
+                    n = n + 1
+                    t[n] = select(i, ...)
+                  end
+                end)
+  if res == nil then return nil, s end
+
+  return tconcat(t), s
+end -- tostring
+
+end -- do
 
 ---------------------------------------- custom
 do
@@ -330,6 +369,7 @@ function unit.customize (Custom, defCustom) --> (table)
   u.path = u.path or path..u.dir
   u.fullpath = t.base..u.path
   --logMsg(t, "data")
+
   return t
 end --
 
