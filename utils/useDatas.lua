@@ -23,8 +23,6 @@ local type = type
 local pairs = pairs
 local getmetatable, setmetatable = getmetatable, setmetatable
 
-local io_open = io.open
-
 ----------------------------------------
 local context = context
 local utils = context.utils
@@ -62,6 +60,7 @@ unit.Dataless = context.utils.null -- A field data for undatum field
 function unit.add (base, user, kind, tpairs, deep, ...) --> (table)
   if not base then return user end
   if not user then return base end
+
   return tables.add(base, user, kind, tpairs, deep, ...)
 end --
 local addData = unit.add
@@ -122,7 +121,9 @@ do
   data (table|nil) - таблица с данными.
 --]]
 function unit.load (fullname, t, kind) --> (table | nil, error)
-  if not fullname then return nil, Msgs.FileNameNotFound end
+  if not fullname then
+    return nil, Msgs.FileNameNotFound
+  end
 
   -- Load lua-file with data:
   local chunk, serror = loadfile(fullname)
@@ -134,24 +135,27 @@ function unit.load (fullname, t, kind) --> (table | nil, error)
   local u = setfenv(chunk, env)()
   if u == nil then u = env.Data end
   if u == nil and t == nil then
-      return nil, Msgs.FileDataNotFound:format(name)
+    return nil, Msgs.FileDataNotFound:format(name)
   end
 
   return addData(t, u, kind or 'update', pairs, false)
-end --
+end -- load
 
 end -- do
 
--- Find data file on package.path.
--- Поиск файла данных на package.path.
+-- Find data file on path.
+-- Поиск файла данных на path.
 --[[ Параметры:
   name (string) - имя файла.
+  path (string) - строка со списком путей-масок.
   -- Результаты:
   fullname (string) - полное имя файла.
 --]]
-function unit.find (name) --> (string)
+function unit.find (name, path) --> (string)
+  path = path or package.path
   -- TODO: !!!
-end ----
+  return nil
+end ---- find
 
 do
   local pcall, require = pcall, require
@@ -167,7 +171,9 @@ do
   data (table|nil) - таблица с данными.
 --]]
 function unit.require (name, t, kind, reload) --> (table | nil, error)
-  if not name then return nil, Msgs.FileNameNotFound end
+  if not name then
+    return nil, Msgs.FileNameNotFound
+  end
 
   -- Protected require module with Data.
   local st, u = pcall(require, name)
@@ -179,7 +185,7 @@ function unit.require (name, t, kind, reload) --> (table | nil, error)
   if reload then package.loaded[name] = nil end
 
   return addData(t, u, kind or 'update', pairs, false)
-end --
+end -- require
 
 end -- do
 
@@ -195,7 +201,10 @@ end -- do
   data (table|nil) - таблица с данными.
 --]]
 function unit.make (path, name, ext, t, kind) --> (table | nil, error)
-  if not name then return nil, Msgs.FileNameNotFound end
+  if not name then
+    return nil, Msgs.FileNameNotFound
+  end
+
   local fullname = utils.fullname(path, name, ext)
   local u, loadError, reqError = unit.load(fullname, t, kind)
   --if u then logMsg(u, 'loadData', 1, '#q') end
@@ -204,8 +213,107 @@ function unit.make (path, name, ext, t, kind) --> (table | nil, error)
   u, reqError = unit.require(name, t, kind)
   --if u then logMsg(u, 'requireData', 1, '#q') end
   if u ~= nil then return u end
+
   return nil, ('%s\n%s'):format(loadError, reqError)
-end --
+end -- make
+
+do
+  local tostring = tostring
+  local format = string.format
+  local frexp, modf = math.frexp, math.modf
+
+  -- Convert key value to string.
+  -- Преобразование значения ключа в строку.
+  local function ValToStr (value) --> (string | nil, type)
+    local tp = type(value)
+    if tp == 'boolean' then return tostring(value) end
+    if tp == 'number' then
+      if value == modf(value) then return tostring(value) end -- integer
+      return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
+    end
+
+    if tp == 'string' then
+      if value:len() > 80*2 and
+         value:find("\n", 1, true) and
+         --not value:find("%[%[.-%]%]") and
+         not value:find("[[", 1, true) and
+         not value:find("]]", 1, true) then
+        return ("[[\n%s]]"):format(value) -- [[string]]
+      end
+      return ("%q"):format(value) -- "string"
+    end
+
+    return nil, tp
+  end -- ValToStr
+  unit.ValToStr = ValToStr
+
+  local reserveds = context.lua.keywords
+
+  -- Convert key name to string.
+  -- Преобразование имени ключа в строку.
+  local function KeyToStr (key) --> (string)
+    local tp = type(key)
+    if tp ~= 'string' then
+      local key = ValToStr(key)
+      if key then
+        return format("[%s]", key)
+      end
+      return nil, tp
+    end
+
+    if key:find("^[a-zA-Z_][a-zA-Z_0-9]-$") and not reserveds[key] then
+      return "."..key
+    end
+    return format("[%q]", key)
+  end -- KeyToStr
+  unit.KeyToStr = KeyToStr
+
+  -- Convert table to string.
+  -- Преобразование таблицы в строку.
+  local function TabToStr (name, data, kind, write)
+    local value = kind.saved[data]
+    if value then -- saved name as value
+      write(indent, name, " = ", value, "\n")
+      return
+    end
+    --logMsg({ name, kind, data or "nil" }, "kind", 3)
+    kind.saved[data] = name
+    -- settings to write current table
+    local tempname = kind.tempname
+    local cur_indent = kind.indent
+    local new_indent = cur_indent..kind.shift
+    kind.indent = new_indent
+
+    -- write current table fields
+    local isnull = true
+    for k, v in kind.pairs(data) do
+      local s = KeyToStr(k)
+      if s then
+        local w, tp = ValToStr(v)
+        if isnull then
+          isnull = false
+          write(cur_indent, format("do local %s = {}; %s = %s\n",
+                                   tempname, name, tempname)) -- do
+        end
+        if w then
+          write(new_indent, format("%s%s = %s\n", tempname, s, w))
+        elseif tp == "table" then
+          TabToStr(name..s, v, kind, write)
+        end
+      end
+    end
+
+    if isnull then
+      write(cur_indent, name, " = {}\n")
+    else
+      write(cur_indent, "end\n"); -- end
+    end
+
+    kind.indent = cur_indent -- restore indent
+
+    return true
+  end -- TabToStr
+  unit.TabToStr = TabToStr
 
 -- Serialize data with write.
 -- Сериализация данных с помощью write.
@@ -217,11 +325,29 @@ end --
   -- Результаты:
   isOk (bool) - успешность операции.
 --]]
-local function serialize (name, data, kind, write) --> (bool)
-  -- TODO
-  return false, 'TODO'
-end --
-unit.serialize = serialize
+function unit.serialize (name, data, kind, write) --> (bool)
+  local s, tp = ValToStr(data)
+  if s then
+    return write(name, " = ", s, "\n")
+  end
+  if tp ~= "table" then return end
+
+  local kind = kind or {}
+  kind.saved = kind.saved or {} -- names of tables already saved
+  kind.tempname = (name == "t") and "u" or "t" -- prevent collision of names
+  kind.indent = "" -- current indent value
+  kind.shift = "  " -- indent shift to pretty write
+  kind.pairs = kind.pairs or pairs -- pairs function to get fields
+
+  return TabToStr(name, data, kind, write)
+end -- serialize
+
+end -- do
+
+local serialize = unit.serialize
+
+do
+  local io_open = io.open
 
 -- Save data to file.
 -- Сохранение данных в файл.
@@ -234,18 +360,22 @@ unit.serialize = serialize
   isOk (bool) - успешность операции.
 --]]
 function unit.save (fullname, name, data, kind) --> (bool)
+  kind = kind or {}
   local f, s, res = io_open(fullname, 'w')
   if f == nil then return nil, s end
-  local res, s =
-      serialize(name, data, kind,
-                function (...)
-                  fh:write (...)
-                end)
+
+  local write = function (...)
+                  return f:write(...)
+                end
+  res, s = (kind.serialize or serialize)(name, data, kind, write)
+
   f:close()
   return res, s
-end --
+end -- save
 
+end -- do
 do
+  local select = select
   local tconcat = table.concat
 
 -- Save data to string.
@@ -258,15 +388,19 @@ do
   isOk (bool) - успешность операции.
 --]]
 function unit.tostring (name, data, kind) --> (bool)
+  kind = kind or {}
   local t, n = {}, 0
-  local res, s =
-      serialize(name, data, kind,
-                function (...)
+
+  local write = function (...)
                   for i = 1, select("#", ...) do
                     n = n + 1
                     t[n] = select(i, ...)
                   end
-                end)
+
+                  return true -- t[n]
+                end
+  local res, s = (kind.serialize or serialize)(name, data, kind, write)
+
   if res == nil then return nil, s end
 
   return tconcat(t), s

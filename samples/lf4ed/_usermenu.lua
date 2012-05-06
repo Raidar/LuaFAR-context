@@ -5,8 +5,11 @@ local UseAutoAdding = true
 ----------------------------------------
 -- Add LuaFAR context features first only!!!
 require "context.initiate"       -- LFc initiate
+if context.use.LFVer >= 3 then
 MakeResident("context.resident") -- LFc resident
---MakeResident(require "context.resident") -- LFc resident
+else
+MakeResident(require "context.resident") -- LFc resident
+end
 
 if UseAutoAdding then
   AutoInstall("scripts/", "%_.+menu%.lua", 1) -- Loading all _*menu.lua

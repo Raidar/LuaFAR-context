@@ -17,6 +17,7 @@ local _G = _G
 local type = type
 local pairs = pairs
 local rawget, rawset = rawget, rawset
+local getmetatable, setmetatable = getmetatable, setmetatable
 
 ----------------------------------------
 local context, ctxdata = context, ctxdata
@@ -28,7 +29,7 @@ local datas  = context.datas
 local cfgpairs = datas.cfgpairs
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -75,7 +76,7 @@ local function detectMode (meta) --> (mode table)
   meta.default = isDef
 
   return meta
-end --
+end -- detectMode
 unit.detectMode = detectMode
 
 do
@@ -116,7 +117,7 @@ function unit.merge (base, user, mode) --> (config table)
 
   L:w1('CWrongMerge', 'SWrongMerge', mode.basis, mode.merge)
   return base or user -- user or base
-end --
+end ---- merge
 
 end -- do
 do
@@ -135,7 +136,7 @@ function unit.require (path, name, mask, loaded) --> (config, mode)
   if not cfg:match("module '.-' not found:") then -- Invalid syntax only!
     L:w(L:t'CInvalidCfg', L:t1('SInvalidCfg', fullname, cfg), 'l')
   end
-end --
+end ---- require
 
 end -- do
 
@@ -220,7 +221,7 @@ function unit.read (regdata) --> (config table)
   end
 
   return usercfg
-end --
+end ---- read
 
 do
   local pkg_loaded = package.loaded
@@ -237,7 +238,7 @@ function unit.reset (key)
     pkg_loaded[loaded[k]] = nil
   end
   regdata.loaded = nil
-end --
+end ---- reset
 
 end -- do
 
@@ -264,7 +265,7 @@ local function itemParent (item) --> (type|string | nil)
 
   parentType = parentType or context.detect.use.parentType
   return parentType(v) or nil -- nil for false
-end --
+end -- itemParent
 
 -- Inheritance mechanism for config data items-subtables.
 -- (Subtable don't know about config data table, so metatable is for get it.)
@@ -279,8 +280,9 @@ local function item_index (item, key)
   v = v[key] -- Recursive call of item_index! -- subtable key's value
   rawset(item, key, v)
   get_meta(cfg).gencfg[key] = true
+
   return v
-end --
+end -- item_index
 
 local item_MT = { __index = item_index }
 
@@ -291,7 +293,7 @@ local function set_meta (cfg, ctype, value) --| (value)
     value._meta_ = { type = ctype, config = cfg, gencfg = {} }
     setmetatable(value, item_MT) -- Access to _meta_ with get_meta only!
   end
-end --
+end -- set_meta
 
 local t_index = tables.t_index
 
@@ -299,9 +301,9 @@ local t_index = tables.t_index
 local function type_oldindex (cfg, ctype)
   local v = t_index(cfg, ctype, '__cfgMT')
   if v ~= nil then return v end
+
   return t_index(cfg, ctype, '__oldindex')
-  --return oldindex(cfg, ctype)
-end --
+end -- type_oldindex
 
 -- Inheritance mechanism for whole config data table.
 local function type_index (cfg, ctype)
@@ -315,15 +317,16 @@ local function type_index (cfg, ctype)
   v = cfg[v] -- Recursive call of type_index! -- parent' subtable
   rawset(cfg, ctype, v)
   get_meta(cfg).gencfg[ctype] = true
+
   return v
-end --
+end -- type_index
 
 local function type_newindex (cfg, ctype, value)
   if getmetatable(value) ~= item_MT then
     set_meta(cfg, ctype, value)
   end
   return rawset(cfg, ctype, value)
-end --
+end -- type_newindex
 
 ---------------------------------------- Load
 
@@ -363,7 +366,7 @@ function unit.load (regdata) --> (config table)
   setmetatable(cfg, MT) -- Set MT
 
   return cfg
-end --
+end ---- load
 
 -- Load config descriptor.
 function unit.loadDescriptor (key, regdata, cfg)
@@ -371,12 +374,14 @@ function unit.loadDescriptor (key, regdata, cfg)
                             desc_mask, regdata.loaded)
   if not desc then return end
   descriptors[key] = { configs = datas.cfglist(cfg), dsc = desc }
-end
+end ---- loadDescriptor
 
 -- Autoload and access to registered config data
 -- via ctxdata.config.<key name of config data> table.
 local function cfg_index (t, key) --> (config table)
   local regdata = cfgReg[key]
+  --logMsg(regdata, key)
+  --if key == "lfa_editor" then logMsg(regdata, key) end
   if not regdata then
     L:w1('CNoRegConfig', 'SNoRegConfig', key)
     return
@@ -385,9 +390,11 @@ local function cfg_index (t, key) --> (config table)
   local cfg = unit.load(regdata)
   t[key] = cfg
   unit.loadDescriptor(key, regdata, cfg)
-  return cfg
-end --
 
+  return cfg
+end -- cfg_index
+
+--logMsg(cfgDat, "cfgDat")
 setmetatable(cfgDat, { __index = cfg_index })
 
 ---------------------------------------- Using
@@ -406,8 +413,9 @@ unit.use = useConfig
 function useConfig.rawget (cfg, ctype)
   local meta = get_meta(cfg)
   if meta and meta.gencfg and meta.gencfg[ctype] then return nil end
+
   return rawget(cfg, ctype)
-end --
+end ---- rawget
 
 -- Rawset for config data table.
 function useConfig.rawset (cfg, ctype, value)
@@ -419,38 +427,39 @@ function useConfig.rawset (cfg, ctype, value)
   if getmetatable(value) ~= item_MT then
     set_meta(cfg, ctype, value)
   end
+
   return rawset(cfg, ctype, value)
-end --
+end ---- rawset
 
 -- Detect value and used type for type in config data table.
 function useConfig.typeValue (cfg, ctype) --> (value, type|string | nil)
   parentType = parentType or context.detect.use.parentType
-  local t, k, v = cfg, ctype
+  local t, k = cfg, ctype
   local cfgonly = rawget(get_meta(cfg), 'cfgonly')
 
   while k do
-    v = rawget(t, k) -- any value!
+    local v = rawget(t, k) -- any value!
     if v ~= nil then return v, k end
     v = type_oldindex(t, k)
     if v ~= nil then return v, k end
     if not cfgonly then k = parentType(k) end -- parent
   end
-end --
+end ---- typeValue
 local typeValue = useConfig.typeValue
 
 -- Detect key value for item-subtable in config data table.
 function useConfig.itemValue (item, key) --> (value | nil)
-  local t, k, v = item, key
+  local t, k = item, key
   local cfg = rawget(get_meta(item), 'config')
 
   while type(t) == 'table' do -- like assert!
-    v = rawget(t, k) -- any value!
+    local v = rawget(t, k) -- any value!
     if v ~= nil then return v, k end
     k = itemParent(t) -- parent
     if not k then return end
     t, k = typeValue(cfg, k)
   end
-end --
+end ---- itemValue
 
 ---------------------------------------- Register
 
@@ -479,8 +488,9 @@ local function fillRegData (regdata) --> (table)
   regdata.inherit = regdata.inherit
   regdata.cfgonly = regdata.cfgonly
   regdata.mode = detectMode(regdata.mode)
+
   return regdata
-end --
+end ---- fillRegData
 unit.fillRegData = fillRegData
 
 -- Register config data.
@@ -495,16 +505,22 @@ unit.fillRegData = fillRegData
 function unit.register (regdata) --> (bool)
   local t = fillRegData(regdata)
   local key = t.key
+
+  --if key == "lfa_editor" then logMsg(regdata, "lfa_editor") end
+
   if cfgReg[key] then
     if not isRegDataEqual(cfgReg[key], t) then
       L:w1('CRegError', 'SRegRepeat', key)
       return false
     end
+
     unit.reset(key)
   end
+
   cfgReg[key] = t
+
   return true
-end --
+end ---- register
 
 -- Unregister config data.
 --[[ Parameters:
@@ -513,6 +529,7 @@ end --
 function unit.unregister (regdata) --> (bool)
   local t = fillRegData(regdata)
   local key = t.key
+
   if not cfgReg[key] then
     L:w1('CUnRegError', 'SUnRegNoReg', key)
     return false
@@ -521,10 +538,12 @@ function unit.unregister (regdata) --> (bool)
     L:w1('CUnRegError', 'SUnRegDiffer', key)
     return false
   end
+
   unit.reset(key)
   cfgReg[key] = nil
+
   return true
-end --
+end ---- unregister
 
 -- Check config is registered.
 function unit.isRegistered (key) --> (bool)

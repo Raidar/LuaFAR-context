@@ -269,7 +269,7 @@ function unit.fexists (filename) --> (bool)
   local f = io_open(filename, 'rb')
   if f then f:close() end
   return f ~= nil
-end --
+end ----
 
   local assert = assert
 
@@ -279,6 +279,7 @@ function unit.filesize (filename) --> (number)
   local f = assert(io_open(filename, "rb"))
   local len = assert(f:seek("end"))
   f:close()
+
   return len
 end ----
 

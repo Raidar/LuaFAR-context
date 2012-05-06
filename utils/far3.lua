@@ -53,7 +53,8 @@ do
   for k, v in pairs(F) do
     if k:find("^KSFLAGS_") then
       local flag = k:match("^KSFLAGS_(.*)")
-      F["KMFLAGS_"..flag], F[k] = v, nil
+      F["KMFLAGS_"..flag] = v
+      F[k] = nil
     end
   end
 

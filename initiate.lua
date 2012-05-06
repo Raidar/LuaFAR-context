@@ -32,17 +32,18 @@ ctxdata.languages = ctxdata.languages or
 local modules = {
   -- Preload modules:
   'context.utils.useUtils',
-  'context.utils.useNumber',
-  'context.utils.useTable',
-  'context.utils.useData',
+  'context.utils.useNumbers',
+  'context.utils.useTables',
+  'context.utils.useLua',
+  'context.utils.useDatas',
   'context.utils.useLocale',
   -- Other modules:
   'context.utils.handleType',
   'context.utils.manageData',
-  'context.utils.useColor',
+  'context.utils.useColors',
   'context.utils.useHistory',
 } ---
-local packnum = 5 -- Number of preload modules
+local packnum = 6 -- Number of preload modules
 
 -- Unregister all loaded modules.
 for k = 1, #modules do

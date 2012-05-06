@@ -114,8 +114,9 @@ function unit.copy (t, usemeta, tpairs, deep) --> (table)
 
   local u = {}
   for k, v in (tpairs or pairs)(t) do u[k] = v end
+
   return usemeta and setmetatable(u, getmetatable(t)) or u
-end --
+end ---- copy
 
 -- Copy of table with possible saving all metatables.
 -- Копия таблицы с возможным сохранением всех метатаблиц.
@@ -152,8 +153,9 @@ local function _update (t, u, tpairs) --|> (t)
       t[k] = v
     end
   end
+
   return t
-end --
+end -- _update
 unit._update = _update
 
 function unit.update (t, u, tpairs, deep) --|> (t)
@@ -165,8 +167,9 @@ function unit.update (t, u, tpairs, deep) --|> (t)
   end
 
   for k, v in (tpairs or pairs)(u) do t[k] = v end
+
   return t
-end --
+end ---- update
 
 -- Extend table t by values from u.
 -- Расширение таблицы t значениями из u.
@@ -176,8 +179,9 @@ local function _extend (t, u, tpairs) --|> (t)
       t[k] = type(v) == 'table' and _copy(v, false, tpairs) or v
     end
   end
+
   return t
-end --
+end -- _extend
 unit._extend = _extend
 
 function unit.extend (t, u, tpairs, deep) --|> (t)
@@ -191,8 +195,9 @@ function unit.extend (t, u, tpairs, deep) --|> (t)
   for k, v in (tpairs or pairs)(u) do
     if t[k] == nil then t[k] = v end
   end
+
   return t
-end --
+end ---- extend
 
 -- Expand table t by values from u (using subvalues).
 -- Наращение таблицы t значениями из u (с учётом подзначений).
@@ -205,8 +210,9 @@ local function _expand (t, u, tpairs) --|> (t)
       _expand(w, v, tpairs)
     end
   end
+
   return t
-end --
+end -- _expand
 unit._expand = _expand
 
 function unit.expand (t, u, tpairs, deep) --|> (t)
@@ -220,8 +226,9 @@ function unit.expand (t, u, tpairs, deep) --|> (t)
   for k, v in (tpairs or pairs)(u) do
     if t[k] == nil then t[k] = v end
   end
+
   return t
-end --
+end -- expand
 
 -- Set table u as field f of metatable for t.
 -- Установка таблицы u как поля f метатаблицы для t.
@@ -239,7 +246,7 @@ local function _asmeta (t, u, tpairs, field, force) --|> (t)
 
   m[field] = u
   return setmetatable(t, m)
-end --
+end -- _asmeta
 unit._asmeta = _asmeta
 
 function unit.asmeta (t, u, tpairs, deep, field, force) --|> (t)
@@ -256,7 +263,7 @@ function unit.asmeta (t, u, tpairs, deep, field, force) --|> (t)
 
   m[field or '__index'] = u
   return setmetatable(t, m)
-end ----
+end ---- asmeta
 
 -- Set table u as field f of metatable for t (expanding subvalues).
 -- Установка таблицы u как поля f метатаблицы для t (с наращением подзначений).
@@ -275,7 +282,7 @@ local function _exmeta (t, u, tpairs, field, force) --|> (t)
 
   m[field] = u
   return setmetatable(t, m)
-end --
+end -- _exmeta
 unit._exmeta = _exmeta
 
 function unit.exmeta (t, u, tpairs, deep, field, force) --|> (t)
@@ -291,7 +298,7 @@ function unit.exmeta (t, u, tpairs, deep, field, force) --|> (t)
 
   m[field or '__index'] = u
   return setmetatable(t, m)
-end ----
+end ---- exmeta
 
 do
   local kinds = {
@@ -325,7 +332,7 @@ function unit.add (t, u, kind, tpairs, ...) --> (table)
   end --
 
   return t
-end --
+end ---- add
 
 end -- do
 
@@ -349,7 +356,7 @@ function unit.list (t, list, field) --> (table)
   end
 
   return list
-end --
+end ---- list
 
 --[[ Warning:
   This version of 'pairs' supports using metatables for merging & inheritance.
@@ -442,8 +449,9 @@ function unit.t_index (t, k, field) --> (value)
   local tp = type(u)
   if tp == 'table'    then return u[k] end
   if tp == 'function' then return u(t, k) end
+
   return u
-end --
+end ---- t_index
 
 -- Fill values in array with value.
 -- Заполнение значений в массиве значением value.
@@ -457,7 +465,7 @@ function unit.fillwith (t, count, value) --|> t
   end
 
   return t
-end --
+end -- fillwith
 
 -- Fill nil values in array with value.
 -- Заполнение значений nil в массиве значением value.
@@ -466,8 +474,9 @@ function unit.fillnils (t, count, value) --|> t
   for k = 1, count or #t do
     if t[k] == nil then t[k] = value end
   end
+
   return t
-end --
+end -- fillnils
 
 -- Fill nil values in { ... } with value.
 -- Заполнение значений nil в { ... } значением value.

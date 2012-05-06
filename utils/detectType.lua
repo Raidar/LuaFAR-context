@@ -66,9 +66,10 @@ local sfind = ('').cfind -- Slow but char positions return
 -- Защищённый поиск паттерна в строке для типа файла.
 local function pfind (s, pattern) --> (number, number | nil)
   if not s then return end
+
   local isOk, findpos, findend = pcall(sfind, s, pattern)
   if isOk then return findpos, findend end -- Успешный поиск
-end --
+end -- pfind
 
 --local pfind = sfind -- TEST
 
@@ -136,7 +137,7 @@ local function lenfind (s, pat)
   if findpos then
     return findend - findpos + 1 -- real length
   end
-end --
+end -- lenfind
 --]]
 
 -- Check a value by values table.
@@ -158,7 +159,7 @@ local function checkValueOver (value, values) --> (number | nil)
     if l then return l, v end
     --]]
   end
-end --function checkValueOver
+end -- checkValueOver
 unit.checkValueOver = checkValueOver
 
 -- Detect a type by filename and first line (on single pass).
@@ -280,7 +281,7 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     return f.assumed, 'read+line', f_ext, 0
   end
   return 'none', 'pass+worse', f_ext, 1 -- It is possible!
-end --function detTypePass
+end -- detTypePass
 unit.TypePass = detTypePass
 
 -- Detect a type by filename and first line.
@@ -335,7 +336,7 @@ function areaFileType.panels (f)
   end
 
   return detectType(f)
-end --
+end -- panels
 
 -- Detect a type of edited file.
 function areaFileType.editor (f)
@@ -353,7 +354,7 @@ function areaFileType.editor (f)
   --if useprofiler then profiler.stop() end
 
   return detectType(f)
-end --
+end -- editor
 
 -- Detect a type of viewed file.
 function areaFileType.viewer (f)
@@ -369,7 +370,7 @@ function areaFileType.viewer (f)
   end
 
   return detectType(f)
-end --
+end -- viewer
 
 do
   local F = far.Flags
@@ -395,7 +396,7 @@ function areaFileType.current (f)
     return nil, L:t1("SNoAreaFunction",
                      L:t((areas[area] or Msgs.UnknownArea)..'Area'))
   end
-end --
+end -- current
 
 end -- do
 
@@ -418,7 +419,7 @@ useType.parentType = parentType
 -- Group type of ctype.
 function useType.groupType (ctype) --> (string|nil)
   return nextType(ctype, 'group')
-end --
+end ----
 
 -- Check ctype as Type or as inheritor from Type.
 function useType.isType (ctype, Type, field) --> (bool)
@@ -428,7 +429,7 @@ function useType.isType (ctype, Type, field) --> (bool)
     tp = nextType(tp, field)
   end
   return false
-end --
+end ----
 
 -- Find abstract config table for cfg.
 function useType.abstractConfig (cfg) --> (table)
@@ -438,7 +439,7 @@ function useType.abstractConfig (cfg) --> (table)
     local u = t[k]
     if u and u._meta_ and u._meta_.abstract then return u end
   end
-end --
+end ----
 
 local abstypes = useType.abstractConfig(types) -- Abstract types
 ctxdata.abstypes = abstypes
@@ -450,7 +451,7 @@ function useType.nomaskType (ctype, cfg, field) --> (string | nil)
     tp = (cfg[tp] or Null)[field] or types[tp][field]
   end
   return tp -- any nomask type
-end --
+end ----
 
 -- Find abstract supertype of ctype for cfg.
 function useType.abstractType (ctype, cfg, field) --> (string | nil)
@@ -459,7 +460,7 @@ function useType.abstractType (ctype, cfg, field) --> (string | nil)
     tp = (cfg[tp] or Null)[field] or types[tp][field]
   end
   return tp and abstypes[tp] and tp -- abstract type only
-end --
+end ----
 
 --[[ Warning:
   These functions is only for unregistered config data tables.
@@ -496,7 +497,7 @@ function useType.configNextType (ctype, cfg, equiv, field) --> (string)
   local tp = ctype and cfg[ctype] and cfg[ctype][field] or -- by cfg
              nextType(ctype, field) -- by types (find next by default)
   return nextConfigType(tp, cfg, equiv, field)
-end --
+end ----
 
 ---------------------------------------- Check
 local checkType = {} -- Check inheritance
@@ -513,7 +514,7 @@ local isError = false -- One warning per action!
   v[field] (string) - supertype for ctype.
 --]]
 local function checkItself (ctype, v, field) --> (string | nil)
-  field = field or 'inherit'
+  local field = field or 'inherit'
   if ctype ~= v[field] then return v[field] end
 
   if not isError then
@@ -536,7 +537,7 @@ checkType.itself = checkItself
   v[field] - supertype for ctype.
 --]]
 local function superType (ctype, v, cfg, field) --> (string | nil)
-  field = field or 'inherit'
+  local field = field or 'inherit'
   local super = v[field]
   if super == nil then return end
 
@@ -568,7 +569,7 @@ checkType.superType = superType
 -- Check inheritance for config type.
 local function checkInherit (ctype, v, cfg, field)
   if v._checked_ then return end
-  field = field or 'inherit'
+  local field = field or 'inherit'
 
   local super = superType(ctype, v, cfg, field)
   if not super then
@@ -632,7 +633,7 @@ function checkType.types (cfg) --| cfg --> (true | nil)
 
   checked[cfg] = true
   return true
-end --
+end ---- types
 
 -- Check inheritance reset.
 function checkType.reset (cfg) --| cfg
@@ -643,7 +644,7 @@ function checkType.reset (cfg) --| cfg
     v._checked_ = false -- nil
   end
   checked[cfg] = false
-end --
+end ---- reset
 
 if not checked[types] then
   checkType.types(types)

@@ -122,7 +122,7 @@ do
   setmetatable(TColors, TColors)
 end -- do
 
----------------------------------------- Functions
+---------------------------------------- functions
 
 -- Number value of table-color.
 -- Численное значение цвета-таблицы.
@@ -131,7 +131,7 @@ function TColors.tonumber (color) --> (number)
   local self = TColors
   return bor(     band(color[self.FGName], self.FGMask),
              bshl(band(color[self.BGName], self.BGMask), self.Shift))
-end --
+end ----
 
 -- Table value of number-color.
 -- Табличное значение цвета-числа.
@@ -143,7 +143,7 @@ function TColors.totable (color) --> (table)
     [self.BGName] = band(bshl(color, self.Shift), self.BGMask),
     [self.Flags]  = F.FCF_4BITMASK,
   }
-end --
+end ----
 
 -- Required value of color.
 -- Требуемое значение цвета.
@@ -155,7 +155,7 @@ function TColors.tocolor (color, kind) --> (table|number)
     return kind == 'table' and color or self.tonumber(color)
   end
   return color
-end --
+end ----
 
 -- Get foreground color for color.
 -- Получение цвета символа для цвета.
@@ -228,7 +228,7 @@ function TColors.cmake (fg, bg, kind) --> (color)
   end
 end ----
 
----------------------------------------- Methods
+---------------------------------------- methods
 -- Make new color (by values).
 -- Формирование нового цвета (по значениям).
 function TColors:newColor (fg, bg, kind) --> (color)

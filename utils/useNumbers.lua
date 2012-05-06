@@ -40,7 +40,7 @@ do
 -- Default width for: Ox12345678
 function unit.hex (number, width) --> (string)
   return ("%#0"..tostring(width or 10).."x"):format(number or 0)
-end
+end ----
 
 end -- do
 
@@ -48,45 +48,45 @@ end -- do
 -- Преобразование логического значения в число.
 function unit.b2n (b) --< (bool) --> (number)
   return b and 1 or 0 -- tonumber(b) don't work!
-end
+end ----
 
 ---------------------------------------- Math
 -- Sign of number.
 -- Знак числа.
 function unit.sign (n) --> (-1 | 0 | 1 | nil)
   return n and (n > 0 and 1 or n < 0 and -1 or 0)
-end
+end ----
 
 -- Minimum of 2 numbers.
 -- Минимум двух чисел.
 function unit.min2 (x, y) --> (number)
   return x <= y and x or y
-end
+end ----
 
 -- Maximum of 2 numbers.
 -- Максимум двух чисел.
 function unit.max2 (x, y) --> (number)
   return y <= x and x or y
-end
+end ----
 
 ---------------------------------------- Numbers
 -- Increment of 2 numbers.
 -- Инкремент двух переменных.
 function unit.inc2 (a, b) --> (number)
   return a + 1, b + 1
-end
+end ----
 
 -- Decrement of 2 numbers.
 -- Декремент двух переменных.
 function unit.dec2 (a, b) --> (number)
   return a - 1, b - 1
-end
+end ----
 
 -- Swap of 2 variables' values.
 -- Обмен значений двух переменных.
 function unit.swap (a, b) --> (number, number)
   return b, a
-end
+end ----
 
 -- Check for an integer number.
 -- Проверка на целочисленность.
@@ -105,53 +105,53 @@ end ----
 -- Целочисленное деление (обычное).
 function unit.divf (x, y) --> (number)
   return (x - x%y) / y
-end
+end ----
 
 -- Integer division (like ceil).
 -- Целочисленное деление (с запасом).
 function unit.divc (x, y) --> (number)
   local m = x%y; local z = (x - m) / y
   if m == 0 then return z else return z + 1 end
-end
+end ----
 
 -- Integer division (rounded).
 -- Целочисленное деление (с округлением).
 function unit.divr (x, y) --> (number)
   local m = x%y; local z = (x - m) / y
   if m < y / 2 then return z else return z + 1 end
-end
+end ----
 
 -- Integer division (with remainder).
 -- Целочисленное деление (с остатком).
 function unit.divm (x, y) --> (number)
   local m = x%y; return (x - m) / y, m
-end
+end ----
 
 ---------------------------------------- Operation
 -- Extract an integer square root.
 -- Извлечение целочисленного квадратного корня.
 function unit.sqrti (x) --> (number)
   return floor(x^(1/2)) -- MAYBE: Лучше методом дихотомии?!
-end
+end ----
 
 ---------------------------------------- Range
 -- Check value in range.
 -- Проверка на принадлежность значения диапазону.
 function unit.inrange (n, min, max) --> (bool)
   return n >= min and n <= max
-end
+end ----
 
 -- Check value not in range.
 -- Проверка на НЕпринадлежность значения диапазону.
 function unit.outrange (n, min, max) --> (bool)
   return n < min or n > max
-end
+end ----
 
 -- Get value within range.
 -- Получение значения в диапазоне.
 function unit.torange (n, min, max) --> (number)
   return n < min and min or n > max and max or n
-end
+end ----
 
 --------------------------------------------------------------------------------
 context.number = unit -- 'numbers' table in context

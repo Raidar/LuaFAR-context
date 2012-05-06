@@ -57,7 +57,7 @@ function unit.add (event, handler) --> (true|nil)
   local handlers = events[event]
   handlers[#handlers+1] = handler
   return true
-end --
+end ----
 
 -- Delete handler for event.
 function unit.del (event, handler) --> (true|nil)
@@ -77,7 +77,7 @@ function unit.del (event, handler) --> (true|nil)
       return true
     end
   end
-end --
+end ----
 
 local pcall = pcall
 
@@ -177,8 +177,9 @@ function unit.changeType (areaid, newtype)
   handleEvent('changeType', oldtype, false)
   areaid.type = newtype
   handleEvent('changeType', newtype, true)
+
   return true
-end --
+end ----
 
 ---------------------------------------- Handlers
 do
@@ -209,7 +210,7 @@ function unit.editorEvent (id, event, param)
   elseif event == EE_CLOSE then
     editors.current, editors[eid] = nil, nil
   end
-end --
+end ----
 
 end -- do
 
@@ -234,7 +235,7 @@ function unit.viewerEvent (id, event, param)
   elseif event == VE_CLOSE then
     viewers.current, viewers[vid] = nil, nil
   end
-end --
+end ----
 
 end -- do
 

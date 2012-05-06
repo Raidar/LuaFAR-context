@@ -48,7 +48,7 @@ local Msgs = {
 -- Получение локализованного текста.
 function unit.text (Data, Index) --> (string | nil)
   return Index and Data[Index] or Index
-end --
+end ----
 
 do
   local initcap = utils.initcap
@@ -62,8 +62,9 @@ function unit.language () --> (table, table)
     s = lCodes[v:lower()] -- Код языка
     if s then codes[k] = initcap(s) end
   end
+
   return lang, codes
-end --
+end ----
 
 end -- do
 
@@ -80,7 +81,7 @@ local f_fname = '%s%s%s'
 --]]
 function unit.filename (path, name, loc) --> (string | nil)
   return f_fname:format(path, name, loc)
-end --
+end ----
 local locfname = unit.filename
 
 -- Check and get full file names with localization + by default.
@@ -90,7 +91,7 @@ local locfname = unit.filename
 --]]
 function unit.bothname (path, name, loc) --> (string/nil, string/nil)
   return loc and locfname(path, name, loc), locfname(path, name, 'Def')
-end --
+end ----
 
 -- Customize localization settings.
 -- Настройка установок локализации.
@@ -100,8 +101,9 @@ function unit.customize (Custom) --> (table)
   u.help, u.defhelp = unit.bothname(u.path, u.file, u.codes.Help)
   u.name, u.defname = unit.bothname(u.path, u.file, u.codes.Main)
   --logMsg(Custom, 'Custom', 2, '#q')
+
   return Custom
-end --
+end ----
 
 ---------------------------------------- Data
 -- Make data with Custom settings.
@@ -120,7 +122,7 @@ function unit.makeData (Custom, name, t) --> (table | nil, error)
   else
     return datas.make(Custom.base, name, Locale.ext, t)
   end
-end --
+end ----
 
 do
   local type = type
@@ -154,7 +156,7 @@ function unit.getData (Custom, locBasis, defBasis) --> (table | nil, errors)
 
   return nil, defError and Msgs.defFileError:format(defError),
               locError and Msgs.locFileError:format(locError)
-end --
+end ----
 
   local _getData = unit.getData
 
@@ -199,7 +201,7 @@ function unit.getDual (Custom, genCustom, ...) --> (table)
 
   return nil, curError and Msgs.curFileError:format(curError),
               genError and Msgs.genFileError:format(genError)
-end --
+end ----
 
 end -- do
 
@@ -208,14 +210,14 @@ end -- do
 function unit.prepare (Custom, ...) --> (table)
   local Custom = unit.customize(Custom) -- Localization customizing
   return unit.getData(Custom, ...)  -- Localization data for Custom
-end --
+end ----
 
 -- Localize data for script by its settings.
 -- Локализация данных для скрипта по его установкам.
 function unit.localize (Custom, defCustom, ...) --> (table)
   local Custom = datas.customize(Custom, defCustom) -- Common customize
   return unit.prepare(Custom, ...)  -- Prepare localization data
-end --
+end ----
 
 ---------------------------------------- Class
 local TLocale = {} -- Класс локализации
@@ -240,16 +242,18 @@ function unit.make (Custom, Data, useError, show) --> (object)
     _show = show or utils.warning,
   } ---
   Custom.Locale = self
+
   return setmetatable(self, Locale_MT)
-end --
+end ----
 
 -- Create a localization object for script with its parameters.
 -- Создание объекта локализации для скрипта с учётом его параметров.
 function unit.create (Custom, defCustom, ...) --> (object)
   local Data, e1, e2 = unit.localize(Custom, defCustom, ...)
   if Data then return unit.make(Custom, Data) end
+
   return nil, e1, e2
-end --
+end ----
 
 -- Update a localization object.
 -- Обновление объекта локализации.
@@ -260,8 +264,9 @@ function TLocale:update () --> (object)
     self.Data = Data
     return self
   end
+
   return nil, e1, e2
-end --
+end ----
 
 -- Free a localization object.
 -- Освобождение объекта локализации.
@@ -269,13 +274,13 @@ function TLocale:free () --| (object)
   self.Data = nil
   self.Custom = nil
   self = nil
-end --
+end ----
 
 -- Show localization error message.
 -- Показ сообщения об ошибке локализации.
 function unit.showError (...)
   return utils.warning('Localization', utils.concat(...), 'l')
-end --
+end ----
 
 ---------------------------------------- Methods
 local loctext = unit.text
@@ -284,68 +289,71 @@ local loctext = unit.text
 -- Получение локализованного текста.
 function TLocale:text (Index) --> (string)
   return loctext(self.Data, Index)
-end
+end ----
 
 -- Get text with detailed remark.
 -- Получение текста с подробным пояснением.
 function TLocale:t1 (Index, ...)
   return self:text(Index):format(...)
-end
+end ----
+
 -- Get text with embedded remark.
 -- Получение текста с вложенным пояснением.
 function TLocale:t2 (Index1, Index2, ...)
   return self:text(Index1):format(self:text(Index2), ...)
-end
+end ----
 
 -- Output warning text.
 -- Вывод текста-предупреждения.
 function TLocale:warning (title, text, flags) --| (message)
   return self._show(title, text, flags and flags..'w' or 'w')
-end
+end ----
 
 -- Output simple warning text.
 -- Вывод простого текста-предупреждения.
 function TLocale:w0 (IndexT, IndexM, flags)
   return self:warning(self:text(IndexT), self:text(IndexM), flags)
-end
+end ----
 
 -- Output warning text with detailed remark.
 -- Вывод текста-предупреждения с подробным пояснением.
 function TLocale:w1 (IndexT, IndexM, ...)
   return self:warning(self:text(IndexT), self:t1(IndexM, ...))
-end
+end ----
 
 -- Output warning text with embedded remark.
 -- Вывод текста-предупреждения с вложенным пояснением.
 function TLocale:w2 (IndexT, Index1, Index2, ...)
   return self:warning(self:text(IndexT), self:t2(Index1, Index2, ...))
-end
+end ----
 
 -- Output text with error.
 -- Вывод текста об ошибке.
 function TLocale:error (text, flags) --| (message)
   return self:warning(self:text'Error', text, flags)
-end
+end ----
 
 -- Output error text with detailed remark.
 -- Вывод текста об ошибке с подробным пояснением.
 function TLocale:e1 (Index, ...)
   return self:error(self:t1(Index, ...))
-end
+end ----
+
 -- Output error text with embedded remark.
 -- Вывод текста об ошибке с вложенным пояснением.
 function TLocale:e2 (Index1, Index2, ...)
   return self:error(self:t2(Index1, Index2, ...))
-end
+end ----
 
 -- Messages/texts about errors.
 -- Сообщения/тексты об ошибках.
 function TLocale:et1 (Index, ...)
   return (self.useError and self.e1 or self.t1)(self, Index, ...)
-end
+end ----
+
 function TLocale:et2 (Index1, Index2, ...)
   return (self.useError and self.e2 or self.t2)(self, Index1, Index2, ...)
-end
+end ----
 
 ---------------------------------------- Specials
 -- Methods with short names.
