@@ -283,7 +283,7 @@ do
     end
     --logMsg({ name, kind, data or "nil" }, "kind", 3)
     kind.saved[data] = name
-    -- settings to write current table
+    -- Settings to write current table:
     local tempname = kind.tempname
     local cur_indent = kind.indent
     local new_indent = cur_indent..kind.shift
@@ -291,7 +291,7 @@ do
 
     kind.indent = new_indent
 
-    -- write current table fields
+    -- Write current table fields:
     local isnull, x = true, 0
     for k, v, n in kind.pairs(data, unpack(kind.pargs)) do
       local s = KeyToStr(k)
@@ -301,10 +301,6 @@ do
           isnull = false
           write(cur_indent, format("do local %s = {}; %s = %s\n",
                                    tempname, name, tempname)) -- do
-        end
-        if tabno and (n or 0) ~= x then
-          x = n
-          write(new_indent, format("-- %s\n", KeyToStr(x, true)))
         end
         if w then
           write(new_indent, format("%s%s = %s\n", tempname, s, w))
@@ -337,7 +333,6 @@ do
     shift  (string) - indent shift to pretty write.
     pairs    (func) - pairs function to get fields.
     pargs   (table) - array of arguments to call pairs.
-    tabno    (bool) - write table number in t_list for allpairs as comment.
   write  (func) - функция записи строки данных.
   -- Результаты:
   isOk (bool) - успешность операции.
@@ -357,11 +352,15 @@ function unit.serialize (name, data, kind, write) --> (bool)
   kind.pargs = kind.pargs or {}
   kind.tempname = (name == "t") and "u" or "t" -- prevent collision of names
 
-  write(kind.indent, "local ", name, "\n")
+  if kind.islocal then
+    write(kind.indent, "local ", name, "\n\n")
+  end;
 
   TabToStr(name, data, kind, write)
 
-  write(kind.indent, "\nreturn ", name, "\n")
+  if kind.islocal then
+    write(kind.indent, "\nreturn ", name, "\n")
+  end
 
   return true
 end -- serialize

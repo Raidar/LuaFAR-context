@@ -91,6 +91,50 @@ function unit.isempty (t) --> (bool)
   return t == nil or next(t) == nil
 end ----
 
+---------------------------------------- find
+-- Find a key for a value.
+-- Поиск ключа для значения.
+function unit.find (t, v, tpairs) --> (key | nil)
+  for k, w in (tpairs or pairs)(t) do
+    if w == v then return k end
+  end
+end ----
+
+do
+  local modf = math.modf
+
+-- Binary find of fitting position in sorted array.
+-- Двоичный поиск подходящей позиции в отсортированном массиве.
+--[[ Параметры:
+  t     (table) - table to find in.
+  v      (~nil) - value to find for.
+  comp   (func) - function to compare.
+  -- Результат:
+  index (number) - fitting position for value.
+--]]
+function unit.bfindfit (t, v, comp) --> (index: 1..#t+1)
+  local min, max = 1, #t + 1
+  while max - min > 0 do
+    local m = modf((max + min) / 2) -- TODO: optimize
+    if comp(t[m], v) then
+      min = m + 1
+    else
+      max = m
+    end
+  end
+
+  return max
+end ---- bfindfit
+
+-- Binary find in sorted array.
+-- Двоичный поиск в отсортированном массиве.
+function unit.bfind (t, v, comp) --> (index | nil)
+  local i = bfindfit(t, v, comp)
+  return v == t[i] and i or nil
+end ---- bfind
+
+end -- do
+
 ---------------------------------------- copy
 
 -- Simple copy of table without links to one and the same table.
@@ -436,6 +480,8 @@ end ---- sortcompare
 
 do
   local t_sort = table.sort
+  local t_insert = table.insert
+  local t_find = unit.bfindfit
   local sortcompare = unit.sortcompare
 
 -- 'pairs' function with field sort.
@@ -445,7 +491,6 @@ do
   make (func) - function for make all tables related to t.
   kind  (table) - вид сериализации:
     pairs    (func) - pairs function to get fields.
-    sort     (func) - sort function to sort fields.
     compare  (func) - compare function to compare field names.
   ...           - parameters to call kind.pairs(t, ...).
 --]]
@@ -455,11 +500,13 @@ local function sortpairs (t, kind, ...) --> (func)
   local names = {}
   local values = {}
 
+  local compare = kind.compare or sortcompare
+
   for k, v in (kind.pairs or pairs)(t, ...) do
     values[k] = v
-    names[#names+1] = k
+    local i = t_find(names, k, compare)
+    t_insert(names, i, k)
   end
-  (kind.sort or t_sort)(names, kind.compare or sortcompare)
 
   local k = 0
   local function _next ()
@@ -543,21 +590,7 @@ end ---- allpairs
 
 end -- do
 
----------------------------------------- others
-
--- Get value t[k] checking field of metatable.
--- Получение значения t[k] проверкой поля метатаблицы.
-function unit.t_index (t, k, field) --> (value)
-  if t == nil then return end
-  local u = (getmetatable(t) or Null)[field or '__index']
-  if u == nil then return end
-
-  local tp = type(u)
-  if tp == 'table'    then return u[k] end
-  if tp == 'function' then return u(t, k) end
-
-  return u
-end ---- t_index
+---------------------------------------- fill
 
 -- Fill values in array with value.
 -- Заполнение значений в массиве значением value.
@@ -590,18 +623,26 @@ function unit.fillargs (value, ...)
   return unit.fillnils({ ... }, select('#', ...), value)
 end ----
 
+---------------------------------------- others
+
+-- Get value t[k] checking field of metatable.
+-- Получение значения t[k] проверкой поля метатаблицы.
+function unit.t_index (t, k, field) --> (value)
+  if t == nil then return end
+  local u = (getmetatable(t) or Null)[field or '__index']
+  if u == nil then return end
+
+  local tp = type(u)
+  if tp == 'table'    then return u[k] end
+  if tp == 'function' then return u(t, k) end
+
+  return u
+end ---- t_index
+
 -- Concat args-strings to string.
 -- Соединение списка параметров-строк в строку.
 function unit.concat (...) --> (string)
   return table.concat(unit.fillargs('', ...), '\n')
-end ----
-
--- Find a key for a value.
--- Поиск ключа для значения.
-function unit.find (t, v, tpairs) --> (key | nil)
-  for k, w in (tpairs or pairs)(t) do
-    if w == v then return k end
-  end
 end ----
 
 --------------------------------------------------------------------------------
