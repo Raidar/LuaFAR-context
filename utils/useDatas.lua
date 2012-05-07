@@ -116,7 +116,7 @@ do
 --[[ Параметры:
   fullname (string) - полное имя файла.
   t     (table|nil) - уже существующая таблица данных.
-  kind     (string) - вид добавления (см. unit.add, по умолчанию 'update').
+  kind     (string) - вид добавления (см. tables.add, по умолчанию 'update').
   -- Результаты:
   data (table|nil) - таблица с данными.
 --]]
@@ -222,8 +222,8 @@ do
   local format = string.format
   local frexp, modf = math.frexp, math.modf
 
-  -- Convert key value to string.
-  -- Преобразование значения ключа в строку.
+  -- Convert simple value to string.
+  -- Преобразование простого значения в строку.
   local function ValToStr (value) --> (string | nil, type)
     local tp = type(value)
     if tp == 'boolean' then return tostring(value) end
@@ -251,11 +251,12 @@ do
 
   -- Convert key name to string.
   -- Преобразование имени ключа в строку.
-  local function KeyToStr (key) --> (string)
+  local function KeyToStr (key, asvalue) --> (string)
     local tp = type(key)
     if tp ~= 'string' then
       local key = ValToStr(key)
       if key then
+        if asvalue then return key end
         return format("[%s]", key)
       end
       return nil, tp
@@ -264,6 +265,9 @@ do
     if key:find("^[a-zA-Z_][a-zA-Z_0-9]-$") and not reserveds[key] then
       return "."..key
     end
+    if asvalue then
+      return format("%q", key)
+    end
     return format("[%q]", key)
   end -- KeyToStr
   unit.KeyToStr = KeyToStr
@@ -271,6 +275,7 @@ do
   -- Convert table to string.
   -- Преобразование таблицы в строку.
   local function TabToStr (name, data, kind, write)
+    local kind = kind
     local value = kind.saved[data]
     if value then -- saved name as value
       write(indent, name, " = ", value, "\n")
@@ -282,11 +287,13 @@ do
     local tempname = kind.tempname
     local cur_indent = kind.indent
     local new_indent = cur_indent..kind.shift
+    local tabno = kind.tabno
+
     kind.indent = new_indent
 
     -- write current table fields
-    local isnull = true
-    for k, v in kind.pairs(data) do
+    local isnull, x = true, 0
+    for k, v, n in kind.pairs(data, unpack(kind.pargs)) do
       local s = KeyToStr(k)
       if s then
         local w, tp = ValToStr(v)
@@ -294,6 +301,10 @@ do
           isnull = false
           write(cur_indent, format("do local %s = {}; %s = %s\n",
                                    tempname, name, tempname)) -- do
+        end
+        if tabno and (n or 0) ~= x then
+          x = n
+          write(new_indent, format("-- %s\n", KeyToStr(x, true)))
         end
         if w then
           write(new_indent, format("%s%s = %s\n", tempname, s, w))
@@ -320,7 +331,13 @@ do
 --[[ Параметры:
   name (string) - название для данных.
   data  (table) - сохраняемые данные.
-  kind  (table) - вид хранения: format, saved etc.
+  kind  (table) - вид сериализации:
+    saved   (table) - names of tables already saved.
+    indent (string) - indent value to write fields.
+    shift  (string) - indent shift to pretty write.
+    pairs    (func) - pairs function to get fields.
+    pargs   (table) - array of arguments to call pairs.
+    tabno    (bool) - write table number in t_list for allpairs as comment.
   write  (func) - функция записи строки данных.
   -- Результаты:
   isOk (bool) - успешность операции.
@@ -333,13 +350,20 @@ function unit.serialize (name, data, kind, write) --> (bool)
   if tp ~= "table" then return end
 
   local kind = kind or {}
-  kind.saved = kind.saved or {} -- names of tables already saved
+  kind.saved = kind.saved or {}
+  kind.indent = kind.indent or ""
+  kind.shift = kind.shift or "  "
+  kind.pairs = kind.pairs or pairs
+  kind.pargs = kind.pargs or {}
   kind.tempname = (name == "t") and "u" or "t" -- prevent collision of names
-  kind.indent = "" -- current indent value
-  kind.shift = "  " -- indent shift to pretty write
-  kind.pairs = kind.pairs or pairs -- pairs function to get fields
 
-  return TabToStr(name, data, kind, write)
+  write(kind.indent, "local ", name, "\n")
+
+  TabToStr(name, data, kind, write)
+
+  write(kind.indent, "\nreturn ", name, "\n")
+
+  return true
 end -- serialize
 
 end -- do
@@ -355,7 +379,7 @@ do
   fullname (string) - полное имя файла.
   name     (string) - название таблицы данных.
   data  (table|nil) - обрабатываемая таблица данных.
-  kind      (table) - вид хранения.
+  kind      (table) - вид сохранения (см. serialize.kind).
   -- Результаты:
   isOk (bool) - успешность операции.
 --]]

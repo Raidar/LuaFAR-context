@@ -49,7 +49,7 @@ unit.keywords = {
   ["not"] = true,
   ["and"] = true,
   ["or"] = true,
-} --
+} -- keywords
 
 unit.types = {
   ["nil"] = true,
@@ -60,7 +60,7 @@ unit.types = {
   ["userdata"] = true,
   ["function"] = true,
   ["thread"] = true,
-} --
+} -- types
 
 --------------------------------------------------------------------------------
 context.lua = unit -- 'lua' table in context

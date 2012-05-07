@@ -302,6 +302,7 @@ end ---- exmeta
 
 do
   local kinds = {
+    change = true,
     update = true,
     extend = true,
     expand = true,
@@ -312,13 +313,16 @@ do
 -- Add data from u to t.
 -- Добавление данных из u в t.
 --[[ Параметры:
-  kind (string) - вид добавления (по умолчанию update):
-                  'update' | 'extend' | 'expand' | 'asmeta' | 'exmeta'.
+  kind (string) - вид добавления (см. kinds, по умолчанию update).
   ...           - дополнительные параметры для вызываемых функций:
     [1]    (bool) - "глубокий" просмотр таблицы.
     [2]  (string) - поле метатаблицы при 'asmeta': по умолчанию '__index'.
 --]]
 function unit.add (t, u, kind, tpairs, ...) --> (table)
+  if kind == 'change' then
+    return u
+  end
+
   local t = t or {}
   if u == nil then return t end
 
@@ -337,10 +341,147 @@ end ---- add
 end -- do
 
 ---------------------------------------- pairs
+-- 'pairs' function for non-hole arrays.
+-- Функция 'pairs' для массивов без "дыр".
+function unit.ipairs (t) --> (func)
+  if not t then return end
+
+  local k = 0
+  local function _next ()
+    k = k + 1
+    if t[k] ~= nil then
+      return k, t[k]
+    end
+    --return nil, nil, k - 1
+  end --
+
+  return _next
+end ---- ipairs
+
+-- 'pairs' function for arrays with preset size.
+-- Функция 'pairs' для массивов с заданным размером.
+function unit.npairs (t, n) --> (func)
+  if not t then return end
+
+  local k, n = 0, n or #t
+  local function _next ()
+    k = k + 1
+    if k <= n then
+      return k, t[k]
+    end
+    --return nil, nil, n
+  end --
+
+  return _next
+end ---- npairs
+
+do
+  local ipairs = ipairs
+
+-- 'pairs' function for hashes only.
+-- Функция 'pairs' только для хешей.
+function unit.hpairs (t) --> (func)
+  if not t then return end
+
+  local skip = {}
+  for i in ipairs(t) do skip[i] = true end
+
+  local k
+  local function _next ()
+    local v
+    repeat
+      k, v = next(t, k)
+    until k == nil or not skip[k]
+
+    return k, v
+  end
+
+  return _next
+end ---- hpairs
+
+end -- do
+
+---------------------------------------- sortpairs
+-- Compare values for table sort.
+-- Сравнение значений для сортировки таблицы.
+function unit.sortcompare (v1, v2) --> (bool)
+  local t1, t2 = type(v1), type(v2)
+
+  -- 1 -- true/false
+  if t1 == 'boolean' then
+    if t2 ~= 'boolean' then return true end
+    return v1
+  end
+
+  -- 2 -- number
+  if t1 == 'number' then
+    if t2 ~= 'number' then return t2 ~= 'boolean' end
+    return v1 < v2
+  end
+
+  -- 3 -- string
+  if t1 == 'string' then
+    if t2 ~= 'string' then return t2 ~= 'boolean' and t2 ~= 'number' end
+    -- 3.1 -- one letter string
+    local l1, l2 = v1:len(), v2:len()
+    if l1 == 1 then return l2 > 1 or v1 < v2 end
+    if l2 == 1 then return l1 == 1 and v1 < v2 end
+    -- 3.2 -- other string
+    return v1 < v2
+  end
+
+  -- 4 -- other
+  return false
+end ---- sortcompare
+
+do
+  local t_sort = table.sort
+  local sortcompare = unit.sortcompare
+
+-- 'pairs' function with field sort.
+-- Функция 'pairs' с сортировкой полей.
+--[[
+  t     (table) - table for pairing.
+  make (func) - function for make all tables related to t.
+  kind  (table) - вид сериализации:
+    pairs    (func) - pairs function to get fields.
+    sort     (func) - sort function to sort fields.
+    compare  (func) - compare function to compare field names.
+  ...           - parameters to call kind.pairs(t, ...).
+--]]
+local function sortpairs (t, kind, ...) --> (func)
+  if not t then return end
+
+  local names = {}
+  local values = {}
+
+  for k, v in (kind.pairs or pairs)(t, ...) do
+    values[k] = v
+    names[#names+1] = k
+  end
+  (kind.sort or t_sort)(names, kind.compare or sortcompare)
+
+  local k = 0
+  local function _next ()
+    k = k + 1
+    local m = names[k]
+    if m ~= nil then
+      return m, values[m]
+    end
+  end --
+
+  return _next
+end -- sortpairs
+
+end -- do
+
+---------------------------------------- allpairs
 -- Make list of all tables.
 -- Формирование списка из всех таблиц.
 function unit.list (t, list, field) --> (table)
-  local list, field = list or {}, field or '__index'
+  local t, list = t, list or {}
+  local field = field or '__index'
+  --local field = field ~= false and (field or '__index')
   if type(t) ~= 'table' then return list end
 
   if not list[t] then
@@ -368,12 +509,13 @@ do
 -- 'pairs' function with metatables support.
 -- (Shmuel's implementation of allpairs, adapted for multimetas.)
 --[[
-  t   (table) - table for pairing.
-  make (func) - function for make all tables related to t.
+  t     (table) - table for pairing.
+  make   (func) - function for make all tables related to t.
+  ...           - parameters to call make(t, ...).
 --]]
-function unit.allpairs (t, make) --> (func)
+function unit.allpairs (t, make, ...) --> (func)
   if not t then return end
-  local list = (make or t_list)(t) -- tables list
+  local list = (make or t_list)(t, ...) -- tables list
 
   local n, k, v = #list
   local function _next ()
@@ -381,22 +523,14 @@ function unit.allpairs (t, make) --> (func)
       k, v = next(list[n], k)
 
       if k ~= nil then
-        --[[
-        -- Find field in previous tables:
-        local m, f = n - 1, false
-        while m > 0 do
-          if rawget(list[m], k) ~= nil then
-            f = true -- found
-            break
-          end
-          m = m - 1 -- not found
+        local m = n - 1 -- Find in previous tables:
+        while m > 0 and rawget(list[m], k) == nil do
+          m = m - 1
         end
-
-        if not f then return k, v, n end
-        --]]
-        local m = n - 1 -- Find field in previous tables:
-        while m > 0 and rawget(list[m], k) == nil do m = m - 1 end
-        if m <= 0 then return k, v, n end
+        if m <= 0 then
+          --logMsg({ n, k, v }, "next")
+          return k, v, n -- Not found --> pairing
+        end
       else
         n, list[n] = n - 1, nil
       end
@@ -408,34 +542,6 @@ function unit.allpairs (t, make) --> (func)
 end ---- allpairs
 
 end -- do
-
--- 'pairs' function for non-hole arrays.
-function unit.ipairs (t) --> (func)
-  if not t then return end
-
-  local k = 0
-  local function _next ()
-    k = k + 1
-    if t[k] ~= nil then return k, t[k] end
-    --return nil, nil, k - 1
-  end --
-
-  return _next
-end ---- ipairs
-
--- 'pairs' function for arrays with preset size.
-function unit.npairs (t, n) --> (func)
-  if not t then return end
-
-  local k, n = 0, n or #t
-  local function _next ()
-    k = k + 1
-    if k <= n then return k, t[k] end
-    --return nil, nil, n
-  end --
-
-  return _next
-end ---- npairs
 
 ---------------------------------------- others
 

@@ -255,11 +255,15 @@ end --
 
 end -- do
 ---------------------------------------- I/O
+do
+  local format = string.format
+
 -- Full name.
 function unit.fullname (path, name, ext) --> (string)
-  return ('%s%s%s'):format(path or '', name or '', ext or '')
+  return format('%s%s%s', path or '', name or '', ext or '')
 end --
 
+end -- do
 do
   local io_open = io.open
 
