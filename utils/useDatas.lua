@@ -50,7 +50,8 @@ unit.Dataless = context.utils.null -- A field data for undatum field
 
 -- Add data from user-table to base-table.
 -- Добавление данных из пользовательской таблицы в базовую.
---[[ Параметры (см. tables.add):
+--[[
+  -- @params (@see tables.add):
   base  (table) - базовая таблица.
   user  (table) - пользовательская таблица.
   kind (string) - вид добавления.
@@ -71,6 +72,7 @@ local addData = unit.add
 -- Make list of all config tables.
 -- Формирование списка из всех таблиц конфигурации.
 --[[
+  -- @params:
   t    (table) - base table.
   list (table) - list of tables.
 --]]
@@ -113,11 +115,12 @@ do
 
 -- Load data from file with loadfile.
 -- Загрузка данных из файла с помощью loadfile.
---[[ Параметры:
+--[[
+  -- @params:
   fullname (string) - полное имя файла.
   t     (table|nil) - уже существующая таблица данных.
-  kind     (string) - вид добавления (см. tables.add, по умолчанию 'update').
-  -- Результаты:
+  kind     (string) - вид добавления (@see tables.add, @default = 'update').
+  -- @return:
   data (table|nil) - таблица с данными.
 --]]
 function unit.load (fullname, t, kind) --> (table | nil, error)
@@ -145,10 +148,11 @@ end -- do
 
 -- Find data file on path.
 -- Поиск файла данных на path.
---[[ Параметры:
+--[[
+  -- @params:
   name (string) - имя файла.
   path (string) - строка со списком путей-масок.
-  -- Результаты:
+  -- @return:
   fullname (string) - полное имя файла.
 --]]
 function unit.find (name, path) --> (string)
@@ -162,12 +166,13 @@ do
 
 -- Load data from file with require.
 -- Загрузка данных из файла с помощью require.
---[[ Параметры:
+--[[
+  -- @params:
   name  (string) - имя файла.
   t  (table|nil) - уже существующая таблица данных.
-  kind  (string) - вид добавления (см. unit.add, по умолчанию 'update').
+  kind  (string) - вид добавления (@see unit.add, @default 'update').
   reload  (bool) - признак перезагрузки при повторной загрузке данных.
-  -- Результаты:
+  -- @return:
   data (table|nil) - таблица с данными.
 --]]
 function unit.require (name, t, kind, reload) --> (table | nil, error)
@@ -191,13 +196,14 @@ end -- do
 
 -- Make data with loadfile or require.
 -- Формирование данных с помощью loadfile или require.
---[[ Параметры:
+--[[
+  -- @params:
   path  (string) - путь к файлу.
   name  (string) - имя файла.
   ext   (string) - расширение файла.
   t  (table|nil) - уже существующая таблица данных.
-  kind  (string) - вид добавления (см. unit.add).
-  -- Результаты:
+  kind  (string) - вид добавления (@see unit.add).
+  -- @return:
   data (table|nil) - таблица с данными.
 --]]
 function unit.make (path, name, ext, t, kind) --> (table | nil, error)
@@ -224,7 +230,7 @@ do
 
   -- Convert simple value to string.
   -- Преобразование простого значения в строку.
-  local function ValToStr (value) --> (string | nil, type)
+  local function ValToStr (value, long) --> (string | nil, type)
     local tp = type(value)
     if tp == 'boolean' then return tostring(value) end
     if tp == 'number' then
@@ -233,7 +239,8 @@ do
     end
 
     if tp == 'string' then
-      if value:len() > 80*2 and
+      if long and
+         value:len() > long and
          value:find("\n", 1, true) and
          --not value:find("%[%[.-%]%]") and
          not value:find("[[", 1, true) and
@@ -322,27 +329,34 @@ do
 
 -- Serialize data with write.
 -- Сериализация данных с помощью write.
---[[ Параметры:
+--[[
+  -- @params:
   name (string) - название для данных.
   data  (table) - сохраняемые данные.
   kind  (table) - вид сериализации:
     saved   (table) - names of tables already saved.
-    indent (string) - indent value to write fields.
-    shift  (string) - indent shift to pretty write.
+    indent (string) - initial indent value to write.
+    shift  (string) - indent shift to pretty write fields.
     pairs    (func) - pairs function to get fields.
     pargs   (table) - array of arguments to call pairs.
-    TabToStr (func) - function to convert table to string.
+    islocal  (bool) - using 'local name = {} ... return name' structure.
+    long  (b|n|nil) - using long brackets for strings
+                      (long as number is for min len).
     ValToStr (func) - function to convert simple value to string.
+    TabToStr (func) - function to convert table to string.
   write  (func) - функция записи строки данных.
-  -- Результаты:
+  -- @return:
   isOk (bool) - успешность операции.
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
   local kind = kind or {}
   --logMsg(kind, "kind")
 
-  local s, tp = (kind.ValToStr or ValToStr)(data)
+  local s, tp = (kind.ValToStr or ValToStr)(data, kind.long)
   if s then
+    if kind.islocal then
+      return write(format("local %s = %s\nreturn %s\n", name, s, name))
+    end
     return write(name, " = ", s, "\n")
   end
   if tp ~= 'table' then return end
@@ -376,12 +390,13 @@ do
 
 -- Save data to file.
 -- Сохранение данных в файл.
---[[ Параметры:
+--[[
+  -- @params:
   fullname (string) - полное имя файла.
   name     (string) - название таблицы данных.
   data  (table|nil) - обрабатываемая таблица данных.
-  kind      (table) - вид сохранения (см. serialize.kind).
-  -- Результаты:
+  kind      (table) - вид сохранения (@see serialize.kind).
+  -- @return:
   isOk (bool) - успешность операции.
 --]]
 function unit.save (fullname, name, data, kind) --> (bool)
@@ -405,11 +420,12 @@ do
 
 -- Save data to string.
 -- Сохранение данных в строку.
---[[ Параметры:
+--[[
+  -- @params:
   name     (string) - название таблицы данных.
   data  (table|nil) - обрабатываемая таблица данных.
   kind      (table) - вид хранения.
-  -- Результаты:
+  -- @return:
   isOk (bool) - успешность операции.
 --]]
 function unit.tostring (name, data, kind) --> (bool)
@@ -483,10 +499,11 @@ local defCustom = {
 
 -- Customize script settings.
 -- Настройка установок скрипта.
---[[ Параметры:
+--[[
+  -- @params:
   Custom    (table) - таблица пользовательских установок.
   defCustom (table) - таблица установок по умолчанию.
-  -- Результаты:
+  -- @return:
   Custom    (table) - настроенная таблица установок.
 --]]
 function unit.customize (Custom, defCustom) --> (table)
@@ -530,7 +547,7 @@ function unit.customize (Custom, defCustom) --> (table)
   --logMsg(t, "data")
 
   return t
-end --
+end -- customize
 
 end -- do
 

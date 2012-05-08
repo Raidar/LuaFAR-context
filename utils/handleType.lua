@@ -136,6 +136,7 @@ local function e_index (t, key) --| for editor
     return { type = detEditorType() }
   end
 end --
+
 local function v_index (t, key) --| for viewer
   if key == 'current' then
     return { type = detViewerType() }
@@ -155,8 +156,9 @@ local function reloadEditorConfig (id) --| editors
   --ev_newindex(editors, 'current', current)
   editors[id] = current
   handleEvent('reloadEditor', current)
+
   --far.Message(editors.current.type, "Editor")
-end --
+end -- reloadEditorConfig
 
 local function reloadViewerConfig (id) --| viewers
   viewers.current = nil           -- reset
@@ -167,8 +169,9 @@ local function reloadViewerConfig (id) --| viewers
   --ev_newindex(viewers, 'current', current)
   viewers[id] = current
   handleEvent('reloadViewer', current)
+
   --far.Message(viewers.current.type, "Viewer")
-end --
+end -- reloadViewerConfig
 
 -- Change type for areaid config.
 function unit.changeType (areaid, newtype)
@@ -179,7 +182,7 @@ function unit.changeType (areaid, newtype)
   handleEvent('changeType', newtype, true)
 
   return true
-end ----
+end ---- changeType
 
 ---------------------------------------- Handlers
 do
@@ -210,7 +213,7 @@ function unit.editorEvent (id, event, param)
   elseif event == EE_CLOSE then
     editors.current, editors[eid] = nil, nil
   end
-end ----
+end ---- editorEvent
 
 end -- do
 
@@ -235,7 +238,7 @@ function unit.viewerEvent (id, event, param)
   elseif event == VE_CLOSE then
     viewers.current, viewers[vid] = nil, nil
   end
-end ----
+end ---- viewerEvent
 
 end -- do
 

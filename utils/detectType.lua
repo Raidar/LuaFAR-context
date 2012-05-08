@@ -506,11 +506,12 @@ unit.check = checkType
 local isError = false -- One warning per action!
 
 -- Check inheritance of type from itself.
---[[ Parameters:
+--[[
+  -- @params:
   ctype (string) - checked type.
   v      (table) - ctype values table.
   field (string) - used field.
-  -- Returns:
+  -- @return:
   v[field] (string) - supertype for ctype.
 --]]
 local function checkItself (ctype, v, field) --> (string | nil)
@@ -524,16 +525,17 @@ local function checkItself (ctype, v, field) --> (string | nil)
         L:t1('SInheritReset', ctype, ctype))
   end
   v[field] = nil
-end --
+end -- checkItself
 checkType.itself = checkItself
 
 -- Check inheritance from supertype.
---[[ Parameters:
+--[[
+  -- @params:
   ctype - checked type.
   v - ctype values table.
   cfg - config table.
   field - used field.
-  -- Returns:
+  -- @return:
   v[field] - supertype for ctype.
 --]]
 local function superType (ctype, v, cfg, field) --> (string | nil)
@@ -551,6 +553,7 @@ local function superType (ctype, v, cfg, field) --> (string | nil)
     end
     v[field] = nil
     return
+
   elseif cfg[super] == nil then -- Unknown
     if not isError then
       isError = true
@@ -563,7 +566,7 @@ local function superType (ctype, v, cfg, field) --> (string | nil)
   end
 
   return super
-end --
+end -- superType
 checkType.superType = superType
 
 -- Check inheritance for config type.
@@ -614,7 +617,8 @@ local function checkInherit (ctype, v, cfg, field)
     end
   end
   --v._checked_ = true -- it is set by upper loop!
-end --
+
+end -- checkInherit
 checkType.type = checkInherit
 
 do
@@ -644,6 +648,8 @@ function checkType.reset (cfg) --| cfg
     v._checked_ = false -- nil
   end
   checked[cfg] = false
+
+  isError = false
 end ---- reset
 
 if not checked[types] then

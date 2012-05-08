@@ -49,7 +49,8 @@ end -- do
 local Null = unit.Null -- Empty read-only table
 
 ---------------------------------------- ----
---[[ Часто используемые параметры:
+--[[
+  -- @params (frequently used):
   t      (table) - основная таблица.
   u      (table) - используемая таблица.
   list   (table) - список (всех) таблиц.
@@ -107,11 +108,12 @@ do
 
 -- Binary find of fitting position in sorted array.
 -- Двоичный поиск подходящей позиции в отсортированном массиве.
---[[ Параметры:
+--[[
+  -- @params:
   t     (table) - table to find in.
   v      (~nil) - value to find for.
   comp   (func) - function to compare.
-  -- Результат:
+  -- @return:
   index (number) - fitting position for value.
 --]]
 function unit.fitfind (t, v, comp) --> (index: 1..#t+1)
@@ -358,11 +360,12 @@ do
 
 -- Add data from u to t.
 -- Добавление данных из u в t.
---[[ Параметры:
-  kind (string) - вид добавления (см. kinds, по умолчанию update).
+--[[
+  -- @params:
+  kind (string) - вид добавления (@see kinds, @default = 'update').
   ...           - дополнительные параметры для вызываемых функций:
     [1]    (bool) - "глубокий" просмотр таблицы.
-    [2]  (string) - поле метатаблицы при 'asmeta': по умолчанию '__index'.
+    [2]  (string) - поле метатаблицы при 'asmeta': @default = '__index'.
 --]]
 function unit.add (t, u, kind, tpairs, ...) --> (table)
   if kind == 'change' then
@@ -481,6 +484,7 @@ do
 -- 'pairs' function with metatables support.
 -- (Shmuel's implementation of allpairs, adapted for multimetas.)
 --[[
+  -- @params:
   t     (table) - table for pairing.
   make   (func) - function for make all tables related to t.
   ...           - parameters to call make(t, ...).
@@ -557,6 +561,7 @@ do
 -- 'pairs' function with field sort.
 -- Функция 'pairs' с сортировкой полей.
 --[[
+  -- @params:
   t     (table) - table for pairing.
   make (func) - function for make all tables related to t.
   kind  (table) - вид сериализации:

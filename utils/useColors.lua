@@ -212,7 +212,7 @@ function TColors.make (fg, bg, kind) --> (color)
   else
     return bor(fg, bshl(bg, TColors.Shift))
   end
-end ----
+end ---- make
 
 -- Make color (by colors).
 -- Формирование цвета (по цветам).
@@ -226,7 +226,7 @@ function TColors.cmake (fg, bg, kind) --> (color)
   else
     return bor(band(fg, TColors.FGMask), band(bg, TColors.BGMask))
   end
-end ----
+end ---- cmake
 
 ---------------------------------------- methods
 -- Make new color (by values).
@@ -241,7 +241,7 @@ function TColors:newColor (fg, bg, kind) --> (color)
   else
     return bor(fg, bshl(bg, self.Shift))
   end
-end ----
+end ---- newColor
 
 do
   local ColorFormat = "^(%a+)%s+.+%s+(%a+)$"
@@ -249,6 +249,7 @@ do
 -- Get color (by name).
 -- Получение цвета (по имени).
 --[[
+  -- @params:
   color  (string) - color name (may be color).
   kind   (string) - color format kind: table | number.
 --]]
@@ -265,13 +266,14 @@ function TColors:getColor (color, kind) --> (color)
   bg = bg and self[bg] or self.DefBG
 
   return self:newColor(fg, bg, kind)
-end ----
+end ---- getColor
 
 end -- do
 
 -- Get color from data and store value.
 -- Получение цвета из data и запоминание значения.
 --[[
+  -- @params:
   data    (table) - data table.
   name   (string) - field with color.
   prefix (string) - name prefix for value store.
@@ -288,7 +290,7 @@ function TColors:dataColor (data, name, prefix, kind) --> (color)
   color = self:getColor(data[name], kind)
   data[prefix..name] = color
   return color
-end ----
+end ---- dataColor
 
 --------------------------------------------------------------------------------
 context.colors = TColors -- 'colors' table in context

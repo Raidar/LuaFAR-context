@@ -101,7 +101,8 @@ end -- do
 local F = far.Flags
 
 do
---[[ Параметры:
+--[[
+  -- @params (for flag handling):
   f     (number|bit64 string) - значение флага.
   flags (number|bit64 string) - набор флагов.
   ...   (list)                - перечисление значений флагов.
@@ -182,11 +183,12 @@ do
 
 -- Convert table-flag to number.
 -- Преобразование флага-таблицы в число.
---[[ Пояснения:
+--[[
+  -- @notes:
   Значения обычных флагов: 0|1, false|true, nil.
   Значения численных флагов: число размером со слово.
   (Значение численного флага задаётся в младшем слове флага.)
-     Параметры:
+  -- @params:
   flags    (table) - преобразуемая таблица с флагами.
   numflags (table) - таблица со списком численных флагов.
 --]]
@@ -217,7 +219,8 @@ unit.PluginPath = unit.pluginPath() -- Current plugin path
 
 -- Used interface and help language.
 -- Используемый язык интерфейса и справки.
---[[ Результаты: таблица с полями:
+--[[
+  -- @return: таблица с полями:
   Main (string) - язык интерфейса.
   Help (string) - язык справки.
 --]]
@@ -242,7 +245,7 @@ end -- do
 
 ---------------------------------------- Message
 do
-  local farMsg = far.Message 
+  local farMsg = far.Message
 -- Simple message box.
 function unit.message (Title, Msg, Flags, Buttons) --| (window)
   return farMsg(Msg, Title, Buttons, Flags)
@@ -272,6 +275,7 @@ do
 function unit.fexists (filename) --> (bool)
   local f = io_open(filename, 'rb')
   if f then f:close() end
+
   return f ~= nil
 end ----
 

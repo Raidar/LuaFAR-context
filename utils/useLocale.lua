@@ -73,7 +73,8 @@ local f_fname = '%s%s%s'
 
 -- Check and get full file name with localization.
 -- Проверка и получение полного имени файла с локализацией.
---[[ Параметры:
+--[[
+  -- @params:
   path (string) - путь до файла локализации.
   name (string) - общая часть имени файла.
   loc  (string) - добавление к имени файла.
@@ -86,8 +87,8 @@ local locfname = unit.filename
 
 -- Check and get full file names with localization + by default.
 -- Проверка и получение полных имён файлов с локализацией + по умолчанию.
---[[ Параметры:
-  см. unit.filename.
+--[[
+  -- @params: @see unit.filename.
 --]]
 function unit.bothname (path, name, loc) --> (string/nil, string/nil)
   return loc and locfname(path, name, loc), locfname(path, name, 'Def')
@@ -108,7 +109,8 @@ end ----
 ---------------------------------------- Data
 -- Make data with Custom settings.
 -- Формирование данных по установкам Custom.
---[[ Параметры:
+--[[
+  -- @params:
   Custom (table) - установки скрипта.
   name  (string) - общая часть имени файла.
   t  (table|nil) - уже существующая таблица данных.
@@ -130,7 +132,8 @@ do
 
 -- Get locale data with Custom settings.
 -- Получение данных локализации по установкам Custom.
---[[ Параметры:
+--[[
+  -- @params:
   Custom   (table) - установки скрипта.
   locBasis (table) - существующая таблица данных локализации.
   defBasis (table) - существующая таблица данных по умолчанию.
@@ -162,10 +165,11 @@ end ----
 
 -- Get locale data with double settings.
 -- Получение данных локализации по двойному набору установок.
---[[ Параметры:
+--[[
+  -- @params:
   Custom    (table) - текущие установки скрипта.
   genCustom (table) - общие установки скрипта.
-  ... - остальные параметры unit.getData для текущих установок.
+  ...               - остальные параметры unit.getData для текущих установок.
 --]]
 function unit.getDual (Custom, genCustom, ...) --> (table)
   -- TODO: Use both error messages from getData!
@@ -225,14 +229,15 @@ local Locale_MT = { __index = TLocale }
 
 -- Make a localization class object.
 -- Формирование объекта класса локализации.
---[[ Параметры:
+--[[
+  -- @params:
   Custom   (table) - установки скрипта.
   Data     (table) - данные локализации.
   useError  (bool) - показ сообщения об ошибке вместо его возврата.
-  show      (func) - функция вывода сообщения (по умолчанию far.Message)
-                     параметры функции: (текст, [заголовок], [флаги]).
-     Результат:
-  объект с методами локализации.
+  show      (func) - функция вывода сообщения (@default = far.Message)
+                     @params: (текст, [заголовок], [флаги]).
+  -- @return:
+  object   (table) - объект с методами локализации.
 --]]
 function unit.make (Custom, Data, useError, show) --> (object)
   local self = {

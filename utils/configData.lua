@@ -88,7 +88,8 @@ do
   } ---
 
 -- Merge two config data tables.
---[[ Parameters:
+--[[
+  -- @params:
   base (table) - base config data table.
   user (table) - user config data table.
   mode (table) - mode table for merging config data tables.
@@ -146,7 +147,8 @@ local user_mask = '.usrcfg.%s_config'   -- configs' user folder
 local auto_mask = '.gencfg.%s_config'   -- auto-generated configs' folder
 
 -- Read config data from base and user config files.
---[[ Parameters:
+--[[
+  -- @params:
   regdata (table) - config registry data from ctxdata.reg.
 --]]
 function unit.read (regdata) --> (config table)
@@ -472,8 +474,9 @@ end --
 unit.isRegDataEqual = isRegDataEqual
 
 -- Fill information for config.
---[[ Parameters:
-  regdata (table) - see registerConfig.
+--[[
+  -- @params:
+  regdata (table) - @see unit.register.
 --]]
 local function fillRegData (regdata) --> (table)
   local key = regdata.key
@@ -494,13 +497,14 @@ end ---- fillRegData
 unit.fillRegData = fillRegData
 
 -- Register config data.
---[[ Parameters:
+--[[
+  -- @params:
   regdata (table) - information about config data:
-    key - config key name.
-    path - config filepath.
-    name - config filename.
+    key     - config key name.
+    path    - config filepath.
+    name    - config filename.
     inherit - inheritance flag.
-    mode - config merge mode.
+    mode    - config merge mode.
 --]]
 function unit.register (regdata) --> (bool)
   local t = fillRegData(regdata)
@@ -523,8 +527,9 @@ function unit.register (regdata) --> (bool)
 end ---- register
 
 -- Unregister config data.
---[[ Parameters:
-  regdata (table) - see unit.register.
+--[[
+  -- @params:
+  regdata (table) - @see unit.register.
 --]]
 function unit.unregister (regdata) --> (bool)
   local t = fillRegData(regdata)
