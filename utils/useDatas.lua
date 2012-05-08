@@ -292,8 +292,8 @@ do
     kind.indent = new_indent
 
     -- Write current table fields:
-    local isnull, x = true, 0
-    for k, v, n in kind.pairs(data, unpack(kind.pargs)) do
+    local isnull = true
+    for k, v in kind.pairs(data, unpack(kind.pargs)) do
       local s = KeyToStr(k)
       if s then
         local w, tp = ValToStr(v)
@@ -333,18 +333,22 @@ do
     shift  (string) - indent shift to pretty write.
     pairs    (func) - pairs function to get fields.
     pargs   (table) - array of arguments to call pairs.
+    TabToStr (func) - function to convert table to string.
+    ValToStr (func) - function to convert simple value to string.
   write  (func) - функция записи строки данных.
   -- Результаты:
   isOk (bool) - успешность операции.
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
-  local s, tp = ValToStr(data)
+  local kind = kind or {}
+  --logMsg(kind, "kind")
+
+  local s, tp = (kind.ValToStr or ValToStr)(data)
   if s then
     return write(name, " = ", s, "\n")
   end
   if tp ~= "table" then return end
 
-  local kind = kind or {}
   kind.saved = kind.saved or {}
   kind.indent = kind.indent or ""
   kind.shift = kind.shift or "  "
@@ -356,7 +360,7 @@ function unit.serialize (name, data, kind, write) --> (bool)
     write(kind.indent, "local ", name, "\n\n")
   end;
 
-  TabToStr(name, data, kind, write)
+  (kind.TabToStr or TabToStr)(name, data, kind, write)
 
   if kind.islocal then
     write(kind.indent, "\nreturn ", name, "\n")

@@ -19,6 +19,8 @@ local next, pairs = next, pairs
 local getmetatable, setmetatable = getmetatable, setmetatable
 local rawget = rawget
 
+local table = table
+
 ----------------------------------------
 local context = context
 
@@ -112,7 +114,7 @@ do
   -- Результат:
   index (number) - fitting position for value.
 --]]
-function unit.bfindfit (t, v, comp) --> (index: 1..#t+1)
+function unit.fitfind (t, v, comp) --> (index: 1..#t+1)
   local min, max = 1, #t + 1
   while max - min > 0 do
     local m = modf((max + min) / 2) -- TODO: optimize
@@ -124,12 +126,12 @@ function unit.bfindfit (t, v, comp) --> (index: 1..#t+1)
   end
 
   return max
-end ---- bfindfit
+end ---- fitfind
 
 -- Binary find in sorted array.
 -- Двоичный поиск в отсортированном массиве.
 function unit.bfind (t, v, comp) --> (index | nil)
-  local i = bfindfit(t, v, comp)
+  local i = fitfind(t, v, comp)
   return v == t[i] and i or nil
 end ---- bfind
 
@@ -445,83 +447,6 @@ end ---- hpairs
 
 end -- do
 
----------------------------------------- sortpairs
--- Compare values for table sort.
--- Сравнение значений для сортировки таблицы.
-function unit.sortcompare (v1, v2) --> (bool)
-  local t1, t2 = type(v1), type(v2)
-
-  -- 1 -- true/false
-  if t1 == 'boolean' then
-    if t2 ~= 'boolean' then return true end
-    return v1
-  end
-
-  -- 2 -- number
-  if t1 == 'number' then
-    if t2 ~= 'number' then return t2 ~= 'boolean' end
-    return v1 < v2
-  end
-
-  -- 3 -- string
-  if t1 == 'string' then
-    if t2 ~= 'string' then return t2 ~= 'boolean' and t2 ~= 'number' end
-    -- 3.1 -- one letter string
-    local l1, l2 = v1:len(), v2:len()
-    if l1 == 1 then return l2 > 1 or v1 < v2 end
-    if l2 == 1 then return l1 == 1 and v1 < v2 end
-    -- 3.2 -- other string
-    return v1 < v2
-  end
-
-  -- 4 -- other
-  return false
-end ---- sortcompare
-
-do
-  local t_sort = table.sort
-  local t_insert = table.insert
-  local t_find = unit.bfindfit
-  local sortcompare = unit.sortcompare
-
--- 'pairs' function with field sort.
--- Функция 'pairs' с сортировкой полей.
---[[
-  t     (table) - table for pairing.
-  make (func) - function for make all tables related to t.
-  kind  (table) - вид сериализации:
-    pairs    (func) - pairs function to get fields.
-    compare  (func) - compare function to compare field names.
-  ...           - parameters to call kind.pairs(t, ...).
---]]
-local function sortpairs (t, kind, ...) --> (func)
-  if not t then return end
-
-  local names = {}
-  local values = {}
-
-  local compare = kind.compare or sortcompare
-
-  for k, v in (kind.pairs or pairs)(t, ...) do
-    values[k] = v
-    local i = t_find(names, k, compare)
-    t_insert(names, i, k)
-  end
-
-  local k = 0
-  local function _next ()
-    k = k + 1
-    local m = names[k]
-    if m ~= nil then
-      return m, values[m]
-    end
-  end --
-
-  return _next
-end -- sortpairs
-
-end -- do
-
 ---------------------------------------- allpairs
 -- Make list of all tables.
 -- Формирование списка из всех таблиц.
@@ -587,6 +512,83 @@ function unit.allpairs (t, make, ...) --> (func)
 
   return _next
 end ---- allpairs
+
+end -- do
+
+---------------------------------------- sortpairs
+-- Compare values for table sort.
+-- Сравнение значений для сортировки таблицы.
+function unit.sortcompare (v1, v2) --> (bool)
+  local t1, t2 = type(v1), type(v2)
+
+  -- 1 -- true/false
+  if t1 == 'boolean' then
+    if t2 ~= 'boolean' then return true end
+    return v1
+  end
+
+  -- 2 -- number
+  if t1 == 'number' then
+    if t2 ~= 'number' then return t2 ~= 'boolean' end
+    return v1 < v2
+  end
+
+  -- 3 -- string
+  if t1 == 'string' then
+    if t2 ~= 'string' then return t2 ~= 'boolean' and t2 ~= 'number' end
+    -- 3.1 -- one letter string
+    local l1, l2 = v1:len(), v2:len()
+    if l1 == 1 then return l2 > 1 or v1 < v2 end
+    if l2 == 1 then return l1 == 1 and v1 < v2 end
+    -- 3.2 -- other string
+    return v1 < v2
+  end
+
+  -- 4 -- other
+  return false
+end ---- sortcompare
+
+do
+  local t_sort = table.sort
+  local t_insert = table.insert
+  local t_find = unit.fitfind
+  local sortcompare = unit.sortcompare
+
+-- 'pairs' function with field sort.
+-- Функция 'pairs' с сортировкой полей.
+--[[
+  t     (table) - table for pairing.
+  make (func) - function for make all tables related to t.
+  kind  (table) - вид сериализации:
+    pairs    (func) - pairs function to get fields.
+    compare  (func) - compare function to compare field names.
+  ...           - parameters to call kind.pairs(t, ...).
+--]]
+function unit.sortpairs (t, kind, ...) --> (func)
+  if not t then return end
+
+  local names = {}
+  local values = {}
+
+  local comp = kind.compare or sortcompare
+
+  for k, v in (kind.pairs or pairs)(t, ...) do
+    values[k] = v
+    local i = t_find(names, k, comp)
+    t_insert(names, i, k)
+  end
+
+  local k = 0
+  local function _next ()
+    k = k + 1
+    local m = names[k]
+    if m ~= nil then
+      return m, values[m]
+    end
+  end --
+
+  return _next
+end ---- sortpairs
 
 end -- do
 
