@@ -73,8 +73,8 @@ local addData = unit.add
 -- Формирование списка из всех таблиц конфигурации.
 --[[
   -- @params:
-  t    (table) - base table.
-  list (table) - list of tables.
+  t     (table) - base table.
+  list  (table) - list of tables.
 --]]
 local function _cfglist (t, list) --> (table)
   if not list[t] then
@@ -118,10 +118,10 @@ do
 --[[
   -- @params:
   fullname (string) - полное имя файла.
-  t     (table|nil) - уже существующая таблица данных.
+  t         (t|nil) - уже существующая таблица данных.
   kind     (string) - вид добавления (@see tables.add, @default = 'update').
   -- @return:
-  data (table|nil) - таблица с данными.
+  data      (t|nil) - таблица с данными.
 --]]
 function unit.load (fullname, t, kind) --> (table | nil, error)
   if not fullname then
@@ -150,8 +150,8 @@ end -- do
 -- Поиск файла данных на path.
 --[[
   -- @params:
-  name (string) - имя файла.
-  path (string) - строка со списком путей-масок.
+  name     (string) - имя файла.
+  path     (string) - строка со списком путей-масок.
   -- @return:
   fullname (string) - полное имя файла.
 --]]
@@ -168,12 +168,12 @@ do
 -- Загрузка данных из файла с помощью require.
 --[[
   -- @params:
-  name  (string) - имя файла.
-  t  (table|nil) - уже существующая таблица данных.
-  kind  (string) - вид добавления (@see unit.add, @default 'update').
-  reload  (bool) - признак перезагрузки при повторной загрузке данных.
+  name (string) - имя файла.
+  t     (t|nil) - уже существующая таблица данных.
+  kind (string) - вид добавления (@see unit.add, @default 'update').
+  reload (bool) - признак перезагрузки при повторной загрузке данных.
   -- @return:
-  data (table|nil) - таблица с данными.
+  data  (table) - таблица с данными.
 --]]
 function unit.require (name, t, kind, reload) --> (table | nil, error)
   if not name then
@@ -198,13 +198,13 @@ end -- do
 -- Формирование данных с помощью loadfile или require.
 --[[
   -- @params:
-  path  (string) - путь к файлу.
-  name  (string) - имя файла.
-  ext   (string) - расширение файла.
-  t  (table|nil) - уже существующая таблица данных.
-  kind  (string) - вид добавления (@see unit.add).
+  path (string) - путь к файлу.
+  name (string) - имя файла.
+  ext  (string) - расширение файла.
+  t     (t|nil) - уже существующая таблица данных.
+  kind (string) - вид добавления (@see unit.add).
   -- @return:
-  data (table|nil) - таблица с данными.
+  data  (table) - таблица с данными.
 --]]
 function unit.make (path, name, ext, t, kind) --> (table | nil, error)
   if not name then
@@ -242,6 +242,7 @@ do
       if long and
          value:len() > long and
          value:find("\n", 1, true) and
+         not value:find("%s\n") and
          --not value:find("%[%[.-%]%]") and
          not value:find("[[", 1, true) and
          not value:find("]]", 1, true) then
@@ -281,27 +282,30 @@ do
   -- Convert table to string.
   -- Преобразование таблицы в строку.
   local function TabToStr (name, data, kind, write) --| (write)
-    local kind = kind
-    local value = kind.saved[data]
-    if value then -- saved name as value
-      write(indent, name, " = ", value, "\n")
-      return
+    do
+      local value = kind.saved[data]
+      if value then -- saved name as value
+        write(indent, name, " = ", value, "\n")
+        return
+      end
+      kind.saved[data] = name
+      --logMsg({ name, kind, data or "nil" }, "kind", 3)
     end
-    --logMsg({ name, kind, data or "nil" }, "kind", 3)
-    kind.saved[data] = name
+
     -- Settings to write current table:
-    local tempname = kind.tempname
     local cur_indent = kind.indent
     local new_indent = cur_indent..kind.shift
-
     kind.indent = new_indent
+
+    local long = kind.long
+    local tempname = kind.tempname
 
     -- Write current table fields:
     local isnull = true
     for k, v in kind.pairs(data, unpack(kind.pargs)) do
       local s = KeyToStr(k)
       if s then
-        local w, tp = ValToStr(v)
+        local w, tp = ValToStr(v, long)
         if isnull and (w or tp == 'table') then
           isnull = false
           write(cur_indent, format("do local %s = {}; %s = %s\n",
@@ -322,7 +326,6 @@ do
     end
 
     kind.indent = cur_indent -- restore indent
-
     return true
   end -- TabToStr
   unit.TabToStr = TabToStr
@@ -340,13 +343,15 @@ do
     pairs    (func) - pairs function to get fields.
     pargs   (table) - array of arguments to call pairs.
     islocal  (bool) - using 'local name = {} ... return name' structure.
+    --length (number) - max length of line to write array.
+    --count  (number) - item count in line to write array.
     long  (b|n|nil) - using long brackets for strings
                       (long as number is for min len).
     ValToStr (func) - function to convert simple value to string.
     TabToStr (func) - function to convert table to string.
   write  (func) - функция записи строки данных.
   -- @return:
-  isOk (bool) - успешность операции.
+  isOk   (bool) - успешность операции.
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
   local kind = kind or {}
@@ -394,10 +399,10 @@ do
   -- @params:
   fullname (string) - полное имя файла.
   name     (string) - название таблицы данных.
-  data  (table|nil) - обрабатываемая таблица данных.
+  data      (t|nil) - обрабатываемая таблица данных.
   kind      (table) - вид сохранения (@see serialize.kind).
   -- @return:
-  isOk (bool) - успешность операции.
+  isOk       (bool) - успешность операции.
 --]]
 function unit.save (fullname, name, data, kind) --> (bool)
   kind = kind or {}
