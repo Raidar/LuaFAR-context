@@ -23,6 +23,8 @@ local context = context
 local unit = {}
 
 ---------------------------------------- base
+unit.KeywordMask = "^[a-zA-Z_][a-zA-Z_0-9]-$"
+
 unit.keywords = {
   ["do"] = true,
   ["end"] = true,

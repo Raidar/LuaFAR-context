@@ -248,33 +248,32 @@ do
   unit.ValToStr = ValToStr
 
   local reserveds = context.lua.keywords
+  local KeywordMask = context.lua.KeywordMask
 
   -- Convert key name to string.
   -- Преобразование имени ключа в строку.
-  local function KeyToStr (key, asvalue) --> (string)
+  local function KeyToStr (key) --> (string)
     local tp = type(key)
     if tp ~= 'string' then
       local key = ValToStr(key)
       if key then
-        if asvalue then return key end
         return format("[%s]", key)
       end
       return nil, tp
     end
 
-    if key:find("^[a-zA-Z_][a-zA-Z_0-9]-$") and not reserveds[key] then
+    if key:find(KeywordMask) and not reserveds[key] then
       return "."..key
-    end
-    if asvalue then
-      return format("%q", key)
     end
     return format("[%q]", key)
   end -- KeyToStr
   unit.KeyToStr = KeyToStr
 
+  local unpack = unpack
+
   -- Convert table to string.
   -- Преобразование таблицы в строку.
-  local function TabToStr (name, data, kind, write)
+  local function TabToStr (name, data, kind, write) --| (write)
     local kind = kind
     local value = kind.saved[data]
     if value then -- saved name as value
@@ -287,7 +286,6 @@ do
     local tempname = kind.tempname
     local cur_indent = kind.indent
     local new_indent = cur_indent..kind.shift
-    local tabno = kind.tabno
 
     kind.indent = new_indent
 
@@ -297,14 +295,14 @@ do
       local s = KeyToStr(k)
       if s then
         local w, tp = ValToStr(v)
-        if isnull then
+        if isnull and (w or tp == 'table') then
           isnull = false
           write(cur_indent, format("do local %s = {}; %s = %s\n",
                                    tempname, name, tempname)) -- do
         end
         if w then
           write(new_indent, format("%s%s = %s\n", tempname, s, w))
-        elseif tp == "table" then
+        elseif tp == 'table' then
           TabToStr(name..s, v, kind, write)
         end
       end
@@ -347,7 +345,7 @@ function unit.serialize (name, data, kind, write) --> (bool)
   if s then
     return write(name, " = ", s, "\n")
   end
-  if tp ~= "table" then return end
+  if tp ~= 'table' then return end
 
   kind.saved = kind.saved or {}
   kind.indent = kind.indent or ""

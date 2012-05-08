@@ -567,10 +567,11 @@ do
 function unit.sortpairs (t, kind, ...) --> (func)
   if not t then return end
 
+  local kind = kind or {}
+  local comp = kind.compare or sortcompare
+
   local names = {}
   local values = {}
-
-  local comp = kind.compare or sortcompare
 
   for k, v in (kind.pairs or pairs)(t, ...) do
     values[k] = v
