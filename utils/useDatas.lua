@@ -230,7 +230,7 @@ do
 
   -- Convert simple value to string.
   -- Преобразование простого значения в строку.
-  local function ValToStr (value, long) --> (string | nil, type)
+  local function ValToStr (value, strlong) --> (string | nil, type)
     local tp = type(value)
     if tp == 'boolean' then return tostring(value) end
     if tp == 'number' then
@@ -239,8 +239,8 @@ do
     end
 
     if tp == 'string' then
-      if long and
-         value:len() > long and
+      if strlong and
+         value:len() > strlong and
          value:find("\n", 1, true) and
          not value:find("%s\n") and
          --not value:find("%[%[.-%]%]") and
@@ -260,7 +260,7 @@ do
 
   -- Convert key name to string.
   -- Преобразование имени ключа в строку.
-  local function KeyToStr (key) --> (string)
+  local function KeyToStr (key, nosep) --> (string)
     local tp = type(key)
     if tp ~= 'string' then
       local key = ValToStr(key)
@@ -271,7 +271,7 @@ do
     end
 
     if key:find(KeywordMask) and not reserveds[key] then
-      return "."..key
+      return nosep and key or "."..key
     end
     return format("[%q]", key)
   end -- KeyToStr
@@ -293,39 +293,45 @@ do
     end
 
     -- Settings to write current table:
+    kind.level = kind.level + 1
     local cur_indent = kind.indent
     local new_indent = cur_indent..kind.shift
     kind.indent = new_indent
 
-    local long = kind.long
-    local tempname = kind.tempname
+    local strlong = kind.strlong
+    local tname = kind.tname
+    tname = (kind.level % 2 == 1) and tname or (tname == "t" and "u" or "t")
 
     -- Write current table fields:
     local isnull = true
     for k, v in kind.pairs(data, unpack(kind.pargs)) do
       local s = KeyToStr(k)
       if s then
-        local w, tp = ValToStr(v, long)
+        local w, tp = ValToStr(v, strlong)
         if isnull and (w or tp == 'table') then
           isnull = false
           write(cur_indent, format("do local %s = {}; %s = %s\n",
-                                   tempname, name, tempname)) -- do
+                                   tname, name, tname)) -- do
         end
         if w then
-          write(new_indent, format("%s%s = %s\n", tempname, s, w))
+          write(new_indent, format("%s%s = %s\n", tname, s, w))
         elseif tp == 'table' then
-          TabToStr(name..s, v, kind, write)
+          TabToStr((kind.tnaming and tname or name)..s, v, kind, write)
         end
       end
     end
 
     if isnull then
-      write(cur_indent, name, " = {}\n")
+      write(cur_indent, name, " = {}")
     else
-      write(cur_indent, "end\n"); -- end
+      write(cur_indent, "end") -- end
     end
+    write(cur_indent, "\n")
 
-    kind.indent = cur_indent -- restore indent
+    -- Restore settings
+    kind.level = kind.level - 1
+    kind.indent = cur_indent
+
     return true
   end -- TabToStr
   unit.TabToStr = TabToStr
@@ -337,18 +343,19 @@ do
   name (string) - название для данных.
   data  (table) - сохраняемые данные.
   kind  (table) - вид сериализации:
-    saved   (table) - names of tables already saved.
-    indent (string) - initial indent value to write.
-    shift  (string) - indent shift to pretty write fields.
-    pairs    (func) - pairs function to get fields.
-    pargs   (table) - array of arguments to call pairs.
-    islocal  (bool) - using 'local name = {} ... return name' structure.
-    --length (number) - max length of line to write array.
-    --count  (number) - item count in line to write array.
-    long  (b|n|nil) - using long brackets for strings
-                      (long as number is for min len).
-    ValToStr (func) - function to convert simple value to string.
-    TabToStr (func) - function to convert table to string.
+    saved     (table) - names of tables already saved.
+    indent   (string) - initial indent value to write.
+    shift    (string) - indent shift to pretty write fields.
+    pairs      (func) - pairs function to get fields.
+    pargs     (table) - array of arguments to call pairs.
+    localret   (bool) - using 'local name = {} ... return name' structure.
+    lcount   (number) - field count in line to write array.
+    lenmax   (number) - length maximum of line to write array.
+    strlong (b|n|nil) - using long brackets for string formatting
+                        (strlong as number is for string length minimum).
+    tnaming    (bool) - using temp names to access fields.
+    ValToStr   (func) - function to convert simple value to string.
+    TabToStr   (func) - function to convert table to string.
   write  (func) - функция записи строки данных.
   -- @return:
   isOk   (bool) - успешность операции.
@@ -357,9 +364,9 @@ function unit.serialize (name, data, kind, write) --> (bool)
   local kind = kind or {}
   --logMsg(kind, "kind")
 
-  local s, tp = (kind.ValToStr or ValToStr)(data, kind.long)
+  local s, tp = (kind.ValToStr or ValToStr)(data, kind.strlong)
   if s then
-    if kind.islocal then
+    if kind.localret then
       return write(format("local %s = %s\nreturn %s\n", name, s, name))
     end
     return write(name, " = ", s, "\n")
@@ -371,15 +378,17 @@ function unit.serialize (name, data, kind, write) --> (bool)
   kind.shift = kind.shift or "  "
   kind.pairs = kind.pairs or pairs
   kind.pargs = kind.pargs or {}
-  kind.tempname = (name == "t") and "u" or "t" -- prevent collision of names
 
-  if kind.islocal then
+  kind.level = 0 -- deep level for table nesting
+  kind.tname = (name == "t") and "u" or "t" -- prevent collision of names
+
+  if kind.localret then
     write(kind.indent, "local ", name, "\n\n")
   end;
 
   (kind.TabToStr or TabToStr)(name, data, kind, write)
 
-  if kind.islocal then
+  if kind.localret then
     write(kind.indent, "\nreturn ", name, "\n")
   end
 
