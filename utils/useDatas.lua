@@ -336,6 +336,167 @@ do
   end -- TabToStr
   unit.TabToStr = TabToStr
 
+  local unpack = unpack
+  local statpairs = tables.statpairs
+
+  -- Convert table to pretty text.
+  -- Преобразование таблицы в читабельный текст.
+  local function TabToText (name, data, kind, write) --| (write)
+    do
+      local value = kind.saved[data]
+      if value then -- saved name as value
+        write(indent, name, " = ", value, "\n")
+        return
+      end
+      kind.saved[data] = name
+    end
+
+    -- Settings to write current table:
+    kind.level = kind.level + 1
+    local level = kind.level
+
+    local cur_indent = kind.indent
+    local new_indent = cur_indent..kind.shift
+    kind.indent = new_indent
+    local isarray = kind.isarray
+
+    local sortkind = kind.pargs[1] or {}
+    local sortnext = statpairs(data, sortkind, unpack(kind.pargs, 2))
+
+    if level == 1 then kind.nestless = {} end
+    kind.nestless[level] = sortkind.stats['table'] == 0
+    local nestless = kind.astable or kind.nestless[level]
+
+    -- Write current table fields:
+    local skip = {}
+    local isnull = true
+
+    -- Simplified write array fields:
+    if nestless then
+      kind.isarray = true
+
+      -- Settings to write fields in one line
+      local lcount, lenmax = kind.lcount, kind.lenmax
+      if type(lcount) == 'function' then
+        lcount = lcount(name, data)
+      end
+      if type(lenmax) == 'function' then
+        lenmax = lenmax(name, data)
+      end
+
+      local l = 0 -- new line count-flag
+      local cnt, len, indlen = 1, 0, new_indent:len()
+
+      local k, v = 1, data[1]
+      while v ~= nil do
+        skip[k] = v
+        local w, tp = ValToStr(v)
+        if isnull and (w or tp == 'table') then
+          isnull = false
+          if isarray then
+            write(cur_indent, "{\n") -- {
+          else
+            write(cur_indent, name, " = {\n") -- {
+          end
+        end
+
+        if w then
+          if lcount or lenmax then
+            l = l + 1
+            cnt = cnt + 1
+            len = len + w:len() + 2 -- 2 for ' ' + ','
+            if l == 1 or
+               lcount and cnt > lcount or
+               lenmax and len >= lenmax then
+              cnt = 1
+              len = indlen + w:len()
+              write(l > 1 and "\n" or "", new_indent, w, ",")
+            else
+              write(" ", w, ",")
+            end
+          else
+            write(new_indent, w, ",\n")
+          end
+        elseif tp == 'table' then
+          if lcount or lenmax then
+            l = 0
+            write("\n")
+          end
+          TabToText(KeyToStr(k), v, kind, write)
+        end
+
+        k = k + 1
+        v = data[k]
+      end -- while
+
+      if not isnull then write("\n") end
+      kind.isarray = isarray
+    end -- if nestless
+
+    local tname = kind.tname
+    tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
+
+    -- Simplified write hash(+array) fields:
+    for k, v in sortnext do
+      if not skip[k] then
+        local s = KeyToStr(k, nestless)
+        if s then
+          local w, tp = ValToStr(v)
+          if isnull and (w or tp == 'table') then
+            isnull = false
+            --logMsg({ nestless, kind }, "table", 2)
+            if nestless then
+              if isarray then
+                write(cur_indent, "{\n") -- {
+              else
+                write(cur_indent, name, " = {\n") -- {
+              end
+            else
+              write(cur_indent, format("do local %s = {}; %s = %s\n",
+                                       tname, name, tname)) -- do
+            end
+          end
+
+          if w then
+            if nestless then
+              write(new_indent, format("%s = %s,\n", s, w))
+            else
+              write(new_indent, format("%s%s = %s\n", tname, s, w))
+            end
+
+          elseif tp == 'table' then
+            if nestless then
+              TabToText(s, v, kind, write)
+            else
+              TabToText((kind.tnaming and tname or name)..s, v, kind, write)
+            end
+          end
+        end
+      end
+    end -- for
+
+    if isnull then
+      write(cur_indent, name, " = {}")
+    else
+      if nestless then
+        write(cur_indent, "}") -- }
+      else
+        write(cur_indent, "end") -- end
+      end
+    end
+    if level > 1 and (kind.astable or kind.nestless[level - 1]) then
+      write(",")
+    end
+    write("\n")
+
+    -- Restore settings
+    kind.level = kind.level - 1
+    kind.indent = cur_indent
+
+    return true
+  end -- TabToText
+  unit.TabToText = TabToText
+
 -- Serialize data with write.
 -- Сериализация данных с помощью write.
 --[[
@@ -349,13 +510,15 @@ do
     pairs      (func) - pairs function to get fields.
     pargs     (table) - array of arguments to call pairs.
     localret   (bool) - using 'local name = {} ... return name' structure.
-    lcount   (number) - field count in line to write array.
-    lenmax   (number) - length maximum of line to write array.
     strlong (b|n|nil) - using long brackets for string formatting
                         (strlong as number is for string length minimum).
     tnaming    (bool) - using temp names to access fields.
     ValToStr   (func) - function to convert simple value to string.
     TabToStr   (func) - function to convert table to string.
+    -- @fields for TabToText only:
+    astable    (bool) - write data as whole table ({ fields }).
+    lcount   (number) - field count in line to write array.
+    lenmax   (number) - length maximum of line to write array.
   write  (func) - функция записи строки данных.
   -- @return:
   isOk   (bool) - успешность операции.

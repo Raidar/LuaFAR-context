@@ -596,6 +596,48 @@ function unit.sortpairs (t, kind, ...) --> (func)
   return _next
 end ---- sortpairs
 
+-- 'sortpairs' function with gathering some statistics.
+-- Функция 'sortpairs' со сбором некоторой статистики.
+function unit.statpairs (t, kind, ...) --> (func)
+  if not t then return end
+
+  assert(type(kind) == 'table')
+  local comp = kind.compare or sortcompare
+
+  -- Статистика по типам значений:
+  local stats = {
+    ['boolean'] = 0,
+    ['number']  = 0,
+    ['string']  = 0,
+    ['table']   = 0,
+  } --
+  kind.stats = stats
+
+  local names = {}
+  local values = {}
+
+  for k, v in (kind.pairs or pairs)(t, ...) do
+    values[k] = v
+
+    local tp = type(v)
+    stats[tp] = (stats[tp] or 0) + 1
+
+    local i = t_find(names, k, comp)
+    t_insert(names, i, k)
+  end
+
+  local k = 0
+  local function _next ()
+    k = k + 1
+    local m = names[k]
+    if m ~= nil then
+      return m, values[m]
+    end
+  end --
+
+  return _next
+end ---- statpairs
+
 end -- do
 
 ---------------------------------------- fill
