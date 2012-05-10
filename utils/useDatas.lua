@@ -52,11 +52,11 @@ unit.Dataless = context.utils.null -- A field data for undatum field
 -- Добавление данных из пользовательской таблицы в базовую.
 --[[
   -- @params (@see tables.add):
-  base  (table) - базовая таблица.
-  user  (table) - пользовательская таблица.
-  kind (string) - вид добавления.
-  tpairs (func) - функция для получения значений таблицы.
-  value  (bool) - дополнительный параметр.
+  base  (table) - base table.
+  user  (table) - user table.
+  kind (string) - kind of addition.
+  tpairs (func) - pairs-function to get fields values.
+  value  (bool) - additional parameter.
 --]]
 function unit.add (base, user, kind, tpairs, deep, ...) --> (table)
   if not base then return user end
@@ -117,11 +117,11 @@ do
 -- Загрузка данных из файла с помощью loadfile.
 --[[
   -- @params:
-  fullname (string) - полное имя файла.
-  t         (t|nil) - уже существующая таблица данных.
-  kind     (string) - вид добавления (@see tables.add, @default = 'update').
+  fullname (string) - full file name.
+  t         (t|nil) - already existing data table.
+  kind     (string) - kind of addition (@see tables.add, @default = 'update').
   -- @return:
-  data      (t|nil) - таблица с данными.
+  data      (t|nil) - data table.
 --]]
 function unit.load (fullname, t, kind) --> (table | nil, error)
   if not fullname then
@@ -150,10 +150,10 @@ end -- do
 -- Поиск файла данных на path.
 --[[
   -- @params:
-  name     (string) - имя файла.
-  path     (string) - строка со списком путей-масок.
+  name     (string) - file name.
+  path     (string) - string with path-mask list.
   -- @return:
-  fullname (string) - полное имя файла.
+  fullname (string) - full file name.
 --]]
 function unit.find (name, path) --> (string)
   path = path or package.path
@@ -168,12 +168,12 @@ do
 -- Загрузка данных из файла с помощью require.
 --[[
   -- @params:
-  name (string) - имя файла.
-  t     (t|nil) - уже существующая таблица данных.
-  kind (string) - вид добавления (@see unit.add, @default 'update').
-  reload (bool) - признак перезагрузки при повторной загрузке данных.
+  name (string) - file name.
+  t     (t|nil) - already existing data table.
+  kind (string) - kind of data require (@see unit.add, @default 'update').
+  reload (bool) - flag for reload on repeated data load.
   -- @return:
-  data  (table) - таблица с данными.
+  data  (table) - data table.
 --]]
 function unit.require (name, t, kind, reload) --> (table | nil, error)
   if not name then
@@ -198,13 +198,13 @@ end -- do
 -- Формирование данных с помощью loadfile или require.
 --[[
   -- @params:
-  path (string) - путь к файлу.
-  name (string) - имя файла.
-  ext  (string) - расширение файла.
-  t     (t|nil) - уже существующая таблица данных.
-  kind (string) - вид добавления (@see unit.add).
+  path (string) - file path.
+  name (string) - file name.
+  ext  (string) - file extension.
+  t     (t|nil) - already existing data table.
+  kind (string) - kind of data load (@see unit.add).
   -- @return:
-  data  (table) - таблица с данными.
+  data  (table) - data table.
 --]]
 function unit.make (path, name, ext, t, kind) --> (table | nil, error)
   if not name then
@@ -228,282 +228,298 @@ do
   local format = string.format
   local frexp, modf = math.frexp, math.modf
 
-  -- Convert simple value to string.
-  -- Преобразование простого значения в строку.
-  local function ValToStr (value, strlong) --> (string | nil, type)
-    local tp = type(value)
-    if tp == 'boolean' then return tostring(value) end
-    if tp == 'number' then
-      if value == modf(value) then return tostring(value) end -- integer
-      return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
-    end
+-- Convert simple value to string.
+-- Преобразование простого значения в строку.
+local function ValToStr (value, strlong) --> (string | nil, type)
+  local tp = type(value)
+  if tp == 'boolean' then return tostring(value) end
+  if tp == 'number' then
+    if value == modf(value) then return tostring(value) end -- integer
+    return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
+  end
 
-    if tp == 'string' then
-      if strlong and
-         value:len() > strlong and
-         value:find("\n", 1, true) and
-         not value:find("%s\n") and
-         --not value:find("%[%[.-%]%]") and
-         not value:find("[[", 1, true) and
-         not value:find("]]", 1, true) then
-        return ("[[\n%s]]"):format(value) -- [[string]]
-      end
-      return ("%q"):format(value) -- "string"
+  if tp == 'string' then
+    if strlong and
+       value:len() > strlong and
+       value:find("\n", 1, true) and
+       not value:find("%s\n") and
+       --not value:find("%[%[.-%]%]") and
+       not value:find("[[", 1, true) and
+       not value:find("]]", 1, true) then
+      return ("[[\n%s]]"):format(value) -- [[string]]
     end
+    return ("%q"):format(value) -- "string"
+  end
 
-    return nil, tp
-  end -- ValToStr
-  unit.ValToStr = ValToStr
+  return nil, tp
+end -- ValToStr
+unit.ValToStr = ValToStr
 
   local reserveds = context.lua.keywords
   local KeywordMask = context.lua.KeywordMask
 
-  -- Convert key name to string.
-  -- Преобразование имени ключа в строку.
-  local function KeyToStr (key, nosep) --> (string)
-    local tp = type(key)
-    if tp ~= 'string' then
-      local key = ValToStr(key)
-      if key then
-        return format("[%s]", key)
-      end
-      return nil, tp
+-- Convert key name to string.
+-- Преобразование имени ключа в строку.
+local function KeyToStr (key, nosep) --> (string)
+  local tp = type(key)
+  if tp ~= 'string' then
+    local key = ValToStr(key)
+    if key then
+      return format("[%s]", key)
     end
+    return nil, tp
+  end
 
-    if key:find(KeywordMask) and not reserveds[key] then
-      return nosep and key or "."..key
-    end
-    return format("[%q]", key)
-  end -- KeyToStr
-  unit.KeyToStr = KeyToStr
+  if key:find(KeywordMask) and not reserveds[key] then
+    return nosep and key or "."..key
+  end
+  return format("[%q]", key)
+end -- KeyToStr
+unit.KeyToStr = KeyToStr
 
   local unpack = unpack
 
-  -- Convert table to string.
-  -- Преобразование таблицы в строку.
-  local function TabToStr (name, data, kind, write) --| (write)
-    do
-      local value = kind.saved[data]
-      if value then -- saved name as value
-        write(indent, name, " = ", value, "\n")
-        return
+-- Convert table to string.
+-- Преобразование таблицы в строку.
+--[[
+  -- @params (@see unit.serialize).
+  -- @return:
+  isOk   (bool) - operation success flag.
+--]]
+local function TabToStr (name, data, kind, write) --| (write)
+  do
+    local value = kind.saved[data]
+    if value then -- saved name as value
+      write(indent, name, " = ", value, "\n")
+      return
+    end
+    kind.saved[data] = name
+    --logMsg({ name, kind, data or "nil" }, "kind", 3)
+  end
+
+  -- Settings to write current table:
+  kind.level = kind.level + 1
+  local cur_indent = kind.indent
+  local new_indent = cur_indent..kind.shift
+  kind.indent = new_indent
+
+  local strlong = kind.strlong
+  local tname = kind.tname
+  tname = (kind.level % 2 == 1) and tname or (tname == "t" and "u" or "t")
+
+  -- Write current table fields:
+  local isnull = true
+  for k, v in kind.pairs(data, unpack(kind.pargs)) do
+    local s = KeyToStr(k)
+    if s then
+      local w, tp = ValToStr(v, strlong)
+      if isnull and (w or tp == 'table') then
+        isnull = false
+        write(cur_indent, format("do local %s = {}; %s = %s\n",
+                                 tname, name, tname)) -- do
       end
-      kind.saved[data] = name
-      --logMsg({ name, kind, data or "nil" }, "kind", 3)
-    end
-
-    -- Settings to write current table:
-    kind.level = kind.level + 1
-    local cur_indent = kind.indent
-    local new_indent = cur_indent..kind.shift
-    kind.indent = new_indent
-
-    local strlong = kind.strlong
-    local tname = kind.tname
-    tname = (kind.level % 2 == 1) and tname or (tname == "t" and "u" or "t")
-
-    -- Write current table fields:
-    local isnull = true
-    for k, v in kind.pairs(data, unpack(kind.pargs)) do
-      local s = KeyToStr(k)
-      if s then
-        local w, tp = ValToStr(v, strlong)
-        if isnull and (w or tp == 'table') then
-          isnull = false
-          write(cur_indent, format("do local %s = {}; %s = %s\n",
-                                   tname, name, tname)) -- do
-        end
-        if w then
-          write(new_indent, format("%s%s = %s\n", tname, s, w))
-        elseif tp == 'table' then
-          TabToStr((kind.tnaming and tname or name)..s, v, kind, write)
-        end
+      if w then
+        write(new_indent, format("%s%s = %s\n", tname, s, w))
+      elseif tp == 'table' then
+        TabToStr((kind.tnaming and tname or name)..s, v, kind, write)
       end
     end
+  end
 
-    if isnull then
-      write(cur_indent, name, " = {}")
-    else
-      write(cur_indent, "end") -- end
-    end
-    write(cur_indent, "\n")
+  if isnull then
+    write(cur_indent, name, " = {}")
+  else
+    write(cur_indent, "end") -- end
+  end
+  write(cur_indent, "\n")
 
-    -- Restore settings
-    kind.level = kind.level - 1
-    kind.indent = cur_indent
+  -- Restore settings
+  kind.level = kind.level - 1
+  kind.indent = cur_indent
 
-    return true
-  end -- TabToStr
-  unit.TabToStr = TabToStr
+  return true
+end -- TabToStr
+unit.TabToStr = TabToStr
 
   local unpack = unpack
   local statpairs = tables.statpairs
 
-  -- Convert table to pretty text.
-  -- Преобразование таблицы в читабельный текст.
-  local function TabToText (name, data, kind, write) --| (write)
-    do
-      local value = kind.saved[data]
-      if value then -- saved name as value
-        write(indent, name, " = ", value, "\n")
-        return
-      end
-      kind.saved[data] = name
+-- Convert table to pretty text.
+-- Преобразование таблицы в читабельный текст.
+--[[
+  -- @params (@see unit.serialize):
+  kind  (table) - conversion kind: @fields additions:
+    pargs[1]  (table) - sortkind (@see tables.statpairs).
+    astable    (bool) - write data as whole table ({ fields }).
+    lcount   (number) - field count in line to write array.
+    lenmax   (number) - length maximum of line to write array.
+  -- @return:
+  isOk   (bool) - operation success flag.
+--]]
+local function TabToText (name, data, kind, write) --| (write)
+  do
+    local value = kind.saved[data]
+    if value then -- saved name as value
+      write(indent, name, " = ", value, "\n")
+      return
+    end
+    kind.saved[data] = name
+  end
+
+  -- Settings to write current table:
+  kind.level = kind.level + 1
+  local level = kind.level
+
+  local cur_indent = kind.indent
+  local new_indent = cur_indent..kind.shift
+  kind.indent = new_indent
+  local isarray = kind.isarray
+
+  local sortkind = kind.pargs[1] or {}
+  local sortnext = statpairs(data, sortkind, unpack(kind.pargs, 2))
+  --logMsg(sortkind.stats, "statpairs stats")
+
+  if level == 1 then kind.nestless = {} end
+  kind.nestless[level] = sortkind.stats['table'] == 0
+  local nestless = kind.astable or kind.nestless[level]
+
+  -- Write current table fields:
+  local skip = {}
+  local isnull = true
+
+  -- Simplified write array fields:
+  if nestless then
+    kind.isarray = true
+
+    -- Settings to write fields in one line
+    local lcount, lenmax = kind.lcount, kind.lenmax
+    if type(lcount) == 'function' then
+      lcount = lcount(name, data)
+    end
+    if type(lenmax) == 'function' then
+      lenmax = lenmax(name, data)
     end
 
-    -- Settings to write current table:
-    kind.level = kind.level + 1
-    local level = kind.level
+    local l = 0 -- new line count-flag
+    local cnt, len, indlen = 1, 0, new_indent:len()
 
-    local cur_indent = kind.indent
-    local new_indent = cur_indent..kind.shift
-    kind.indent = new_indent
-    local isarray = kind.isarray
-
-    local sortkind = kind.pargs[1] or {}
-    local sortnext = statpairs(data, sortkind, unpack(kind.pargs, 2))
-
-    if level == 1 then kind.nestless = {} end
-    kind.nestless[level] = sortkind.stats['table'] == 0
-    local nestless = kind.astable or kind.nestless[level]
-
-    -- Write current table fields:
-    local skip = {}
-    local isnull = true
-
-    -- Simplified write array fields:
-    if nestless then
-      kind.isarray = true
-
-      -- Settings to write fields in one line
-      local lcount, lenmax = kind.lcount, kind.lenmax
-      if type(lcount) == 'function' then
-        lcount = lcount(name, data)
-      end
-      if type(lenmax) == 'function' then
-        lenmax = lenmax(name, data)
+    local k, v = 1, data[1]
+    while v ~= nil do
+      skip[k] = v
+      local w, tp = ValToStr(v)
+      if isnull and (w or tp == 'table') then
+        isnull = false
+        if isarray then
+          write(cur_indent, "{\n") -- {
+        else
+          write(cur_indent, name, " = {\n") -- {
+        end
       end
 
-      local l = 0 -- new line count-flag
-      local cnt, len, indlen = 1, 0, new_indent:len()
+      if w then
+        if lcount or lenmax then
+          l = l + 1
+          cnt = cnt + 1
+          len = len + w:len() + 2 -- 2 for ' ' + ','
+          if l == 1 or
+             lcount and cnt > lcount or
+             lenmax and len >= lenmax then
+            cnt = 1
+            len = indlen + w:len()
+            write(l > 1 and "\n" or "", new_indent, w, ",")
+          else
+            write(" ", w, ",")
+          end
+        else
+          write(new_indent, w, ",\n")
+        end
+      elseif tp == 'table' then
+        if lcount or lenmax then
+          l = 0
+          write("\n")
+        end
+        TabToText(KeyToStr(k), v, kind, write)
+      end
 
-      local k, v = 1, data[1]
-      while v ~= nil do
-        skip[k] = v
+      k = k + 1
+      v = data[k]
+    end -- while
+
+    if not isnull then write("\n") end
+    kind.isarray = isarray
+  end -- if nestless
+
+  local tname = kind.tname
+  tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
+
+  -- Simplified write hash(+array) fields:
+  for k, v in sortnext do
+    if not skip[k] then
+      local s = KeyToStr(k, nestless)
+      if s then
         local w, tp = ValToStr(v)
         if isnull and (w or tp == 'table') then
           isnull = false
-          if isarray then
-            write(cur_indent, "{\n") -- {
+          --logMsg({ nestless, kind }, "table", 2)
+          if nestless then
+            if isarray then
+              write(cur_indent, "{\n") -- {
+            else
+              write(cur_indent, name, " = {\n") -- {
+            end
           else
-            write(cur_indent, name, " = {\n") -- {
+            write(cur_indent, format("do local %s = {}; %s = %s\n",
+                                     tname, name, tname)) -- do
           end
         end
 
         if w then
-          if lcount or lenmax then
-            l = l + 1
-            cnt = cnt + 1
-            len = len + w:len() + 2 -- 2 for ' ' + ','
-            if l == 1 or
-               lcount and cnt > lcount or
-               lenmax and len >= lenmax then
-              cnt = 1
-              len = indlen + w:len()
-              write(l > 1 and "\n" or "", new_indent, w, ",")
-            else
-              write(" ", w, ",")
-            end
+          if nestless then
+            write(new_indent, format("%s = %s,\n", s, w))
           else
-            write(new_indent, w, ",\n")
+            write(new_indent, format("%s%s = %s\n", tname, s, w))
           end
+
         elseif tp == 'table' then
-          if lcount or lenmax then
-            l = 0
-            write("\n")
-          end
-          TabToText(KeyToStr(k), v, kind, write)
-        end
-
-        k = k + 1
-        v = data[k]
-      end -- while
-
-      if not isnull then write("\n") end
-      kind.isarray = isarray
-    end -- if nestless
-
-    local tname = kind.tname
-    tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
-
-    -- Simplified write hash(+array) fields:
-    for k, v in sortnext do
-      if not skip[k] then
-        local s = KeyToStr(k, nestless)
-        if s then
-          local w, tp = ValToStr(v)
-          if isnull and (w or tp == 'table') then
-            isnull = false
-            --logMsg({ nestless, kind }, "table", 2)
-            if nestless then
-              if isarray then
-                write(cur_indent, "{\n") -- {
-              else
-                write(cur_indent, name, " = {\n") -- {
-              end
-            else
-              write(cur_indent, format("do local %s = {}; %s = %s\n",
-                                       tname, name, tname)) -- do
-            end
-          end
-
-          if w then
-            if nestless then
-              write(new_indent, format("%s = %s,\n", s, w))
-            else
-              write(new_indent, format("%s%s = %s\n", tname, s, w))
-            end
-
-          elseif tp == 'table' then
-            if nestless then
-              TabToText(s, v, kind, write)
-            else
-              TabToText((kind.tnaming and tname or name)..s, v, kind, write)
-            end
+          if nestless then
+            TabToText(s, v, kind, write)
+          else
+            TabToText((kind.tnaming and tname or name)..s, v, kind, write)
           end
         end
       end
-    end -- for
+    end
+  end -- for
 
-    if isnull then
-      write(cur_indent, name, " = {}")
+  if isnull then
+    write(cur_indent, name, " = {}")
+  else
+    if nestless then
+      write(cur_indent, "}") -- }
     else
-      if nestless then
-        write(cur_indent, "}") -- }
-      else
-        write(cur_indent, "end") -- end
-      end
+      write(cur_indent, "end") -- end
     end
-    if level > 1 and (kind.astable or kind.nestless[level - 1]) then
-      write(",")
-    end
-    write("\n")
+  end
+  if level > 1 and (kind.astable or kind.nestless[level - 1]) then
+    write(",")
+  end
+  write("\n")
 
-    -- Restore settings
-    kind.level = kind.level - 1
-    kind.indent = cur_indent
+  -- Restore settings
+  kind.level = kind.level - 1
+  kind.indent = cur_indent
 
-    return true
-  end -- TabToText
-  unit.TabToText = TabToText
+  return true
+end -- TabToText
+unit.TabToText = TabToText
 
 -- Serialize data with write.
 -- Сериализация данных с помощью write.
 --[[
   -- @params:
-  name (string) - название для данных.
-  data  (table) - сохраняемые данные.
-  kind  (table) - вид сериализации:
+  name (string) - data name.
+  data  (table) - saved data.
+  kind  (table) - serializion kind (@see kind in pairs and TabToStr):
     saved     (table) - names of tables already saved.
     indent   (string) - initial indent value to write.
     shift    (string) - indent shift to pretty write fields.
@@ -515,13 +531,9 @@ do
     tnaming    (bool) - using temp names to access fields.
     ValToStr   (func) - function to convert simple value to string.
     TabToStr   (func) - function to convert table to string.
-    -- @fields for TabToText only:
-    astable    (bool) - write data as whole table ({ fields }).
-    lcount   (number) - field count in line to write array.
-    lenmax   (number) - length maximum of line to write array.
-  write  (func) - функция записи строки данных.
+  write  (func) - function to write data strings.
   -- @return:
-  isOk   (bool) - успешность операции.
+  isOk   (bool) - operation success flag.
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
   local kind = kind or {}
@@ -569,12 +581,12 @@ do
 -- Сохранение данных в файл.
 --[[
   -- @params:
-  fullname (string) - полное имя файла.
-  name     (string) - название таблицы данных.
-  data      (t|nil) - обрабатываемая таблица данных.
-  kind      (table) - вид сохранения (@see serialize.kind).
+  fullname (string) - full file name.
+  name     (string) - data table name.
+  data      (t|nil) - processed data table.
+  kind      (table) - kind of data save (@see serialize.kind).
   -- @return:
-  isOk       (bool) - успешность операции.
+  isOk       (bool) - operation success flag.
 --]]
 function unit.save (fullname, name, data, kind) --> (bool)
   kind = kind or {}
@@ -599,11 +611,11 @@ do
 -- Сохранение данных в строку.
 --[[
   -- @params:
-  name     (string) - название таблицы данных.
-  data  (table|nil) - обрабатываемая таблица данных.
-  kind      (table) - вид хранения.
+  name     (string) - data table name.
+  data      (t|nil) - processed data table.
+  kind      (table) - kind of data save (@see serialize.kind).
   -- @return:
-  isOk (bool) - успешность операции.
+  isOk (bool) - operation success flag.
 --]]
 function unit.tostring (name, data, kind) --> (bool)
   kind = kind or {}
@@ -678,10 +690,10 @@ local defCustom = {
 -- Настройка установок скрипта.
 --[[
   -- @params:
-  Custom    (table) - таблица пользовательских установок.
-  defCustom (table) - таблица установок по умолчанию.
+  Custom    (table) - user settings table.
+  defCustom (table) - default settings table.
   -- @return:
-  Custom    (table) - настроенная таблица установок.
+  Custom    (table) - customized settings table.
 --]]
 function unit.customize (Custom, defCustom) --> (table)
   local t, u = addData(Custom or {}, defCustom, 'extend', pairs, true)
