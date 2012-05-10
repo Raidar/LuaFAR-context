@@ -51,14 +51,14 @@ local Null = unit.Null -- Empty read-only table
 ---------------------------------------- ----
 --[[
   -- @params (frequently used):
-  t      (table) - основная таблица.
-  u      (table) - используемая таблица.
-  list   (table) - список (всех) таблиц.
-  value    (any) - значение поля таблицы.
-  field (string) - название поля (мета)таблицы.
-  usemeta (bool) - признак использования метатаблицы.
-  tpairs  (func) - функция для получения значений таблицы.
-  deep    (bool) - признак "глубокого" просмотра таблицы.
+  t      (table) - main table.
+  u      (table) - used table.
+  list   (table) - (all) tables list.
+  value    (any) - table field value.
+  field (string) - (meta)table field name.
+  usemeta (bool) - metatable using flag.
+  tpairs  (func) - pairs-function to get fields values.
+  deep    (bool) - table deep viewing falg.
 --]]
 ---------------------------------------- base
 do
@@ -362,8 +362,8 @@ do
 -- Добавление данных из u в t.
 --[[
   -- @params:
-  kind (string) - вид добавления (@see kinds, @default = 'update').
-  ...           - дополнительные параметры для вызываемых функций:
+  kind (string) - kind of addition (@see kinds, @default = 'update').
+  ...           - additional parameters for called functions:
     [1]    (bool) - "глубокий" просмотр таблицы.
     [2]  (string) - поле метатаблицы при 'asmeta': @default = '__index'.
 --]]
@@ -553,10 +553,8 @@ function unit.sortcompare (v1, v2) --> (bool)
 end ---- sortcompare
 
 do
-  local t_sort = table.sort
-  local t_insert = table.insert
   local t_find = unit.fitfind
-  local sortcompare = unit.sortcompare
+  local t_insert = table.insert
 
 -- 'pairs' function with field sort.
 -- Функция 'pairs' с сортировкой полей.
@@ -564,23 +562,23 @@ do
   -- @params:
   t     (table) - table for pairing.
   make (func) - function for make all tables related to t.
-  kind  (table) - вид сериализации:
-    pairs    (func) - pairs function to get fields.
-    compare  (func) - compare function to compare field names.
+  kind  (table) - additional parameters for sort:
+    pairs    (func) - pairs-function to get fields.
+    compare  (func) - function to compare field names.
   ...           - parameters to call kind.pairs(t, ...).
 --]]
 function unit.sortpairs (t, kind, ...) --> (func)
   if not t then return end
 
   local kind = kind or {}
-  local comp = kind.compare or sortcompare
+  local compare = kind.compare or unit.sortcompare
 
   local names = {}
   local values = {}
 
   for k, v in (kind.pairs or pairs)(t, ...) do
     values[k] = v
-    local i = t_find(names, k, comp)
+    local i = t_find(names, k, compare)
     t_insert(names, i, k)
   end
 
@@ -596,22 +594,56 @@ function unit.sortpairs (t, kind, ...) --> (func)
   return _next
 end ---- sortpairs
 
+  local luatypes = context.lua.types
+
+-- Gather simple statistics.
+-- Сбор элементарной статистики.
+--[[
+  -- @params:
+  k       (any) - table key (k == nil --> call for init).
+  v       (any) - table value (v == t --> call for init).
+  kind  (table) - additional parameters (@see unit.statpairs.kind).
+--]]
+function unit.gatherstat (k, v, kind) --| kind.stats
+  if k == nil then
+    local gathered = kind.gathered
+    kind.stats = kind.stats or {}
+    for k, _ in pairs(luatypes) do
+      if gathered then
+        kind.stats[k] = kind.stats[k] or 0
+      else
+        kind.stats[k] = 0
+      end
+    end
+    return
+  end
+
+  local tp = type(v)
+  kind.stats[tp] = kind.stats[tp] + 1
+  --return tp
+end ---- gatherstat
+
 -- 'sortpairs' function with gathering some statistics.
 -- Функция 'sortpairs' со сбором некоторой статистики.
+--[[
+  -- @params:
+  t     (table) - table for pairing.
+  make (func) - function for make all tables related to t.
+  kind  (table) - additional parameters for sort:
+    pairs    (func) - pairs-function to get fields.
+    compare  (func) - function to compare field names.
+    gather   (func) - function to gather statistics.
+    gathered (bool) - gathered statistics (@default = false).
+  ...           - parameters to call kind.pairs(t, ...).
+--]]
 function unit.statpairs (t, kind, ...) --> (func)
   if not t then return end
 
   assert(type(kind) == 'table')
-  local comp = kind.compare or sortcompare
+  local compare = kind.compare or unit.sortcompare
+  local gather = kind.gather or unit.gatherstat
 
-  -- Статистика по типам значений:
-  local stats = {
-    ['boolean'] = 0,
-    ['number']  = 0,
-    ['string']  = 0,
-    ['table']   = 0,
-  } --
-  kind.stats = stats
+  gather(nil, t, kind) -- Init
 
   local names = {}
   local values = {}
@@ -619,10 +651,9 @@ function unit.statpairs (t, kind, ...) --> (func)
   for k, v in (kind.pairs or pairs)(t, ...) do
     values[k] = v
 
-    local tp = type(v)
-    stats[tp] = (stats[tp] or 0) + 1
+    gather(k, v, kind) -- Gather stats
 
-    local i = t_find(names, k, comp)
+    local i = t_find(names, k, compare)
     t_insert(names, i, k)
   end
 
