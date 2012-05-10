@@ -31,10 +31,10 @@ ctxdata.languages = ctxdata.languages or
 -- Modules used in context
 local modules = {
   -- Preload modules:
+  'context.utils.useLua',
   'context.utils.useUtils',
   'context.utils.useNumbers',
   'context.utils.useTables',
-  'context.utils.useLua',
   'context.utils.useDatas',
   'context.utils.useLocale',
   -- Other modules:
