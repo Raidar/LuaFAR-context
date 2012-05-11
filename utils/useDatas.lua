@@ -13,7 +13,8 @@
 --]]
 ----------------------------------------
 --[[ some code from:
-  serial.lua -- for serialize
+  serial.lua -- for serialize.
+  history.lua -- for history.
   (c) Shmuel Zeigerman.
 --]]
 --------------------------------------------------------------------------------
@@ -109,7 +110,7 @@ function unit.cfgpairs (t) --> (func)
   return tables.allpairs(t, unit.cfglist)
 end --
 
----------------------------------------- load/save
+---------------------------------------- load/require
 do
   local loadfile, setfenv = loadfile, setfenv
 
@@ -161,6 +162,7 @@ function unit.find (name, path) --> (string)
   return nil
 end ---- find
 
+---------------------------------------- save/serialize
 do
   local pcall, require = pcall, require
 
@@ -287,10 +289,21 @@ unit.KeyToStr = KeyToStr
   isOk   (bool) - operation success flag.
 --]]
 local function TabToStr (name, data, kind, write) --| (write)
+
+  if kind.level == 0 then kind.tnaming = false end
   do
     local value = kind.saved[data]
     if value then -- saved name as value
-      write(indent, name, " = ", value, "\n")
+      if kind.tnaming then
+        -- WARN: This way self-reference doesn't write properly!
+        -- TODO: ???
+        -- TEMP: Write as comment
+        write(kind.indent,
+              "-- TEMP: self-reference: ",
+              name, " = ", value, "\n")
+      else
+        write(kind.indent, name, " = ", value, "\n")
+      end
       return
     end
     kind.saved[data] = name
@@ -344,6 +357,19 @@ unit.TabToStr = TabToStr
   local unpack = unpack
   local statpairs = tables.statpairs
 
+  -- TODO: в случае astable = true и наличии self-reference
+  -- вставить после Data = {} код записи этих reference.
+  --[[
+    1. В TabToText реализовать передачу
+       name, fullname, fieldname, tempname
+       для нормальной self-reference.
+    2. Продумать схему хранения.
+    -- Пример из http://lua-users.org/wiki/TableSerialization:
+   g = {}; -- Data.default (self-reference)
+};
+Data[1] = Data.default
+  --]]
+
 -- Convert table to pretty text.
 -- Преобразование таблицы в читабельный текст.
 --[[
@@ -357,23 +383,37 @@ unit.TabToStr = TabToStr
   isOk   (bool) - operation success flag.
 --]]
 local function TabToText (name, data, kind, write) --| (write)
+
+  local level = kind.level -- Prior level
+
+  -- Write self-reference:
   do
     local value = kind.saved[data]
     if value then -- saved name as value
-      write(indent, name, " = ", value, "\n")
+      if kind.tnaming or
+         (level > 1 and (kind.astable or kind.nestless[level])) then
+        -- WARN: This way self-reference doesn't write properly!
+        -- TODO: ???
+        -- TEMP: Write as comment
+        write(kind.indent,
+              "-- TEMP: self-reference: ",
+              name, " = ", value, "\n")
+      else
+        write(kind.indent, name, " = ", value, "\n")
+      end
+
       return
     end
     kind.saved[data] = name
   end
 
   -- Settings to write current table:
-  kind.level = kind.level + 1
-  local level = kind.level
+  kind.level = kind.level + 1 -- Current level
+  level = kind.level
 
   local cur_indent = kind.indent
   local new_indent = cur_indent..kind.shift
   kind.indent = new_indent
-  local isarray = kind.isarray
 
   local sortkind = kind.pargs[1] or {}
   local sortnext = statpairs(data, sortkind, unpack(kind.pargs, 2))
@@ -386,6 +426,8 @@ local function TabToText (name, data, kind, write) --| (write)
   -- Write current table fields:
   local skip = {}
   local isnull = true
+
+  local isarray = kind.isarray -- Save value
 
   -- Simplified write array fields:
   if nestless then
@@ -446,11 +488,12 @@ local function TabToText (name, data, kind, write) --| (write)
     end -- while
 
     if not isnull then write("\n") end
-    kind.isarray = isarray
+    kind.isarray = isarray -- Restore value
   end -- if nestless
 
   local tname = kind.tname
   tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
+  --if name == "t.aTEST" then logMsg(kind, tname) end
 
   -- Simplified write hash(+array) fields:
   for k, v in sortnext do
@@ -505,8 +548,12 @@ local function TabToText (name, data, kind, write) --| (write)
   end
   write("\n")
 
+  if level == 1 then
+    -- TODO: Write self-reference here! Use fullname only!
+  end
+
   -- Restore settings
-  kind.level = kind.level - 1
+  kind.level = kind.level - 1 -- Prior level
   kind.indent = cur_indent
 
   return true
@@ -529,6 +576,7 @@ unit.TabToText = TabToText
     strlong (b|n|nil) - using long brackets for string formatting
                         (strlong as number is for string length minimum).
     tnaming    (bool) - using temp names to access fields.
+                        WARN: tnaming doesn't write self-reference properly!
     ValToStr   (func) - function to convert simple value to string.
     TabToStr   (func) - function to convert table to string.
   write  (func) - function to write data strings.
@@ -637,6 +685,22 @@ function unit.tostring (name, data, kind) --> (bool)
 end -- tostring
 
 end -- do
+
+---------------------------------------- history
+local THistory = {} -- history class
+local MHistory = { __index = THistory }
+
+-- TODO: THistory methods.
+
+function unit.history (name, kind) --> (object)
+
+  local self = {
+    name = name or "unknown",
+    kind = kind or {},
+  } --- self
+
+  return setmetatable(self, MHistory)
+end -- history
 
 ---------------------------------------- custom
 do
