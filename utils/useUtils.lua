@@ -103,9 +103,9 @@ local F = far.Flags
 do
 --[[
   -- @params (for flag handling):
-  f     (number|bit64 string) - значение флага.
-  flags (number|bit64 string) - набор флагов.
-  ...   (list)                - перечисление значений флагов.
+  f     (number|bit64 string) - flag value.
+  flags (number|bit64 string) - flag set.
+  ...   (list)                - flag values list.
 --]]
 
 -- Create a new empty flag set.
@@ -185,12 +185,12 @@ do
 -- Преобразование флага-таблицы в число.
 --[[
   -- @notes:
-  Значения обычных флагов: 0|1, false|true, nil.
-  Значения численных флагов: число размером со слово.
-  (Значение численного флага задаётся в младшем слове флага.)
+  Values of simple-value flags: 0|1, false|true, nil.
+  Values of number-value flags: word-sized number.
+  (Value of number-value flag takes a low word of flagh value.)
   -- @params:
-  flags    (table) - преобразуемая таблица с флагами.
-  numflags (table) - таблица со списком численных флагов.
+  flags    (table) - source table with flags.
+  numflags (table) - table with number-value flags.
 --]]
 function unit.numFlag (flags, numflags) --> (flags number)
   if type(flags) == 'string' then flags = { [flags] = 1 } end
@@ -220,9 +220,10 @@ unit.PluginPath = unit.pluginPath() -- Current plugin path
 -- Used interface and help language.
 -- Используемый язык интерфейса и справки.
 --[[
-  -- @return: таблица с полями:
-  Main (string) - язык интерфейса.
-  Help (string) - язык справки.
+  -- @return:
+  _ (table):
+    Main (string) - interface language.
+    Help (string) - help language.
 --]]
 function unit.language () --> (table)
   local key = "Software\\Far Manager\\Language"
