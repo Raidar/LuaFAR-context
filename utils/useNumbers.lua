@@ -34,12 +34,13 @@ local unit = {}
 ---------------------------------------- Convert
 do
   local tostring = tostring
+  local sformat = string.format
 
 -- Hexadecimal string presentation of number.
 -- 16-ричное строковое представление числа.
 -- Default width for: Ox12345678
-function unit.hex (number, width) --> (string)
-  return ("%#0"..tostring(width or 10).."x"):format(number or 0)
+function unit.hex (n, width) --> (string)
+  return sformat(sformat("%%#0%dx", width or 10), n or 0)
 end ----
 
 end -- do
