@@ -169,8 +169,10 @@ unit.TabToStr = TabToStr
     astable    (bool) - write data as whole table ({ fields }).
     tnaming    (bool) - using temp names to access fields.
     lining   (string) - write to fill lines (@see below 2 fields).
-    lcount   (number) - field count in line to write array.
-    lenmax   (number) - length maximum of line to write array.
+    acount   (number) - field count in line to write array.
+    alimit   (number) - length limit of line to write array.
+    hcount   (number) - field count in line to write hash.
+    hlimit   (number) - length limit of line to write hash.
   -- @return:
   isOk   (bool) - operation success flag.
 --]]
@@ -191,11 +193,10 @@ local function TabToText (name, data, kind, write) --| (write)
         if kind.isarray then
           write(kind.indent, "false, -- ", value, "\n")
         else
-          write(kind.indent, name, " = ",
-                "false, -- ", value, "\n")
+          write(kind.indent, format("%s = false, -- %s\n", name, value))
         end
       else
-        write(kind.indent, name, " = ", value, "\n")
+        write(kind.indent, format("%s = %s\n", name, value))
       end
 
       return
@@ -222,29 +223,25 @@ local function TabToText (name, data, kind, write) --| (write)
   kind.nestless[level] = nestless
   nestless = kind.astable or nestless
 
-  -- Settings to write fields in one line
-  local lining, lcount, lenmax = kind.lining
-  if lining then
-    lcount, lenmax = kind.lcount, kind.lenmax
-    if type(lcount) == 'function' then
-      lcount = lcount(name, data)
-    end
-    if type(lenmax) == 'function' then
-      lenmax = lenmax(name, data)
-    end
-  end
-
   -- 3. Write current table fields:
   local skip = {}
   local isnull = true
 
   local isarray = kind.isarray -- Save value
 
-  -- 3.1. Simplified write array fields:
+  -- 3.1. Write array only fields:
   if nestless then
     kind.isarray = true -- in array-part only
 
-    local islining = lining == "all" or lining == "array"
+    -- Settings to write fields of array in one line
+    local islining = kind.lining == "all" or kind.lining == "array"
+    local acount, alimit
+    if islining then
+      acount, alimit = kind.acount, kind.alimit
+      if type(acount) == 'function' then acount = acount(name, data) end
+      if type(alimit) == 'function' then alimit = alimit(name, data) end
+    end
+
     local l = 0 -- New line count-flag
     local cnt, len, indlen = 1, 0, new_indent:len()
 
@@ -267,8 +264,8 @@ local function TabToText (name, data, kind, write) --| (write)
           cnt = cnt + 1
           len = len + w:len() + 2 -- for ' ' + ','
           if l == 1 or
-             lcount and cnt > lcount or
-             lenmax and len >= lenmax then
+             acount and cnt > acount or
+             alimit and len >= alimit then
             cnt = 1
             len = indlen + w:len() + 1 -- for ','
             write(l > 1 and "\n" or "", new_indent, w, ",")
@@ -279,9 +276,10 @@ local function TabToText (name, data, kind, write) --| (write)
           write(new_indent, w, ",\n")
         end
       elseif tp == 'table' then
+        -- New line before subtable:
         if islining then
-          l = 0
           write("\n")
+          l = 0
         end
         local s = KeyToStr(k)
         kind.fname = fname..s
@@ -292,10 +290,10 @@ local function TabToText (name, data, kind, write) --| (write)
       v = data[k]
     end -- while
 
-    -- Separate array and hash parts by empty line:
-    --if not isnull then write("\n") end
     if not isnull then
+      -- Set '}' of array to new line:
       if islining then write("\n") end
+      -- Separate array and hash parts by empty line:
       if sortkind.stats.main >= k then write("\n") end
     end
 
@@ -303,19 +301,27 @@ local function TabToText (name, data, kind, write) --| (write)
   end -- if nestless
   -- 3.1. --
 
-  -- 3.2. Write hash(+array) fields (simplified):
+  -- 3.2. Write hash/table fields:
   do
     local tname = kind.tname -- Different temp names for sequential levels
     tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
 
-    local islining = lining == "all" or lining == "hash"
+    -- Settings to write fields of hash in one line
+    local islining = kind.lining == "all" or kind.lining == "hash"
+    local hcount, hlimit
+    if islining then
+      hcount, hlimit = kind.hcount, kind.hlimit
+      if type(hcount) == 'function' then hcount = hcount(name, data) end
+      if type(hlimit) == 'function' then hlimit = hlimit(name, data) end
+    end
+
     local l = 0 -- New line count-flag
-    local len, indlen = 0, new_indent:len()
+    local cnt, len, indlen = 1, 0, new_indent:len()
 
     for k, v in sortnext do
       if not skip[k] then
         local s, c = KeyToStr(k)
-        c = nestless and c or s
+        c = nestless and c or s -- Check using dot
         --logMsg({ nestless, s, c, kind }, name, 2)
 
         if s then
@@ -339,15 +345,18 @@ local function TabToText (name, data, kind, write) --| (write)
             if nestless then
               if islining then
                 l = l + 1
-                len = len + s:len() + w:len() + 5 -- for ' ' + ' = ' + ','
+                cnt = cnt + 1
+                len = len + c:len() + w:len() + 5 -- for ' ' + ' = ' + ','
                 if l == 1 or
-                   lenmax and len >= lenmax then
-                  len = indlen + s:len() + w:len() + 4 -- for ' = ' + ','
-                  --write(l > 1 and "\n" or "", new_indent, format("%s = %s,", c, w))
+                   hcount and cnt > hcount or
+                   hlimit and len >= hlimit then
+                  cnt = 1
+                  len = indlen + c:len() + w:len() + 4 -- for ' = ' + ','
+                  write(l > 1 and "\n" or "",
+                        new_indent, format("%s = %s,", c, w))
                 else
-                  --write(format(" %s = %s,", c, w))
+                  write(format(" %s = %s,", c, w))
                 end
-                write(new_indent, format("%s = %s,\n", c, w))
               else
                 write(new_indent, format("%s = %s,\n", c, w))
               end
@@ -355,9 +364,10 @@ local function TabToText (name, data, kind, write) --| (write)
               write(new_indent, format("%s%s = %s\n", tname, c, w))
             end
           elseif tp == 'table' then
+            -- New line before subtable:
             if islining then
+              if l > 0 then write("\n") end
               l = 0
-              --write("\n")
             end
             kind.fname = fname..s
             if nestless then
@@ -369,13 +379,17 @@ local function TabToText (name, data, kind, write) --| (write)
         end
       end
     end -- for
+
+    if not isnull then
+      -- Set '}' of hash/table to new line:
+      if islining and l > 0 then write("\n") end
+    end
   end -- do
   -- 3.2. --
 
   if isnull then
     write(cur_indent, name, " = {}")
   else
-    --if islining then write("\n") end
     if nestless then
       write(cur_indent, "}") -- }
     else
