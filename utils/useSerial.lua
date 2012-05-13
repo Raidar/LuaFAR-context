@@ -38,7 +38,7 @@ local tables = context.tables
 --------------------------------------------------------------------------------
 local unit = {}
 
----------------------------------------- save/tostring
+----------------------------------------
 local format = string.format
 local frexp, modf = math.frexp, math.modf
 
@@ -91,6 +91,7 @@ local function KeyToStr (key) --> (string)
 end -- KeyToStr
 unit.KeyToStr = KeyToStr
 
+---------------------------------------- TabToStr
 -- Convert table to string.
 -- Преобразование таблицы в строку.
 --[[
@@ -155,6 +156,7 @@ local function TabToStr (name, data, kind, write) --| (write)
 end -- TabToStr
 unit.TabToStr = TabToStr
 
+---------------------------------------- TabToText
   local sortpairs = tables.sortpairs
   local statpairs = tables.statpairs
 
@@ -182,11 +184,16 @@ local function TabToText (name, data, kind, write) --| (write)
     local saved = kind.saved --or {}
     local value = saved[data]
     if value then -- saved name as value
-      if kind.tnaming or kind.astable or
-         (level > 1 and kind.nestless[level]) then
-        saved[fname] = data -- Save self-reference
-        write(kind.indent, name, " = ",   -- and
-              "false, -- ", value, "\n")  -- Write as comment
+      if kind.astable or (kind.tnaming and
+         (level > 1 and kind.nestless[level])) then
+        -- Save self-reference + Write as comment
+        saved[fname] = data
+        if kind.isarray then
+          write(kind.indent, "false, -- ", value, "\n")
+        else
+          write(kind.indent, name, " = ",
+                "false, -- ", value, "\n")
+        end
       else
         write(kind.indent, name, " = ", value, "\n")
       end
@@ -258,12 +265,12 @@ local function TabToText (name, data, kind, write) --| (write)
         if islining then
           l = l + 1
           cnt = cnt + 1
-          len = len + w:len() + 2 -- 2 for ' ' + ','
+          len = len + w:len() + 2 -- for ' ' + ','
           if l == 1 or
              lcount and cnt > lcount or
              lenmax and len >= lenmax then
             cnt = 1
-            len = indlen + w:len()
+            len = indlen + w:len() + 1 -- for ','
             write(l > 1 and "\n" or "", new_indent, w, ",")
           else
             write(" ", w, ",")
@@ -272,7 +279,7 @@ local function TabToText (name, data, kind, write) --| (write)
           write(new_indent, w, ",\n")
         end
       elseif tp == 'table' then
-        if lcount or lenmax then
+        if islining then
           l = 0
           write("\n")
         end
@@ -294,56 +301,81 @@ local function TabToText (name, data, kind, write) --| (write)
 
     kind.isarray = isarray -- Restore value
   end -- if nestless
-
-  local tname = kind.tname -- Different temp names for sequential levels
-  tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
+  -- 3.1. --
 
   -- 3.2. Write hash(+array) fields (simplified):
-  for k, v in sortnext do
-    if not skip[k] then
-      local s, c = KeyToStr(k)
-      c = nestless and c or s
-      --logMsg({ nestless, s, c, kind }, name, 2)
+  do
+    local tname = kind.tname -- Different temp names for sequential levels
+    tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
 
-      if s then
-        local w, tp = ValToStr(v)
-        if isnull and (w or tp == 'table') then
-          isnull = false
-          --logMsg({ nestless, kind }, name, 2)
-          if nestless then
-            if isarray then
-              write(cur_indent, "{\n") -- {
+    local islining = lining == "all" or lining == "hash"
+    local l = 0 -- New line count-flag
+    local len, indlen = 0, new_indent:len()
+
+    for k, v in sortnext do
+      if not skip[k] then
+        local s, c = KeyToStr(k)
+        c = nestless and c or s
+        --logMsg({ nestless, s, c, kind }, name, 2)
+
+        if s then
+          local w, tp = ValToStr(v)
+          if isnull and (w or tp == 'table') then
+            isnull = false
+            --logMsg({ nestless, kind }, name, 2)
+            if nestless then
+              if isarray then
+                write(cur_indent, "{\n") -- {
+              else
+                write(cur_indent, name, " = {\n") -- {
+              end
             else
-              write(cur_indent, name, " = {\n") -- {
+              write(cur_indent, format("do local %s = {}; %s = %s\n",
+                                       tname, name, tname)) -- do
             end
-          else
-            write(cur_indent, format("do local %s = {}; %s = %s\n",
-                                     tname, name, tname)) -- do
-          end
-        end
-
-        if w then
-          if nestless then
-            write(new_indent, format("%s = %s,\n", c, w))
-          else
-            write(new_indent, format("%s%s = %s\n", tname, c, w))
           end
 
-        elseif tp == 'table' then
-          kind.fname = fname..s
-          if nestless then
-            TabToText(c, v, kind, write)
-          else
-            TabToText((kind.tnaming and tname or name)..c, v, kind, write)
+          if w then
+            if nestless then
+              if islining then
+                l = l + 1
+                len = len + s:len() + w:len() + 5 -- for ' ' + ' = ' + ','
+                if l == 1 or
+                   lenmax and len >= lenmax then
+                  len = indlen + s:len() + w:len() + 4 -- for ' = ' + ','
+                  --write(l > 1 and "\n" or "", new_indent, format("%s = %s,", c, w))
+                else
+                  --write(format(" %s = %s,", c, w))
+                end
+                write(new_indent, format("%s = %s,\n", c, w))
+              else
+                write(new_indent, format("%s = %s,\n", c, w))
+              end
+            else
+              write(new_indent, format("%s%s = %s\n", tname, c, w))
+            end
+          elseif tp == 'table' then
+            if islining then
+              l = 0
+              --write("\n")
+            end
+            kind.fname = fname..s
+            if nestless then
+              TabToText(c, v, kind, write)
+            else
+              TabToText((kind.tnaming and tname or name)..c, v, kind, write)
+            end
           end
         end
       end
-    end
-  end -- for
+    end -- for
+  end -- do
+  -- 3.2. --
 
   if isnull then
     write(cur_indent, name, " = {}")
   else
+    --if islining then write("\n") end
     if nestless then
       write(cur_indent, "}") -- }
     else
@@ -381,6 +413,7 @@ local function TabToText (name, data, kind, write) --| (write)
 end -- TabToText
 unit.TabToText = TabToText
 
+---------------------------------------- serialize
 -- Serialize data.
 -- Сериализация данных.
 --[[
