@@ -606,15 +606,23 @@ end ---- sortpairs
 --]]
 function unit.gatherstat (k, v, kind) --| kind.stats
   if k == nil then
-    local gathered = kind.gathered
-    kind.stats = kind.stats or {}
-    for k, _ in pairs(luatypes) do
-      if gathered then
-        kind.stats[k] = kind.stats[k] or 0
-      else
-        kind.stats[k] = 0
+    local stats = kind.stats or {}
+    kind.stats = stats
+    if v ~= nil then
+      -- Init --
+      local gathered = kind.gathered
+      for k, _ in pairs(luatypes) do
+        if gathered then
+          stats[k] = stats[k] or 0
+        else
+          stats[k] = 0
+        end
       end
-    end
+    else
+      -- Done --
+      stats.main = stats["boolean"] + stats["number"] +
+                   stats["string"] + stats["table"]
+    end -- Init/Done
     return
   end
 
@@ -656,6 +664,8 @@ function unit.statpairs (t, kind, ...) --> (func)
     local i = t_find(names, k, compare)
     t_insert(names, i, k)
   end
+
+  gather(nil, nil, kind) -- Done
 
   local k = 0
   local function _next ()
