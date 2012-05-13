@@ -13,12 +13,8 @@
 --]]
 ----------------------------------------
 --[[ some code from:
-1. Serial and History.
-  serial.lua -- for serialize.
-  history.lua -- for history.
+1. History: history.lua.
   © Shmuel Zeigerman.
-2. Table Serialization.
-  URL: http://lua-users.org/wiki/TableSerialization
 --]]
 --------------------------------------------------------------------------------
 local _G = _G
