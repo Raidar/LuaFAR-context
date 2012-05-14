@@ -26,6 +26,8 @@ local pairs = pairs
 local unpack = unpack
 local tostring = tostring
 
+local string = string
+
 ----------------------------------------
 local context = context
 local lua = context.lua
@@ -69,8 +71,8 @@ local function ValToStr (value, strlong) --> (string | nil, type)
 end -- ValToStr
 unit.ValToStr = ValToStr
 
-  local reserveds = lua.keywords
-  local KeywordMask = lua.KeywordMask
+local reserveds = lua.keywords
+local KeywordMask = lua.KeywordMask
 
 -- Convert key name to string.
 -- Преобразование имени ключа в строку.
@@ -85,9 +87,9 @@ local function KeyToStr (key) --> (string)
   end
 
   if key:find(KeywordMask) and not reserveds[key] then
-    return "."..key, key
+    return "."..key, key -- .string
   end
-  return format("[%q]", key)
+  return ("[%q]"):format(key) -- ["string"]
 end -- KeyToStr
 unit.KeyToStr = KeyToStr
 
@@ -95,6 +97,8 @@ unit.KeyToStr = KeyToStr
 -- Convert table to string.
 -- Преобразование таблицы в строку.
 --[[
+  -- @notes:
+     Serialize data of following types: boolean, number, string, table.
   -- @params (@see unit.serialize).
   -- @return:
   isOk   (bool) - operation success flag.
@@ -127,14 +131,14 @@ local function TabToStr (name, data, kind, write) --| (write)
   for k, v in kind.pairs(data, unpack(kind.pargs)) do
     local s = KeyToStr(k)
     if s then
-      local w, tp = ValToStr(v, strlong)
-      if isnull and (w or tp == 'table') then
+      local u, tp = ValToStr(v, strlong)
+      if isnull and (u or tp == 'table') then
         isnull = false
         write(cur_indent, format("do local %s = {}; %s = %s\n",
                                  tname, name, tname)) -- do
       end
-      if w then
-        write(new_indent, format("%s%s = %s\n", tname, s, w))
+      if u then
+        write(new_indent, format("%s%s = %s\n", tname, s, u))
       elseif tp == 'table' then
         TabToStr(name..s, v, kind, write)
       end
@@ -157,22 +161,33 @@ end -- TabToStr
 unit.TabToStr = TabToStr
 
 ---------------------------------------- TabToText
-  local sortpairs = tables.sortpairs
-  local statpairs = tables.statpairs
+local srep = string.rep
+local sortpairs = tables.sortpairs
+local statpairs = tables.statpairs
+
+local spaces = {
+} ---
 
 -- Convert table to pretty text.
 -- Преобразование таблицы в читабельный текст.
 --[[
+  -- @notes:
+     Serialize data of following types: boolean, number, string, table.
   -- @params (@see unit.serialize):
   kind  (table) - conversion kind: @fields additions:
-    pargs[1]  (table) - sortkind (@see tables.statpairs).
-    astable    (bool) - write data as whole table ({ fields }).
+    pargs[1]  (table) - sortkind for statpairs (@see tables.statpairs).
     tnaming    (bool) - using temp names to access fields.
-    lining   (string) - write to fill lines (@see below 2 fields).
-    acount   (number) - field count in line to write array.
-    alimit   (number) - length limit of line to write array.
-    hcount   (number) - field count in line to write hash.
-    hlimit   (number) - length limit of line to write hash.
+    astable    (bool) - write data as whole table ({ fields }).
+    -- Linearization parameters:
+    lining   (string) - write to fill lines (@see 3+3 fields below).
+                        ~to write array:
+    alimit   (number) - length limit for line.
+    acount   (number) - max field count in line.
+    awidth   (number) - min field width in line.
+                        ~ to write hash:
+    hlimit   (number) - length limit for line.
+    hcount   (number) - max field count in line.
+    hwidth   (number) - min field width in line.
   -- @return:
   isOk   (bool) - operation success flag.
 --]]
@@ -235,11 +250,12 @@ local function TabToText (name, data, kind, write) --| (write)
 
     -- Settings to write fields of array in one line
     local islining = kind.lining == "all" or kind.lining == "array"
-    local acount, alimit
+    local alimit, acount, awidth
     if islining then
-      acount, alimit = kind.acount, kind.alimit
-      if type(acount) == 'function' then acount = acount(name, data) end
+      alimit, acount, awidth = kind.alimit, kind.acount, kind.awidth
       if type(alimit) == 'function' then alimit = alimit(name, data) end
+      if type(acount) == 'function' then acount = acount(name, data) end
+      if type(awidth) == 'function' then awidth = awidth(name, data) end
     end
 
     local l = 0 -- New line count-flag
@@ -248,8 +264,10 @@ local function TabToText (name, data, kind, write) --| (write)
     local k, v = 1, data[1]
     while v ~= nil do
       skip[k] = v
-      local w, tp = ValToStr(v)
-      if isnull and (w or tp == 'table') then
+      local u, tp = ValToStr(v)
+
+      -- Set '{' of array/table to line:
+      if isnull and (u or tp == 'table') then
         isnull = false
         if isarray then
           write(cur_indent, "{\n") -- {
@@ -258,22 +276,36 @@ local function TabToText (name, data, kind, write) --| (write)
         end
       end
 
-      if w then
+      if u then
         if islining then
           l = l + 1
           cnt = cnt + 1
-          len = len + w:len() + 2 -- for ' ' + ','
+          local ulen = u:len()
+          len = len + ulen + 2 -- for ' ' + ','
+          -- Settings to align fields:
+          local w, sp = awidth or 0, ""
+          w = w - ulen
+          if w > 0 then
+            len = len + w
+            sp = spaces[w]
+            if not sp then
+              sp = srep(" ", w)
+              spaces[w] = sp
+            end
+          end
+          -- Write field:
           if l == 1 or
              acount and cnt > acount or
              alimit and len >= alimit then
-            cnt = 1
-            len = indlen + w:len() + 1 -- for ','
-            write(l > 1 and "\n" or "", new_indent, w, ",")
-          else
-            write(" ", w, ",")
+            cnt = 1 -- First field in new line:
+            len = indlen + ulen + 1 -- for ','
+            write(l > 1 and "\n" or "",
+                  new_indent, format("%s,%s", u, sp))
+          else      -- Other fields in same line:
+            write(format(" %s,%s", u, sp))
           end
         else
-          write(new_indent, w, ",\n")
+          write(new_indent, u, ",\n")
         end
       elseif tp == 'table' then
         -- New line before subtable:
@@ -291,7 +323,7 @@ local function TabToText (name, data, kind, write) --| (write)
     end -- while
 
     if not isnull then
-      -- Set '}' of array to new line:
+      -- Set '}' of array/table to new line:
       if islining then write("\n") end
       -- Separate array and hash parts by empty line:
       if sortkind.stats.main >= k then write("\n") end
@@ -308,11 +340,12 @@ local function TabToText (name, data, kind, write) --| (write)
 
     -- Settings to write fields of hash in one line
     local islining = kind.lining == "all" or kind.lining == "hash"
-    local hcount, hlimit
+    local hlimit, hcount, hwidth
     if islining then
-      hcount, hlimit = kind.hcount, kind.hlimit
-      if type(hcount) == 'function' then hcount = hcount(name, data) end
+      hlimit, hcount, hwidth = kind.hlimit, kind.hcount, kind.hwidth
       if type(hlimit) == 'function' then hlimit = hlimit(name, data) end
+      if type(hcount) == 'function' then hcount = hcount(name, data) end
+      if type(hwidth) == 'function' then hwidth = hwidth(name, data) end
     end
 
     local l = 0 -- New line count-flag
@@ -325,8 +358,9 @@ local function TabToText (name, data, kind, write) --| (write)
         --logMsg({ nestless, s, c, kind }, name, 2)
 
         if s then
-          local w, tp = ValToStr(v)
-          if isnull and (w or tp == 'table') then
+          local u, tp = ValToStr(v)
+          -- Set '{' of hash/table to line:
+          if isnull and (u or tp == 'table') then
             isnull = false
             --logMsg({ nestless, kind }, name, 2)
             if nestless then
@@ -341,27 +375,40 @@ local function TabToText (name, data, kind, write) --| (write)
             end
           end
 
-          if w then
+          if u then
             if nestless then
               if islining then
                 l = l + 1
                 cnt = cnt + 1
-                len = len + c:len() + w:len() + 5 -- for ' ' + ' = ' + ','
+                local culen = c:len() + u:len()
+                len = len + culen + 5 -- for ' ' + ' = ' + ','
+                -- Settings to align fields:
+                local w, sp = hwidth or 0, ""
+                w = w - culen
+                if w > 0 then
+                  len = len + w
+                  sp = spaces[w]
+                  if not sp then
+                    sp = srep(" ", w)
+                    spaces[w] = sp
+                  end
+                end
+                -- Write field:
                 if l == 1 or
                    hcount and cnt > hcount or
                    hlimit and len >= hlimit then
-                  cnt = 1
-                  len = indlen + c:len() + w:len() + 4 -- for ' = ' + ','
+                  cnt = 1 -- First field in new line:
+                  len = indlen + culen + 4 -- for ' = ' + ','
                   write(l > 1 and "\n" or "",
-                        new_indent, format("%s = %s,", c, w))
-                else
-                  write(format(" %s = %s,", c, w))
+                        new_indent, format("%s = %s,%s", c, u, sp))
+                else      -- Other fields in same line:
+                  write(format(" %s = %s,%s", c, u, sp))
                 end
               else
-                write(new_indent, format("%s = %s,\n", c, w))
+                write(new_indent, format("%s = %s,\n", c, u))
               end
             else
-              write(new_indent, format("%s%s = %s\n", tname, c, w))
+              write(new_indent, format("%s%s = %s\n", tname, c, u))
             end
           elseif tp == 'table' then
             -- New line before subtable:
