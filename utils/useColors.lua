@@ -251,7 +251,7 @@ do
 --[[
   -- @params:
   color  (string) - color name (may be color).
-  kind   (string) - color format kind: table | number.
+  kind   (string) - color format kind: 'table' | 'number'.
 --]]
 function TColors:getColor (color, kind) --> (color)
   -- TODO: Копировать self.Default, если это таблица!
@@ -277,7 +277,7 @@ end -- do
   data    (table) - data table.
   name   (string) - field with color.
   prefix (string) - name prefix for value store.
-  kind   (string) - color fomrat kind: table | number.
+  kind   (string) - color format kind: 'table' | 'number'.
 --]]
 function TColors:dataColor (data, name, prefix, kind) --> (color)
   local prefix = prefix or '_'
