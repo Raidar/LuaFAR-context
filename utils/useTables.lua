@@ -362,10 +362,10 @@ do
 -- Добавление данных из u в t.
 --[[
   -- @params:
-  kind (string) - kind of addition (@see kinds, @default = 'update').
+  kind (string) - kind of addition (@default = 'update'): @see kinds.
   ...           - additional parameters for called functions:
-    [1]    (bool) - "глубокий" просмотр таблицы.
-    [2]  (string) - поле метатаблицы при 'asmeta': @default = '__index'.
+    [1]    (bool) - "deep" view of table.
+    [2]  (string) - metatable field for 'asmeta' (@default = '__index').
 --]]
 function unit.add (t, u, kind, tpairs, ...) --> (table)
   if kind == 'change' then
@@ -600,9 +600,12 @@ end ---- sortpairs
 -- Сбор элементарной статистики.
 --[[
   -- @params:
-  k       (any) - table key (k == nil --> call for init).
-  v       (any) - table value (v == t --> call for init).
-  kind  (table) - additional parameters (@see unit.statpairs.kind).
+  k         (any) - table key (k == nil --> call for init).
+  v         (any) - table value (v == t --> call for init).
+  kind    (table) - additional parameters (@see unit.statpairs.kind).
+  -- @return:
+    -- @return in kind:
+    stats (table) - required statistics.
 --]]
 function unit.gatherstat (k, v, kind) --| kind.stats
   if k == nil then
@@ -623,6 +626,7 @@ function unit.gatherstat (k, v, kind) --| kind.stats
       stats.main = stats["boolean"] + stats["number"] +
                    stats["string"] + stats["table"]
     end -- Init/Done
+
     return
   end
 
@@ -643,8 +647,10 @@ end ---- gatherstat
     gather   (func) - function to gather statistics.
     gathered (bool) - gathered statistics (@default = false).
   ...           - parameters to call kind.pairs(t, ...).
+  -- @return:
+    -- @return in kind (@see unit.gatherstat.kind).
 --]]
-function unit.statpairs (t, kind, ...) --> (func)
+function unit.statpairs (t, kind, ...) --| kind --> (func)
   if not t then return end
 
   assert(type(kind) == 'table')
