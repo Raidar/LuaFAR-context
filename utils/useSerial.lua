@@ -105,7 +105,7 @@ unit.KeyToStr = KeyToStr
 --]]
 local function TabToStr (name, data, kind, write) --| (write)
 
-  -- Write self-references:
+  -- 1. Write self-references:
   do
     local value = kind.saved[data]
     if value then -- saved name as value
@@ -116,7 +116,13 @@ local function TabToStr (name, data, kind, write) --| (write)
     --logMsg({ name, kind, data or "nil" }, "kind", 3)
   end
 
-  -- Settings to write current table:
+  -- 2. Settings to write current table:
+
+  -- Settings to write keys/values:
+  local KeyToStr = kind.KeyToStr
+  local ValToStr = kind.ValToStr
+
+  -- Settings to data nesting:
   kind.level = kind.level + 1
   local cur_indent = kind.indent
   local new_indent = cur_indent..kind.shift
@@ -126,7 +132,7 @@ local function TabToStr (name, data, kind, write) --| (write)
   local tname = kind.tname
   tname = (kind.level % 2 == 1) and tname or (tname == "t" and "u" or "t")
 
-  -- Write current table fields:
+  -- 3. Write current table fields:
   local isnull = true
   for k, v in kind.pairs(data, unpack(kind.pargs)) do
     local s = KeyToStr(k)
@@ -152,7 +158,7 @@ local function TabToStr (name, data, kind, write) --| (write)
   end
   write(cur_indent, "\n")
 
-  -- Restore settings
+  -- 4. Restore settings
   kind.level = kind.level - 1
   kind.indent = cur_indent
 
@@ -175,19 +181,24 @@ local spaces = {
      Serialize data of following types: boolean, number, string, table.
   -- @params (@see unit.serialize):
   kind  (table) - conversion kind: @fields additions:
-    pargs[1]  (table) - sortkind for statpairs (@see tables.statpairs).
+    pargs[1]  (table) - sortkind for statpairs: @see tables.statpairs.
     tnaming    (bool) - using temp names to access fields.
     astable    (bool) - write data as whole table ({ fields }).
+    nesting   (n|nil) - max nesting level of data to convert.
     -- Linearization parameters:
-    lining   (string) - write to fill lines (@see 3+3 fields below).
+    lining   (string) - write for lines fill (@see fields below):
+                        "all", "array", "hash".
                         ~to write array:
-    alimit   (number) - length limit for line.
-    acount   (number) - max field count in line.
-    awidth   (number) - min field width in line.
+    alimit      (n|f) - length limit for line.
+    acount      (n|f) - max field count in line.
+    awidth      (n|f) - min field width in line.
                         ~ to write hash:
-    hlimit   (number) - length limit for line.
-    hcount   (number) - max field count in line.
-    hwidth   (number) - min field width in line.
+    hlimit      (n|f) - length limit for line.
+    hcount      (n|f) - max field count in line.
+    hwidth      (n|f) - min field width in line.
+    -- @locals in kind:
+    nestless  (table) - nestless flags for nesting levels.
+    isarray   (table) - flag of array-part of prior/current level table.
   -- @return:
   isOk   (bool) - operation success flag.
 --]]
@@ -195,36 +206,73 @@ local function TabToText (name, data, kind, write) --| (write)
 
   local level = kind.level -- Prior level
   local fname = kind.fname or name
+  local cur_indent = kind.indent
+
+  -- 0. Init serialize:
+  if level == 0 then
+    kind.nestless = {}
+    local nesting = kind.nesting
+    if nesting then
+       if type(nesting) ~= 'number' or nesting < 0 then
+         kind.nesting = 0
+       end
+    end
+  end
 
   -- 1. Write self-references:
   do
+    local astable = kind.astable or
+                    (kind.tnaming and level > 0 and kind.nestless[level])
+
     local saved = kind.saved --or {}
     local value = saved[data]
     if value then -- saved name as value
-      if kind.astable or (kind.tnaming and
-         (level > 1 and kind.nestless[level])) then
+      if astable then
         -- Save self-reference + Write as comment
         saved[fname] = data
         if kind.isarray then
-          write(kind.indent, "false, -- ", value, "\n")
+          write(cur_indent, format("false, -- %s\n", value))
         else
-          write(kind.indent, format("%s = false, -- %s\n", name, value))
+          write(cur_indent, format("%s = false, -- %s\n", name, value))
         end
       else
-        write(kind.indent, format("%s = %s\n", name, value))
+        write(cur_indent, format("%s = %s\n", name, value))
       end
 
       return
     end
 
     saved[data] = fname -- name
+
+    -- Check nesting level:
+    local nesting = kind.nesting
+    if nesting and level > nesting then
+      -- TODO: write something to indicate skip.
+      local tp = type(name)
+      if astable then
+        if kind.isarray then
+          --logMsg(kind, name, 1)
+          write(cur_indent, format("{}, -- skip\n"))
+        else
+          write(cur_indent, format("%s = {}, -- skip\n", name))
+        end
+      else
+        write(cur_indent, format("%s = {} -- skip\n", name))
+      end
+      return
+    end
   end -- do
 
   -- 2. Settings to write current table:
+
+  -- Settings to write keys/values:
+  local KeyToStr = kind.KeyToStr
+  local ValToStr = kind.ValToStr
+
+  -- Settings to data nesting:
   kind.level = kind.level + 1 -- Current level
   level = kind.level
-
-  local cur_indent = kind.indent
+  local isarray = kind.isarray
   local new_indent = cur_indent..kind.shift
   kind.indent = new_indent
 
@@ -232,8 +280,7 @@ local function TabToText (name, data, kind, write) --| (write)
   local sortnext = statpairs(data, sortkind, unpack(kind.pargs, 2))
   --logMsg(sortkind.stats, "statpairs stats")
 
-  -- Settings to check table nesting
-  if level == 1 then kind.nestless = {} end
+  -- Settings to check table nesting:
   local nestless = sortkind.stats['table'] == 0
   kind.nestless[level] = nestless
   nestless = kind.astable or nestless
@@ -242,13 +289,11 @@ local function TabToText (name, data, kind, write) --| (write)
   local skip = {}
   local isnull = true
 
-  local isarray = kind.isarray -- Save value
-
   -- 3.1. Write array only fields:
   if nestless then
     kind.isarray = true -- in array-part only
 
-    -- Settings to write fields of array in one line
+    -- Settings to write fields of array in one line:
     local islining = kind.lining == "all" or kind.lining == "array"
     local alimit, acount, awidth
     if islining then
@@ -335,10 +380,12 @@ local function TabToText (name, data, kind, write) --| (write)
 
   -- 3.2. Write hash/table fields:
   do
+    kind.isarray = false -- in hash-part only
+
     local tname = kind.tname -- Different temp names for sequential levels
     tname = (level % 2 == 1) and tname or (tname == "t" and "u" or "t")
 
-    -- Settings to write fields of hash in one line
+    -- Settings to write fields of hash in one line:
     local islining = kind.lining == "all" or kind.lining == "hash"
     local hlimit, hcount, hwidth
     if islining then
@@ -418,6 +465,7 @@ local function TabToText (name, data, kind, write) --| (write)
             end
             kind.fname = fname..s
             if nestless then
+              --if c == "subsubtable" then logMsg(kind, name, 1) end
               TabToText(c, v, kind, write)
             else
               TabToText((kind.tnaming and tname or name)..c, v, kind, write)
@@ -448,7 +496,7 @@ local function TabToText (name, data, kind, write) --| (write)
   end
   write("\n")
 
-  -- 4. Write self-references:
+  -- 3.3. Write self-references:
   if level == 1 then
     local isnull = true
   
@@ -466,9 +514,12 @@ local function TabToText (name, data, kind, write) --| (write)
     --if not isnull then write("--\n") end
   end
 
-  -- 5. Restore settings
-  kind.level = kind.level - 1 -- Prior level
+  -- 4. Restore settings
+  kind.level = kind.level - 1
+  kind.isarray = isarray
   kind.indent = cur_indent
+
+  -- 5. Done serialize:
 
   return true
 end -- TabToText
@@ -482,7 +533,7 @@ unit.TabToText = TabToText
   name (string) - data name.
   data  (table) - saved data.
   kind  (table) - serializion kind (@see kind in pairs and TabToStr):
-    saved     (table) - names of tables already saved.
+    saved     (table) - tables already saved with its names.
     indent   (string) - initial indent value to write.
     shift    (string) - indent shift to pretty write fields.
     pairs      (func) - pairs function to get fields.
@@ -491,7 +542,13 @@ unit.TabToText = TabToText
     strlong (b|n|nil) - using long brackets for string formatting
                         (strlong as number is for string length minimum).
     ValToStr   (func) - function to convert simple value to string.
+    KeyToStr   (func) - function to convert field key to string.
     TabToStr   (func) - function to convert table to string.
+    -- @locals in kind:
+    level    (number) - current level of nesting: 0+.
+    fname    (string) - full name of table field.
+    tname    (string) - temporary name of table for local access:
+                        "t" or "u" -- to prevent collision with data name.
   write  (func) - function to write data strings.
   -- @return:
   isOk   (bool) - operation success flag.
@@ -500,7 +557,10 @@ function unit.serialize (name, data, kind, write) --> (bool)
   local kind = kind or {}
   --logMsg(kind, "kind")
 
-  local s, tp = (kind.ValToStr or ValToStr)(data, kind.strlong)
+  kind.ValToStr = kind.ValToStr or ValToStr
+  kind.KeyToStr = kind.KeyToStr or KeyToStr
+
+  local s, tp = kind.ValToStr(data, kind.strlong)
   if s then
     if kind.localret then
       return write(format("local %s = %s\nreturn %s\n", name, s, name))
@@ -515,9 +575,9 @@ function unit.serialize (name, data, kind, write) --> (bool)
   kind.pairs = kind.pairs or pairs
   kind.pargs = kind.pargs or {}
 
-  kind.level = 0 -- deep level for table nesting
-  kind.fname = name -- using for table field name
-  kind.tname = (name == "t") and "u" or "t" -- prevent collision of names
+  kind.level = 0
+  kind.fname = name
+  kind.tname = (name == "t") and "u" or "t"
 
   if kind.localret then
     write(kind.indent, "local ", name, "\n\n")
