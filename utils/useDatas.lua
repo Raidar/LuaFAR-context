@@ -119,7 +119,7 @@ do
   -- @params:
   fullname (string) - full file name.
   t         (t|nil) - already existing data table.
-  kind     (string) - kind of addition (@see tables.add, @default = 'update').
+  kind     (string) - kind of addition (@default = 'update'): @see tables.add.
   -- @return:
   data      (t|nil) - data table.
 --]]
@@ -170,7 +170,7 @@ do
   -- @params:
   name (string) - file name.
   t     (t|nil) - already existing data table.
-  kind (string) - kind of data require (@see unit.add, @default 'update').
+  kind (string) - kind of data require (@default 'update'): @see unit.add.
   reload (bool) - flag for reload on repeated data load.
   -- @return:
   data  (table) - data table.
@@ -202,7 +202,7 @@ end -- do
   name (string) - file name.
   ext  (string) - file extension.
   t     (t|nil) - already existing data table.
-  kind (string) - kind of data load (@see unit.add).
+  kind (string) - kind of data load: @see unit.add.
   -- @return:
   data  (table) - data table.
 --]]
@@ -245,7 +245,7 @@ do
   fullname (string) - full file name.
   name     (string) - data table name.
   data      (t|nil) - processed data table.
-  kind      (table) - kind of data save (@see serialize.kind).
+  kind      (table) - kind of data save: @see serial.serialize.kind.
   -- @return:
   isOk       (bool) - operation success flag.
 --]]
@@ -273,7 +273,7 @@ end -- save
   -- @params:
   name     (string) - data table name.
   data      (t|nil) - processed data table.
-  kind      (table) - kind of data save (@see serialize.kind).
+  kind      (table) - kind of data save: @see serial.serialize.kind.
   -- @return:
   isOk (bool) - operation success flag.
 --]]
