@@ -34,6 +34,8 @@ local lua = context.lua
 --local utils = context.utils
 local tables = context.tables
 
+local hex = context.numbers.hex
+
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 
@@ -46,7 +48,7 @@ local frexp, modf = math.frexp, math.modf
 
 -- Convert simple value to string.
 -- Преобразование простого значения в строку.
-local function ValToStr (value, strlong) --> (string | nil, type)
+local function ValToStr (value, kind) --> (string | nil, type)
   local tp = type(value)
   if tp == 'boolean' then return tostring(value) end
   if tp == 'number' then
@@ -55,8 +57,8 @@ local function ValToStr (value, strlong) --> (string | nil, type)
   end
 
   if tp == 'string' then
-    if strlong and
-       value:len() > strlong and
+    if kind.strlong and
+       value:len() > kind.strlong and
        value:find("\n", 1, true) and
        not value:find("%s\n") and
        --not value:find("%[%[.-%]%]") and
@@ -76,10 +78,10 @@ local KeywordMask = lua.KeywordMask
 
 -- Convert key name to string.
 -- Преобразование имени ключа в строку.
-local function KeyToStr (key) --> (string)
+local function KeyToStr (key, kind) --> (string)
   local tp = type(key)
   if tp ~= 'string' then
-    local key = ValToStr(key)
+    local key = ValToStr(key, kind)
     if key then
       return format("[%s]", key)
     end
@@ -128,16 +130,15 @@ local function TabToStr (name, data, kind, write) --| (write)
   local new_indent = cur_indent..kind.shift
   kind.indent = new_indent
 
-  local strlong = kind.strlong
   local tname = kind.tname
   tname = (kind.level % 2 == 1) and tname or (tname == "t" and "u" or "t")
 
   -- 3. Write current table fields:
   local isnull = true
   for k, v in kind.pairs(data, unpack(kind.pargs)) do
-    local s = KeyToStr(k)
+    local s = KeyToStr(k, kind)
     if s then
-      local u, tp = ValToStr(v, strlong)
+      local u, tp = ValToStr(v, kind)
       if isnull and (u or tp == 'table') then
         isnull = false
         write(cur_indent, format("do local %s = {}; %s = %s\n",
@@ -182,7 +183,7 @@ local spaces = {
   -- @params (@see unit.serialize):
   kind  (table) - conversion kind: @fields additions:
     pargs[1]  (table) - sortkind for statpairs: @see tables.statpairs.
-    tnaming    (bool) - using temp names to access fields.
+    tnaming    (bool) - use temporary names to access fields.
     astable    (bool) - write data as whole table ({ fields }).
     nesting   (n|nil) - max nesting level of data to convert.
     -- Linearization parameters:
@@ -309,7 +310,7 @@ local function TabToText (name, data, kind, write) --| (write)
     local k, v = 1, data[1]
     while v ~= nil do
       skip[k] = v
-      local u, tp = ValToStr(v)
+      local u, tp = ValToStr(v, kind)
 
       -- Set '{' of array/table to line:
       if isnull and (u or tp == 'table') then
@@ -358,7 +359,7 @@ local function TabToText (name, data, kind, write) --| (write)
           write("\n")
           l = 0
         end
-        local s = KeyToStr(k)
+        local s = KeyToStr(k, kind)
         kind.fname = fname..s
         TabToText(s, v, kind, write)
       end
@@ -400,12 +401,12 @@ local function TabToText (name, data, kind, write) --| (write)
 
     for k, v in sortnext do
       if not skip[k] then
-        local s, c = KeyToStr(k)
+        local s, c = KeyToStr(k, kind)
         c = nestless and c or s -- Check using dot
         --logMsg({ nestless, s, c, kind }, name, 2)
 
         if s then
-          local u, tp = ValToStr(v)
+          local u, tp = ValToStr(v, kind)
           -- Set '{' of hash/table to line:
           if isnull and (u or tp == 'table') then
             isnull = false
@@ -538,9 +539,11 @@ unit.TabToText = TabToText
     shift    (string) - indent shift to pretty write fields.
     pairs      (func) - pairs function to get fields.
     pargs     (table) - array of arguments to call pairs.
-    localret   (bool) - using 'local name = {} ... return name' structure.
-    strlong (b|n|nil) - using long brackets for string formatting
-                        (strlong as number is for string length minimum).
+    localret   (bool) - use 'local name = {} ... return name' structure.
+    keyhex    (n|nil) - write integer keys in hexadecimal format.
+    valhex    (n|nil) - write integer values in hexadecimal format.
+    strlong (b|n|nil) - use long brackets for string formatting
+                        (strlong as number - string length minimum).
     ValToStr   (func) - function to convert simple value to string.
     KeyToStr   (func) - function to convert field key to string.
     TabToStr   (func) - function to convert table to string.
@@ -548,7 +551,7 @@ unit.TabToText = TabToText
     level    (number) - current level of nesting: 0+.
     fname    (string) - full name of table field.
     tname    (string) - temporary name of table for local access:
-                        "t" or "u" -- to prevent collision with data name.
+                        "t" or "u" - to prevent collision with data name.
   write  (func) - function to write data strings.
   -- @return:
   isOk   (bool) - operation success flag.
@@ -560,7 +563,7 @@ function unit.serialize (name, data, kind, write) --> (bool)
   kind.ValToStr = kind.ValToStr or ValToStr
   kind.KeyToStr = kind.KeyToStr or KeyToStr
 
-  local s, tp = kind.ValToStr(data, kind.strlong)
+  local s, tp = kind.ValToStr(data, kind)
   if s then
     if kind.localret then
       return write(format("local %s = %s\nreturn %s\n", name, s, name))
