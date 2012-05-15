@@ -32,16 +32,24 @@ local win, far = win, far
 local unit = {}
 
 ---------------------------------------- Convert
+-- Hexadecimal string presentation of number.
+-- 16-ричное строковое представление числа.
 do
   local tostring = tostring
   local sformat = string.format
 
--- Hexadecimal string presentation of number.
--- 16-ричное строковое представление числа.
 -- Default width for: Ox12345678
-function unit.hex (n, width) --> (string)
+function unit.hex8 (n, width) --> (string)
   return sformat(sformat("%%#0%dx", width or 10), n or 0)
 end ----
+local hex8 = unit.hex8
+
+function unit.hex (n, width) --> (string)
+  if width then
+    return hex8(n, width)
+  end
+  return sformat("%#x", n or 0)
+end ---- hex
 
 end -- do
 
@@ -155,5 +163,5 @@ function unit.torange (n, min, max) --> (number)
 end ----
 
 --------------------------------------------------------------------------------
-context.number = unit -- 'numbers' table in context
+context.numbers = unit -- 'numbers' table in context
 --------------------------------------------------------------------------------
