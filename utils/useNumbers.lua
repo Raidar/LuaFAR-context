@@ -36,11 +36,11 @@ local unit = {}
 -- 16-ричное строковое представление числа.
 do
   local tostring = tostring
-  local sformat = string.format
+  local format = string.format
 
 -- Default width for: Ox12345678
 function unit.hex8 (n, width) --> (string)
-  return sformat(sformat("%%#0%dx", width or 10), n or 0)
+  return format(format("%%#0%dx", (width or 8) + 2), n or 0)
 end ----
 local hex8 = unit.hex8
 
@@ -48,7 +48,7 @@ function unit.hex (n, width) --> (string)
   if width then
     return hex8(n, width)
   end
-  return sformat("%#x", n or 0)
+  return format("%#x", n or 0)
 end ---- hex
 
 end -- do
