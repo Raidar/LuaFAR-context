@@ -175,6 +175,8 @@ local spaces = {} -- prepared space strings.
     numwidth  (n|nil) - min width of number value in string.
     keyhex    (n|nil) - write integer keys as hexadecimal numbers.
     valhex    (n|nil) - write integer values as hexadecimal numbers.
+    keyfloat   (bool) - write float keys using tostring.
+    valfloat   (bool) - write float values using tostring.
     strlong (b|n|nil) - use long brackets for string formatting
                         (strlong as number - string length minimum).
   -- @return:
@@ -191,12 +193,8 @@ local function ValToText (value, kind) --> (string | nil, type)
   if tp == 'number' then
     -- integer:
     if value == modf(value) then
-      local w
-      if kind.iskey then
-        w = kind.keyhex
-      else
-        w = kind.valhex
-      end
+      local w = kind.iskey
+      if w then w = kind.keyhex else w = kind.valhex end
       if w then -- hex:
         return hex(value, type(w) == 'number' and w or nil)
       end
@@ -215,6 +213,9 @@ local function ValToText (value, kind) --> (string | nil, type)
     end
 
     -- float:
+    local f = kind.iskey
+    if f then f = kind.keyfloat else f = kind.valfloat end
+    if f then return tostring(value) end          -- pretty float
     return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
   end
 
@@ -654,10 +655,9 @@ unit.TabToText = TabToText
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
   local kind = kind or {}
-  --logMsg(kind, "kind")
 
-  kind.ValToStr = kind.ValToStr or ValToStr
   kind.KeyToStr = kind.KeyToStr or KeyToStr
+  kind.ValToStr = kind.ValToStr or ValToStr
 
   local s, tp = kind.ValToStr(data, kind)
   if s then
@@ -690,6 +690,23 @@ function unit.serialize (name, data, kind, write) --> (bool)
 
   return true
 end -- serialize
+
+-- Serialize data to pretty text.
+-- Сериализация данных в читабельный текст.
+function unit.prettyize (name, data, kind, write) --> (bool)
+  local kind = kind or {}
+  --logMsg(kind, "kind")
+
+  kind.KeyToStr = kind.KeyToStr or KeyToText
+  kind.ValToStr = kind.ValToStr or ValToText
+  kind.TabToStr = kind.TabToStr or TabToText
+
+  if kind.localret == nil then kind.localret = true end
+  if kind.tnaming == nil then kind.tnaming = true end
+  --if kind.lining == nil then kind.lining = "array" end
+
+  return unit.serialize(name, data, kind, write)
+end ---- prettyize
 
 --------------------------------------------------------------------------------
 context.serial = unit -- 'serial' table in context
