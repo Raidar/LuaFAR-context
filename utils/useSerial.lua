@@ -42,32 +42,23 @@ local hex = context.numbers.hex
 --------------------------------------------------------------------------------
 local unit = {}
 
-----------------------------------------
+---------------------------------------- ValToStr/KeyToStr
 local format = string.format
 local frexp, modf = math.frexp, math.modf
 
 -- Convert simple value to string.
 -- Преобразование простого значения в строку.
-local function ValToStr (value, kind) --> (string | nil, type)
+local function ValToStr (value) --> (string | nil, type)
   local tp = type(value)
+
   if tp == 'boolean' then return tostring(value) end
+
   if tp == 'number' then
     if value == modf(value) then return tostring(value) end -- integer
     return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
   end
 
-  if tp == 'string' then
-    if kind.strlong and
-       value:len() > kind.strlong and
-       value:find("\n", 1, true) and
-       not value:find("%s\n") and
-       --not value:find("%[%[.-%]%]") and
-       not value:find("[[", 1, true) and
-       not value:find("]]", 1, true) then
-      return format("[[\n%s]]", value) -- [[string]]
-    end
-    return ("%q"):format(value) -- "string"
-  end
+  if tp == 'string' then return ("%q"):format(value) end -- "string"
 
   return nil, tp
 end -- ValToStr
@@ -78,10 +69,10 @@ local KeywordMask = lua.KeywordMask
 
 -- Convert key name to string.
 -- Преобразование имени ключа в строку.
-local function KeyToStr (key, kind) --> (string)
+local function KeyToStr (key) --> (string)
   local tp = type(key)
   if tp ~= 'string' then
-    local key = ValToStr(key, kind)
+    local key = ValToStr(key)
     if key then
       return format("[%s]", key)
     end
@@ -167,20 +158,131 @@ local function TabToStr (name, data, kind, write) --| (write)
 end -- TabToStr
 unit.TabToStr = TabToStr
 
----------------------------------------- TabToText
+---------------------------------------- ValToText/KeyToText
 local srep = string.rep
+
+local spaces = {} -- prepared space strings.
+
+-- Convert simple value to pretty text.
+-- Преобразование простого значения в читабельный текст.
+--[[
+  -- @notes:
+     Convert value of following types: boolean, number, string.
+  -- @params (@see unit.serialize and unit.TabToText):
+  value   (any) - value to convert.
+  kind  (table) - conversion kind: @fields additions:
+    iskey     (table) - flag for key of field (not value).
+    numwidth  (n|nil) - min width of number value in string.
+    keyhex    (n|nil) - write integer keys as hexadecimal numbers.
+    valhex    (n|nil) - write integer values as hexadecimal numbers.
+    strlong (b|n|nil) - use long brackets for string formatting
+                        (strlong as number - string length minimum).
+  -- @return:
+  (s | nil,tp)  - string representation of value.
+--]]
+local function ValToText (value, kind) --> (string | nil, type)
+  local tp = type(value)
+
+  -- boolean:
+  if tp == 'boolean' then
+    return tostring(value)
+  end
+
+  if tp == 'number' then
+    -- integer:
+    if value == modf(value) then
+      local w
+      if kind.iskey then
+        w = kind.keyhex
+      else
+        w = kind.valhex
+      end
+      if w then -- hex:
+        return hex(value, type(w) == 'number' and w or nil)
+      end
+
+      local s = tostring(value)
+      w = (kind.numwidth or 0) - s:len()
+      if w > 0 then -- align:
+        local sp = spaces[w]
+        if not sp then
+          sp = srep(" ", w)
+          spaces[w] = sp
+        end
+        return format("%s%s", sp, w)
+      end
+      return s
+    end
+
+    -- float:
+    return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
+  end
+
+  -- string:
+  if tp == 'string' then
+    -- using long brackets:
+    if kind.strlong and
+       value:len() > kind.strlong and
+       value:find("\n", 1, true) and
+       not value:find("%s\n") and
+       --not value:find("%[%[.-%]%]") and
+       not value:find("[[", 1, true) and
+       not value:find("]]", 1, true) then
+      return format("[[\n%s]]", value) -- [[string]]
+    end
+
+    -- quoted:
+    return ("%q"):format(value) -- "string"
+  end
+
+  return nil, tp
+end -- ValToText
+unit.ValToText = ValToText
+
+-- Convert key name to pretty text.
+-- Преобразование имени ключа в читабельный текст.
+--[[
+  -- @notes: @see unit.ValToText.
+  -- @params (@see unit.serialize and unit.TabToText):
+  value   (any) - value to convert.
+  kind  (table) - conversion kind: @fields additions: none.
+    -- @locals in kind:
+    iskey     (table) - flag for key of field (not value).
+  -- @return:
+  (s | nil,tp)  - string representation of value.
+--]]
+local function KeyToText (key, kind) --> (string)
+  local tp = type(key)
+
+  -- boolean & number:
+  if tp ~= 'string' then
+    kind.iskey = true
+    local key = ValToText(key, kind)
+    kind.iskey = false
+    if key then
+      return format("[%s]", key)
+    end
+    return --nil, tp
+  end
+
+  -- string:
+  if key:find(KeywordMask) and not reserveds[key] then
+    return "."..key, key -- .string
+  end
+  return ("[%q]"):format(key) -- ["string"]
+end -- KeyToText
+unit.KeyToText = KeyToText
+
+---------------------------------------- TabToText
 local sortpairs = tables.sortpairs
 local statpairs = tables.statpairs
-
-local spaces = {
-} ---
 
 -- Convert table to pretty text.
 -- Преобразование таблицы в читабельный текст.
 --[[
   -- @notes:
      Serialize data of following types: boolean, number, string, table.
-  -- @params (@see unit.serialize):
+  -- @params (@see unit.serialize, unit.KeyToText, unit.ValToText):
   kind  (table) - conversion kind: @fields additions:
     pargs[1]  (table) - sortkind for statpairs: @see tables.statpairs.
     tnaming    (bool) - use temporary names to access fields.
@@ -248,7 +350,6 @@ local function TabToText (name, data, kind, write) --| (write)
     -- Check nesting level:
     local nesting = kind.nesting
     if nesting and level > nesting then
-      -- TODO: write something to indicate skip.
       local tp = type(name)
       if astable then
         if kind.isarray then
@@ -329,8 +430,7 @@ local function TabToText (name, data, kind, write) --| (write)
           local ulen = u:len()
           len = len + ulen + 2 -- for ' ' + ','
           -- Settings to align fields:
-          local w, sp = awidth or 0, ""
-          w = w - ulen
+          local w, sp = (awidth or 0) - ulen, ""
           if w > 0 then
             len = len + w
             sp = spaces[w]
@@ -431,8 +531,7 @@ local function TabToText (name, data, kind, write) --| (write)
                 local culen = c:len() + u:len()
                 len = len + culen + 5 -- for ' ' + ' = ' + ','
                 -- Settings to align fields:
-                local w, sp = hwidth or 0, ""
-                w = w - culen
+                local w, sp = (hwidth or 0) - culen, ""
                 if w > 0 then
                   len = len + w
                   sp = spaces[w]
@@ -540,10 +639,7 @@ unit.TabToText = TabToText
     pairs      (func) - pairs function to get fields.
     pargs     (table) - array of arguments to call pairs.
     localret   (bool) - use 'local name = {} ... return name' structure.
-    keyhex    (n|nil) - write integer keys in hexadecimal format.
-    valhex    (n|nil) - write integer values in hexadecimal format.
-    strlong (b|n|nil) - use long brackets for string formatting
-                        (strlong as number - string length minimum).
+
     ValToStr   (func) - function to convert simple value to string.
     KeyToStr   (func) - function to convert field key to string.
     TabToStr   (func) - function to convert table to string.
