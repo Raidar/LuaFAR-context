@@ -9,7 +9,7 @@
 --[[ uses:
   LuaFAR,
   LF context.
-  -- group: LFc utils, Datas.
+  -- group: LFc scripts, Datas.
 --]]
 --------------------------------------------------------------------------------
 local _G = _G

@@ -9,7 +9,7 @@
 --[[ uses:
   LuaFAR,
   LF context.
-  -- group: LFc utils.
+  -- group: LFc scripts.
   -- areas: editor, viewer.
 --]]
 --------------------------------------------------------------------------------

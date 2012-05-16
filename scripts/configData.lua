@@ -9,7 +9,7 @@
 --[[ uses:
   LuaFAR,
   LF context.
-  -- group: LFc utils, Datas.
+  -- group: LFc scripts, Datas.
 --]]
 --------------------------------------------------------------------------------
 local _G = _G
@@ -37,8 +37,8 @@ local unit = {}
 ----------------------------------------
 local Custom = {
   label = "mCfg",
-  name = "utils",
-  path = "context.utils.",
+  name = "scripts",
+  path = "context.scripts.",
   locale = { kind = 'require' },
 } ---
 local L, e1, e2 = context.locale.create(Custom)

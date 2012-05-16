@@ -1,6 +1,6 @@
 --[[ LuaFAR context ]]--
---[[ utils: Russian ]]--
---[[ utils: русский ]]--
+--[[ scripts: Russian ]]--
+--[[ scripts: русский ]]--
 
 --------------------------------------------------------------------------------
 --local U = unicode.utf8.char

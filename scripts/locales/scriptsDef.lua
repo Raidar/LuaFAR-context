@@ -1,5 +1,5 @@
 --[[ LuaFAR context ]]--
---[[ utils: English ]]--
+--[[ scripts: English ]]--
 
 --------------------------------------------------------------------------------
 --local U = unicode.utf8.char

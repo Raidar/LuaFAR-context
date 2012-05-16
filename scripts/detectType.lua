@@ -9,7 +9,7 @@
 --[[ uses:
   LuaFAR,
   LF context.
-  -- group: LFc utils.
+  -- group: LFc scripts.
   -- areas: basic.
 --]]
 --------------------------------------------------------------------------------
@@ -41,8 +41,8 @@ local unit = {}
 ----------------------------------------
 local Custom = {
   label = "mDet",
-  name = "utils",
-  path = "context.utils.",
+  name = "scripts",
+  path = "context.scripts.",
   locale = { kind = 'require' },
 } ---
 local L, e1, e2 = context.locale.create(Custom)
