@@ -247,12 +247,15 @@ end -- do
 ---------------------------------------- Message
 do
   local farMsg = far.Message
+
 -- Simple message box.
+-- Простое окно с сообщением.
 function unit.message (Title, Msg, Flags, Buttons) --| (window)
   return farMsg(Msg, Title, Buttons, Flags)
 end --
 
 -- Warning message box.
+-- Окно-предупреждение с сообщением.
 function unit.warning (Title, Msg, Flags) --| (window)
   return farMsg(Msg, Title, nil, (Flags or '').."w")
 end --

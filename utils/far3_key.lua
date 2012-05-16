@@ -29,8 +29,10 @@ local F = far.Flags
 local context = context
 local utils = context.utils
 
-local hex = context.numbers.hex8 -- for far.Message
 local tconcat, tfind = table.concat, context.tables.find
+
+local numbers = require 'context.utils.useNumbers'
+local hex = numbers.hex8 -- for far.Message
 
 local far23 = context.use.far23
 

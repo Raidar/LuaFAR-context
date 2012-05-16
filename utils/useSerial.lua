@@ -33,9 +33,8 @@ local context = context
 --local utils = context.utils
 local tables = context.tables
 
-local hex = context.numbers.hex
-
 local lua = require "context.utils.useLua"
+local numbers = require 'context.utils.useNumbers'
 
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message
@@ -160,6 +159,8 @@ end -- TabToStr
 unit.TabToStr = TabToStr
 
 ---------------------------------------- ValToText/KeyToText
+local hex = numbers.hex
+
 local srep = string.rep
 
 -- TODO: use __index to autocreate required space-string.

@@ -29,7 +29,7 @@ local datas  = context.datas
 local cfgpairs = datas.cfgpairs
 
 ----------------------------------------
-local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 
 --------------------------------------------------------------------------------
 local unit = {}

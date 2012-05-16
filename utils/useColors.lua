@@ -35,7 +35,7 @@ local linMsg = logUt.lineMessage
 
 --------------------------------------------------------------------------------
 -- Color handling class
-local TColors = {
+local unit = {
   Mask  = 0xF,
   Shift = 0x4,
   Default = 0xF0,
@@ -50,10 +50,10 @@ local TColors = {
   FGName = 'ForegroundColor',
   BGName = 'BackgroundColor',
 } ---
-TColors.FGMask =      TColors.Mask
-TColors.BGMask = bshl(TColors.Mask, TColors.Shift)
+unit.FGMask =      unit.Mask
+unit.BGMask = bshl(unit.Mask, unit.Shift)
 
---local MColors = { __index = TColors }
+--local MColors = { __index = unit }
 
 ---------------------------------------- Colors
 do
@@ -115,29 +115,29 @@ do
 
   --linMsg(Colors, "Additional Colors", 0)
 
-  TColors.Colors = Colors
-  TColors.BaseColors = BaseColors
+  unit.Colors = Colors
+  unit.BaseColors = BaseColors
 
-  TColors.__index = Colors
-  setmetatable(TColors, TColors)
+  unit.__index = Colors
+  setmetatable(unit, unit)
 end -- do
 
 ---------------------------------------- functions
 
 -- Number value of table-color.
 -- Численное значение цвета-таблицы.
-function TColors.tonumber (color) --> (number)
+function unit.tonumber (color) --> (number)
   if type(color) ~= 'table' then return color end
-  local self = TColors
+  local self = unit
   return bor(     band(color[self.FGName], self.FGMask),
              bshl(band(color[self.BGName], self.BGMask), self.Shift))
 end ----
 
 -- Table value of number-color.
 -- Табличное значение цвета-числа.
-function TColors.totable (color) --> (table)
+function unit.totable (color) --> (table)
   if type(color) == 'table' then return color end
-  local self = TColors
+  local self = unit
   return {
     [self.FGName] = band(     color, self.FGMask             ),
     [self.BGName] = band(bshl(color, self.Shift), self.BGMask),
@@ -147,8 +147,8 @@ end ----
 
 -- Required value of color.
 -- Требуемое значение цвета.
-function TColors.tocolor (color, kind) --> (table|number)
-  local self, tp = TColors, type(color)
+function unit.tocolor (color, kind) --> (table|number)
+  local self, tp = unit, type(color)
   if tp == 'number' then
     return kind ~= 'table' and color or self.totable(color)
   elseif tp == 'table' then
@@ -159,79 +159,79 @@ end ----
 
 -- Get foreground color for color.
 -- Получение цвета символа для цвета.
-function TColors.getFG (color) --> (number)
+function unit.getFG (color) --> (number)
   if type(color) == 'table' then
-    return color[TColors.FGName]
+    return color[unit.FGName]
   else
-    return band(color, TColors.FGMask)
+    return band(color, unit.FGMask)
   end
 end ----
 
 -- Get background color for color.
 -- Получение цвета фона для цвета.
-function TColors.getBG (color) --> (number)
+function unit.getBG (color) --> (number)
   if type(color) == 'table' then
-    return color[TColors.BGName]
+    return color[unit.BGName]
   else
-    return bshr(color, TColors.Shift)
+    return bshr(color, unit.Shift)
   end
 end ----
 
 -- Set foreground color for color.
 -- Установка цвета символа для цвета.
-function TColors.setFG (color, fg) --> (number)
+function unit.setFG (color, fg) --> (number)
   if type(color) == 'table' then
-    color[TColors.FGName] = fg
+    color[unit.FGName] = fg
     return color
   else
-    return bor(band(color, TColors.BGMask), band(fg, TColors.Mask))
+    return bor(band(color, unit.BGMask), band(fg, unit.Mask))
   end
 end ----
 
 -- Set background color for color.
 -- Установка цвета фона для цвета.
-function TColors.setBG (color, bg) --> (number)
+function unit.setBG (color, bg) --> (number)
   if type(color) == 'table' then
-    color[TColors.BGName] = bg
+    color[unit.BGName] = bg
     return color
   else
-    return bor(band(color, TColors.FGMask),
-               bshl(band(bg, TColors.Mask), TColors.Shift))
+    return bor(band(color, unit.FGMask),
+               bshl(band(bg, unit.Mask), unit.Shift))
   end
 end ----
 
 -- Make color (by values).
 -- Формирование цвета (по значениям).
-function TColors.make (fg, bg, kind) --> (color)
+function unit.make (fg, bg, kind) --> (color)
   if (kind or 'table') == 'table' then
     return {
-      [TColors.FGName] = fg,
-      [TColors.BGName] = bg,
-      [TColors.Flags]  = F.FCF_4BITMASK,
+      [unit.FGName] = fg,
+      [unit.BGName] = bg,
+      [unit.Flags]  = F.FCF_4BITMASK,
     }
   else
-    return bor(fg, bshl(bg, TColors.Shift))
+    return bor(fg, bshl(bg, unit.Shift))
   end
 end ---- make
 
 -- Make color (by colors).
 -- Формирование цвета (по цветам).
-function TColors.cmake (fg, bg, kind) --> (color)
+function unit.cmake (fg, bg, kind) --> (color)
   if (kind or 'table') == 'table' then
     return {
-      [TColors.FGName] = type(fg) == 'table' and fg[TColors.FGName] or fg,
-      [TColors.BGName] = type(bg) == 'table' and bg[TColors.FGName] or bg,
-      [TColors.Flags]  = F.FCF_4BITMASK,
+      [unit.FGName] = type(fg) == 'table' and fg[unit.FGName] or fg,
+      [unit.BGName] = type(bg) == 'table' and bg[unit.FGName] or bg,
+      [unit.Flags]  = F.FCF_4BITMASK,
     }
   else
-    return bor(band(fg, TColors.FGMask), band(bg, TColors.BGMask))
+    return bor(band(fg, unit.FGMask), band(bg, unit.BGMask))
   end
 end ---- cmake
 
 ---------------------------------------- methods
 -- Make new color (by values).
 -- Формирование нового цвета (по значениям).
-function TColors:newColor (fg, bg, kind) --> (color)
+function unit:newColor (fg, bg, kind) --> (color)
   if (kind or 'table') == 'table' then
     return {
       [self.FGName] = fg,
@@ -253,7 +253,7 @@ do
   color  (string) - color name (may be color).
   kind   (string) - color format kind: 'table' | 'number'.
 --]]
-function TColors:getColor (color, kind) --> (color)
+function unit:getColor (color, kind) --> (color)
   -- TODO: Копировать self.Default, если это таблица!
   local color = color or self.Default
 
@@ -279,7 +279,7 @@ end -- do
   prefix (string) - name prefix for value store.
   kind   (string) - color format kind: 'table' | 'number'.
 --]]
-function TColors:dataColor (data, name, prefix, kind) --> (color)
+function unit:dataColor (data, name, prefix, kind) --> (color)
   local prefix = prefix or '_'
   local color = data[prefix..name]
 
@@ -293,5 +293,5 @@ function TColors:dataColor (data, name, prefix, kind) --> (color)
 end ---- dataColor
 
 --------------------------------------------------------------------------------
-context.colors = TColors -- 'colors' table in context
+return unit
 --------------------------------------------------------------------------------
