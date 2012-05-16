@@ -36,8 +36,8 @@ local modules = {
   'context.utils.useDatas',
   'context.utils.useLocale',
   -- Other modules:
-  'context.utils.handleType', --> detectType
-  'context.utils.manageData',
+  'context.scripts.handleType', --> detectType
+  'context.scripts.manageData',
   'context.utils.useHistory',
 } ---
 local packnum = 4 -- Number of preload modules
@@ -73,12 +73,12 @@ local registerConfig
 
 do -- Load special modules & Register types.
   --far.Message("require configData")
-  require 'context.utils.configData'
+  require 'context.scripts.configData'
   registerConfig = context.config.register
   --far.Message("register 'types' config")
   registerConfig{ key = 'types' }
   --far.Message("require detectType")
-  require 'context.utils.detectType'
+  require 'context.scripts.detectType'
 end
 
 ---------------------------------------- Configs

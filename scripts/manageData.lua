@@ -162,6 +162,7 @@ function unit.showFileList ()
     t[3] = LineFmt:format('v', '*', s(tp), s(types[tp].desc))
     t[4] = LineSep
   end
+
   -- other open files:
   for k, v in pairs(editors) do
     if k ~= 'current' then
@@ -175,6 +176,7 @@ function unit.showFileList ()
       t[#t+1] = LineFmt:format('v', s(k), s(tp), s(types[tp].desc))
     end
   end
+
   local s = #t > 2 and table.concat(t, '\n') or ''
   far.Message(s ~= '' and s or "No open files",
               "Open files list", nil, s ~= '' and 'l' or nil)

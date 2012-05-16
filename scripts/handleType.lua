@@ -25,7 +25,7 @@ local far = far
 local F = far.Flags
 
 ----------------------------------------
-require 'context.utils.detectType'
+require 'context.scripts.detectType'
 
 local context, ctxdata = context, ctxdata
 local detect = context.detect
