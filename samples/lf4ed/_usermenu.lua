@@ -12,7 +12,7 @@ MakeResident(require "context.resident") -- LFc resident
 end
 
 if UseAutoAdding then
-  AutoInstall("scripts/", "%_.+menu%.lua", 1) -- Loading all _*menu.lua
+  AutoInstall("scripts/", "%_.+menu%.lua$", 1) -- Loading all _*menu.lua
 else
   AddUserFile('scripts/lfa_config/_usermenu.lua') -- LFA config menu
   AddUserFile("scripts/Rh_Scripts/_usermenu.lua") -- Rh scripts items

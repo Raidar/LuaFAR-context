@@ -38,7 +38,7 @@ local modules = {
   -- Other modules:
   'context.scripts.handleType', --> detectType
   'context.scripts.manageData',
-  'context.utils.useHistory',
+  --'context.utils.useHistory',
 } ---
 local packnum = 4 -- Number of preload modules
 
