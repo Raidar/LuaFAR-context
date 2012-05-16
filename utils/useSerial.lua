@@ -30,11 +30,12 @@ local string = string
 
 ----------------------------------------
 local context = context
-local lua = context.lua
 --local utils = context.utils
 local tables = context.tables
 
 local hex = context.numbers.hex
+
+local lua = require "context.utils.useLua"
 
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message
@@ -161,6 +162,7 @@ unit.TabToStr = TabToStr
 ---------------------------------------- ValToText/KeyToText
 local srep = string.rep
 
+-- TODO: use __index to autocreate required space-string.
 local spaces = {} -- prepared space strings.
 
 -- Convert simple value to pretty text.
@@ -633,7 +635,7 @@ unit.TabToText = TabToText
   -- @params:
   name (string) - data name.
   data  (table) - saved data.
-  kind  (table) - serializion kind (@see kind in pairs and TabToStr):
+  kind  (table) - serializion kind (@see kind in pairs and *ToStr):
     saved     (table) - tables already saved with its names.
     indent   (string) - initial indent value to write.
     shift    (string) - indent shift to pretty write fields.
@@ -709,5 +711,5 @@ function unit.prettyize (name, data, kind, write) --> (bool)
 end ---- prettyize
 
 --------------------------------------------------------------------------------
-context.serial = unit -- 'serial' table in context
+return unit
 --------------------------------------------------------------------------------

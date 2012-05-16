@@ -12,10 +12,12 @@
 ―――――――
 [=] Совместимость с FAR 3 build 2574.
 [=] Совместимость с LuaFAR v.3.0.8 и LuaFAR for Editor v.3.0.5 .
-[+] useTables.lua: sortpairs — pairs с сортировкой полей.
-[+] useTables.lua: statpairs — pairs со статистикой для сериализации.
-[+] useSerial.lua: Сериализация таблицы данных (код из serial.lua).
-[+] useSerial.lua: Сериализация с улучшенной читабельностью.
+[+] useTables.lua:
+    — sortpairs — pairs с сортировкой полей.
+    — statpairs — pairs со статистикой для сериализации.
+[+] useSerial.lua:
+    — Сериализация таблицы данных (код из serial.lua).
+    — Сериализация с улучшенной читабельностью.
 
 2012-03-15, v.3.0.2.2
 ―――――――

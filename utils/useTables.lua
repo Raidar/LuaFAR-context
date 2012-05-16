@@ -594,7 +594,7 @@ function unit.sortpairs (t, kind, ...) --> (func)
   return _next
 end ---- sortpairs
 
-  local luatypes = context.lua.types
+  local lua -- useLua unit
 
 -- Gather simple statistics.
 -- Сбор элементарной статистики.
@@ -614,13 +614,16 @@ function unit.gatherstat (k, v, kind) --| kind.stats
     if v ~= nil then
       -- Init --
       local gathered = kind.gathered
-      for k, _ in pairs(luatypes) do
+      if not lua then lua = require 'context.utils.useLua' end
+
+      for k, _ in pairs(lua.types) do
         if gathered then
           stats[k] = stats[k] or 0
         else
           stats[k] = 0
         end
       end
+
     else
       -- Done --
       stats.main = stats["boolean"] + stats["number"] +

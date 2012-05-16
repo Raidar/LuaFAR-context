@@ -227,16 +227,16 @@ end -- make
 do
   local io_open = io.open
 
-  -- Get serialize function.
-  local function getSerialize (serialize) --> (serialize)
-    if serialize then return serialize end
+  local serial -- useSerial unit
 
-    if not context.serial then
-      require 'context.utils.useSerial'
-    end
+-- Get serialize function.
+local function getSerialize (serialize) --> (serialize)
+  if serialize then return serialize end
 
-    return context.serial.serialize
-  end -- getSerialize
+  serial = serial or require 'context.utils.useSerial'
+
+  return serial and serial.serialize
+end -- getSerialize
 
 -- Save data to file.
 -- Сохранение данных в файл.
@@ -245,12 +245,13 @@ do
   fullname (string) - full file name.
   name     (string) - data table name.
   data      (t|nil) - processed data table.
-  kind      (table) - kind of data save: @see serial.serialize.kind.
+  kind      (table) - kind of data save: @see serialize.kind in useSerial.
   -- @return:
   isOk       (bool) - operation success flag.
 --]]
 function unit.save (fullname, name, data, kind) --> (bool)
   kind = kind or {}
+
   local f, s, res = io_open(fullname, 'w')
   if f == nil then return nil, s end
 
@@ -273,21 +274,20 @@ end -- save
   -- @params:
   name     (string) - data table name.
   data      (t|nil) - processed data table.
-  kind      (table) - kind of data save: @see serial.serialize.kind.
+  kind      (table) - kind of data conversion: @see serialize.kind in useSerial.
   -- @return:
   isOk (bool) - operation success flag.
 --]]
 function unit.tostring (name, data, kind) --> (bool)
   kind = kind or {}
-  local t, n = {}, 0
 
+  local t, n = {}, 0
   local write = function (...)
                   for i = 1, select("#", ...) do
                     n = n + 1
                     t[n] = select(i, ...)
                   end
-
-                  return true -- t[n]
+                  return true
                 end
   local res, s = getSerialize(kind.serialize)(name, data, kind, write)
 
