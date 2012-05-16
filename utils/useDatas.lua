@@ -28,6 +28,8 @@ local context = context
 local utils = context.utils
 local tables = context.tables
 
+local PluginPath = utils.PluginPath
+
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 
@@ -304,9 +306,10 @@ local MHistory = { __index = THistory }
 
 -- TODO: THistory methods.
 
-function unit.history (name, kind) --> (object)
+function unit.history (path, name, kind) --> (object)
 
   local self = {
+    path = path or PluginPath,
     name = name or "unknown",
     kind = kind or {},
   } --- self
@@ -314,10 +317,22 @@ function unit.history (name, kind) --> (object)
   return setmetatable(self, MHistory)
 end -- history
 
+-- Create history object.
+function unit.newHistory (name) --> (object)
+if context.use.LFVer >= 3 then
+  local history = require "far2.history"
+
+  return history.newfile(name)
+
+else -- FAR23
+  local history = require "history"
+
+  return history.new(name)
+end
+end -- history
+
 ---------------------------------------- custom
 do
-  local PluginPath = utils.PluginPath
-
   local f_fpath = '%s%s%s'      -- Relative path
   local f_tlink = '<%s%s>%s'    -- Help topic link
 
