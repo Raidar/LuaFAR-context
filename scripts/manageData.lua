@@ -23,9 +23,12 @@ local F = far.Flags
 ----------------------------------------
 local context, ctxdata = context, ctxdata
 
+local datas = require 'context.utils.useDatas'
+
+local cfgpairs = datas.cfgpairs
+
 local types = ctxdata.config.types
 local abstypes = ctxdata.abstypes or {}
-local cfgpairs = context.datas.cfgpairs
 
 --------------------------------------------------------------------------------
 local unit = {}

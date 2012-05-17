@@ -25,6 +25,7 @@ local getmetatable, setmetatable = getmetatable, setmetatable
 
 ----------------------------------------
 local context = context
+
 local utils = context.utils
 local tables = context.tables
 
@@ -47,8 +48,8 @@ local Msgs = {
 
 ---------------------------------------- base
 -- Special values:
-unit.Nameless = '@'                -- A field name for unnamed field
-unit.Dataless = context.utils.null -- A field data for undatum field
+unit.Nameless = '@'         -- A field name for unnamed field
+unit.Dataless = utils.null  -- A field data for undatum field
 
 -- Add data from user-table to base-table.
 -- Добавление данных из пользовательской таблицы в базовую.
@@ -432,6 +433,5 @@ end -- customize
 end -- do
 
 --------------------------------------------------------------------------------
-context.datas = unit -- 'datas' table in context
 return unit
 --------------------------------------------------------------------------------

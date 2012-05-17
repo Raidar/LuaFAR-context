@@ -25,10 +25,11 @@ local cfgDat, cfgReg = ctxdata.config, ctxdata.reg
 local descriptors = ctxdata.descriptors
 
 local tables = context.tables
-local datas  = context.datas
-local cfgpairs = datas.cfgpairs
 
+local datas = require 'context.utils.useDatas'
 local locale = require 'context.utils.useLocale'
+
+local cfgpairs = datas.cfgpairs
 
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message

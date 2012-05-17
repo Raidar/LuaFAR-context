@@ -24,12 +24,12 @@ local types = ctxdata.config.types
 
 local utils = context.utils
 local tables = context.tables
-local datas  = context.datas
-local cfgpairs = datas.cfgpairs
+
+local datas = require 'context.utils.useDatas'
+local locale = require 'context.utils.useLocale'
 
 local Null = tables.Null
-
-local locale = require 'context.utils.useLocale'
+local cfgpairs = datas.cfgpairs
 
 ----------------------------------------
 local useprofiler = false

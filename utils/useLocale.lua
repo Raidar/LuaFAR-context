@@ -22,7 +22,8 @@ local context, ctxdata = context, ctxdata
 
 local utils  = context.utils
 local tables = context.tables
-local datas  = context.datas
+
+local datas = require 'context.utils.useDatas'
 
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message
@@ -124,7 +125,7 @@ function unit.makeData (Custom, name, t) --> (table | nil, error)
   else
     return datas.make(Custom.base, name, Locale.ext, t)
   end
-end ----
+end ---- makeData
 
 do
   local type = type
@@ -159,7 +160,7 @@ function unit.getData (Custom, locBasis, defBasis) --> (table | nil, errors)
 
   return nil, defError and Msgs.defFileError:format(defError),
               locError and Msgs.locFileError:format(locError)
-end ----
+end ---- getData
 
   local _getData = unit.getData
 
@@ -205,7 +206,7 @@ function unit.getDual (Custom, genCustom, ...) --> (table)
 
   return nil, curError and Msgs.curFileError:format(curError),
               genError and Msgs.genFileError:format(genError)
-end ----
+end ---- getDual
 
 end -- do
 
@@ -249,7 +250,7 @@ function unit.make (Custom, Data, useError, show) --> (object)
   Custom.Locale = self
 
   return setmetatable(self, Locale_MT)
-end ----
+end ---- make
 
 -- Create a localization object for script with its parameters.
 -- Создание объекта локализации для скрипта с учётом его параметров.
@@ -258,7 +259,7 @@ function unit.create (Custom, defCustom, ...) --> (object)
   if Data then return unit.make(Custom, Data) end
 
   return nil, e1, e2
-end ----
+end ---- create
 
 -- Update a localization object.
 -- Обновление объекта локализации.
@@ -271,7 +272,7 @@ function TLocale:update () --> (object)
   end
 
   return nil, e1, e2
-end ----
+end ---- update
 
 -- Free a localization object.
 -- Освобождение объекта локализации.
@@ -279,7 +280,7 @@ function TLocale:free () --| (object)
   self.Data = nil
   self.Custom = nil
   self = nil
-end ----
+end ---- free
 
 -- Show localization error message.
 -- Показ сообщения об ошибке локализации.
