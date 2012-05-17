@@ -34,12 +34,11 @@ local modules = {
   'context.utils.useUtils',
   'context.utils.useTables',
   'context.utils.useDatas',
-  'context.utils.useLocale',
   -- Other modules:
   'context.scripts.handleType', --> detectType
   'context.scripts.manageData',
 } ---
-local packnum = 4 -- Number of preload modules
+local packnum = 3 -- Number of preload modules
 
 -- Unregister all loaded modules.
 for k = 1, #modules do

@@ -29,6 +29,8 @@ local cfgpairs = datas.cfgpairs
 
 local Null = tables.Null
 
+local locale = require 'context.utils.useLocale'
+
 ----------------------------------------
 local useprofiler = false
 --local useprofiler = true
@@ -45,9 +47,9 @@ local Custom = {
   path = "context.scripts.",
   locale = { kind = 'require' },
 } ---
-local L, e1, e2 = context.locale.create(Custom)
+local L, e1, e2 = locale.create(Custom)
 if L == nil then
-  return context.locale.showError(e1, e2)
+  return locale.showError(e1, e2)
 end
 
 -- Messages

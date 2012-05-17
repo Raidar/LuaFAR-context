@@ -28,6 +28,8 @@ local tables = context.tables
 local datas  = context.datas
 local cfgpairs = datas.cfgpairs
 
+local locale = require 'context.utils.useLocale'
+
 ----------------------------------------
 --local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 
@@ -41,9 +43,9 @@ local Custom = {
   path = "context.scripts.",
   locale = { kind = 'require' },
 } ---
-local L, e1, e2 = context.locale.create(Custom)
+local L, e1, e2 = locale.create(Custom)
 if L == nil then
-  return context.locale.showError(e1, e2)
+  return locale.showError(e1, e2)
 end
 
 ---------------------------------------- Forming

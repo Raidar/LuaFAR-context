@@ -10,7 +10,8 @@ local _G = _G
 
 ----------------------------------------
 local context = context
-local locale = context.locale
+
+local locale = require 'context.utils.useLocale'
 
 local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 

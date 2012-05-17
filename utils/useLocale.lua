@@ -64,7 +64,7 @@ function unit.language () --> (table, table)
   end
 
   return lang, codes
-end ----
+end ---- language
 
 end -- do
 
@@ -104,7 +104,7 @@ function unit.customize (Custom) --> (table)
   --logMsg(Custom, 'Custom', 2, '#q')
 
   return Custom
-end ----
+end ---- customize
 
 ---------------------------------------- Data
 -- Make data with Custom settings.
@@ -418,6 +418,5 @@ do
 end -- do
 
 --------------------------------------------------------------------------------
-context.locale = unit -- 'locale' table in context
 return unit
 --------------------------------------------------------------------------------
