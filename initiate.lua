@@ -27,13 +27,6 @@ ctxdata.descriptors = ctxdata.descriptors or {} -- config descriptors
 ctxdata.languages = ctxdata.languages or
                     require "context.data.languages" -- languages and codes
 
----------------------------------------- Modules
--- Modules loaded to context
-local modules = {
-  'context.scripts.handleType', --> detectType
-  'context.scripts.manageData',
-} ---
-
 ---------------------------------------- -- FAR23 begin
 --[[
   Блок кода работы скриптов для LuaFAR3 под LuaFAR2.
@@ -71,6 +64,14 @@ do -- Register other configuration files.
 end
 
 ---------------------------------------- Modules
--- Load modules to context.
-for k = 1, #modules do require(modules[k]) end
+do
+  -- Modules loaded to context:
+  local modules = {
+    'context.scripts.handleType', --> detectType
+    'context.scripts.manageData',
+  } ---
+
+  -- Load modules to context.
+  for k = 1, #modules do require(modules[k]) end
+end -- do
 --------------------------------------------------------------------------------
