@@ -21,11 +21,11 @@ local getmetatable, setmetatable = getmetatable, setmetatable
 
 ----------------------------------------
 local context, ctxdata = context, ctxdata
+
 local cfgDat, cfgReg = ctxdata.config, ctxdata.reg
 local descriptors = ctxdata.descriptors
 
-local tables = context.tables
-
+local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
 local locale = require 'context.utils.useLocale'
 

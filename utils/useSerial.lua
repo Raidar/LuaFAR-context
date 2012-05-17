@@ -31,8 +31,7 @@ local string = string
 ----------------------------------------
 local context = context
 
-local tables = context.tables
-
+local tables = require 'context.utils.useTables'
 local lua = require "context.utils.useLua"
 local numbers = require 'context.utils.useNumbers'
 
