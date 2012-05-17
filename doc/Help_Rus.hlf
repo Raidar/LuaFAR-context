@@ -277,7 +277,6 @@ $ #Используемые таблицы#: LF context
   Функции пакета доступны через глобальную переменную \37context\- или её таблицы.
 
   Таблицы функций:
-    Общие функции пакета доступны через \37context.utils\-.
     Функции ~configData.lua~@LFc_configData@ доступны через \37context.config\-.
     Функции ~detectType.lua~@LFc_detectType@ доступны через \37context.detect\-.
     Функции ~handleType.lua~@LFc_handleType@ доступны через \37context.handle\-.

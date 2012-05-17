@@ -23,6 +23,7 @@ local F = far.Flags
 ----------------------------------------
 local context, ctxdata = context, ctxdata
 
+--local utils = require 'context.utils.useUtils'
 local datas = require 'context.utils.useDatas'
 
 local cfgpairs = datas.cfgpairs

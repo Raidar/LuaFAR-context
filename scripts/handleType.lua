@@ -28,6 +28,9 @@ local F = far.Flags
 require 'context.scripts.detectType'
 
 local context, ctxdata = context, ctxdata
+
+local utils = require 'context.utils.useUtils'
+
 local detect = context.detect
 local cfgDat = ctxdata.config
 local types = cfgDat.types
@@ -37,7 +40,7 @@ local types = cfgDat.types
 local unit = {}
 
 ----------------------------------------
-local farWarning = context.utils.warning
+local farWarning = utils.warning
 
 -- Messages
 local Msgs = {

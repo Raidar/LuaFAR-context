@@ -26,8 +26,7 @@ local getmetatable, setmetatable = getmetatable, setmetatable
 ----------------------------------------
 local context = context
 
-local utils = context.utils
-
+local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 
 local PluginPath = utils.PluginPath

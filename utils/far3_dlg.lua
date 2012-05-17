@@ -11,9 +11,12 @@ local F = far.Flags
 local SendDlgMessage = far.SendDlgMessage
 
 local LFVer = context.use.LFVer
+
 local bit = LFVer >= 3 and bit64 or bit
 local band, bor  = bit.band, bit.bor
 local bnot, bxor = bit.bnot, bit.bxor
+
+local utils = require 'context.utils.useUtils'
 
 --[[
   This module for temporary include to far3 for replace far2.dialog.
@@ -175,7 +178,7 @@ end
 --    item names.
 local mapkey = {}
 
-local numFlag = context.utils.numFlag
+local numFlag = utils.numFlag
 -- Metatable for dialog.
 -- *  When assigning an item to a (string) field of the dialog, the item is also
 --    added to the array part.

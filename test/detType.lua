@@ -24,13 +24,15 @@ if not readCfg then
   return
 end -- if
 
+local utils = require 'context.utils.useUtils'
+
 ----------------------------------------
 local farMsg = far.Message
 local logMsg = (require "Rh_Scripts.Utils.Logging").Message
 
 readCfg(cfgReg.types) -- Reading types_config
 
-local PluginPath = context.utils.PluginPath
+local PluginPath = utils.PluginPath
 
 -- Protected require.
 local function prequire (modname)

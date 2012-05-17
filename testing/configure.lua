@@ -1,5 +1,6 @@
 local far23 = context.use.far23
-local dlgHandler=require 'context.utils.dlgHandler'
+
+local dlgHandler = require 'context.utils.dlgHandler'
 
 local flags = far.Flags
 local descriptors = ctxdata.descriptors

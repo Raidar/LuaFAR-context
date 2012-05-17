@@ -28,20 +28,11 @@ ctxdata.languages = ctxdata.languages or
                     require "context.data.languages" -- languages and codes
 
 ---------------------------------------- Modules
--- Modules used in context
+-- Modules loaded to context
 local modules = {
-  -- Preload modules:
-  'context.utils.useUtils',
-  -- Other modules:
   'context.scripts.handleType', --> detectType
   'context.scripts.manageData',
 } ---
-local packnum = 1 -- Number of preload modules
-
--- Unregister all loaded modules.
-for k = 1, #modules do
-  package.loaded[modules[k]] = nil
-end
 
 ---------------------------------------- -- FAR23 begin
 --[[
@@ -56,15 +47,12 @@ if context.use.LFVer < 3 then bit64 = bit end
 require "context.utils.far3_spc"
 
 --]==]
----------------------------------------- -- FAR23 end
-
--- Load preload packages.
-for k = 1, packnum do require(modules[k]) end
-
 -- [[
   require "context.utils.far3" -- FAR23
 --]]
+---------------------------------------- -- FAR23 end
 
+---------------------------------------- Config
 local registerConfig
 
 do -- Load special modules & Register types.
@@ -82,7 +70,7 @@ do -- Register other configuration files.
   --registerConfig{ key = 'key name', name = 'file base name' } -- Sample
 end
 
----------------------------------------- Others
--- Load other modules.
-for k = packnum + 1, #modules do require(modules[k]) end
+---------------------------------------- Modules
+-- Load modules to context.
+for k = 1, #modules do require(modules[k]) end
 --------------------------------------------------------------------------------

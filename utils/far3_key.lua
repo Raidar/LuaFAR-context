@@ -27,8 +27,8 @@ local F = far.Flags
 
 ----------------------------------------
 local context = context
-local utils = context.utils
 
+--local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 local numbers = require 'context.utils.useNumbers'
 
