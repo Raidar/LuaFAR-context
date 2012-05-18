@@ -36,12 +36,17 @@ local numbers = require 'context.utils.useNumbers'
 local serial = require 'context.utils.useSerial'
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+-- [[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
 
 ---------------------------------------- Config
+unit.Nameless = "data"
+
 unit.ExcludeChar = nil
 --unit.ExcludeChar = '-'
 
@@ -219,14 +224,18 @@ function unit.toarray (name, data, kind, filter) --> (table)
   local t, n = {}, 0
   local u, m = {}, 0 -- temporary table to concat one line only
 
+  -- Write strings to array.
+  --[[ Algorithm:
+    for all arguments do
+    1. Repeat by '\n':
+      1.1. Collect all before '\n' to subarray u.
+      1.2. Concat subarray u to array t.
+    2. Save all after last '\n' to subarray u.
+  --]]
+  -- 3. Создать новую подтаблицу, куда перенести остаток после '\n'.
   local write = function (...)
-                  --logMsg({ ... }, tostring(kind.level or -1))
+                  --log({ ... }, tostring(kind.level or -1))
                   for i = 1, select("#", ...) do
-                    -- TODO: Алгоритм:
-                    -- 1. Собирать в подтаблицу u до встречи '\n'.
-                    -- 2. Перенести всё до '\n' без концевых пробелов в новую позицию t
-                    -- 3. Создать новую подтаблицу, куда перенести остаток после '\n'.
-                    -- Повторить несколько раз, т.к. в строке м/б несколько '\n'.
                     local s = select(i, ...)
                     -- Match for first "\n":
                     local sl, sr = s:match("^([^\n]*)\n([^\n]*)$")
@@ -236,6 +245,7 @@ function unit.toarray (name, data, kind, filter) --> (table)
                         m = m + 1
                         u[m] = sl
                       end
+                      -- Move collected to t:
                       if m > 0 then
                         n = n + 1
                         t[n] = tconcat(u)
@@ -245,8 +255,6 @@ function unit.toarray (name, data, kind, filter) --> (table)
                       if sr ~= "" then
                         s = sr
                         sl, sr = s:match("^([^\n]*)\n([^\n]*)$")
-                        --m = m + 1
-                        --u[m] = sr
                       else
                         s, sl = "", false
                       end
@@ -259,10 +267,18 @@ function unit.toarray (name, data, kind, filter) --> (table)
                   end -- for
 
                   return true
-                end
+                end -- write
+
   local res, s = serial.prettyize(name, data, kind, write)
 
-  --logMsg(t, "toarray")
+  -- Move last collected to t:
+  if m > 0 then
+    n = n + 1
+    t[n] = tconcat(u)
+  end
+  t.n = n
+
+  --logShow(t, "toarray")
 
   if res == nil then return nil, s end
 
@@ -304,7 +320,7 @@ end
   -- @return: @see unit.toarray.
 --]]
 function unit.tabulize (name, data, kind, filter) --> (table)
-  name = name or "data"
+  name = name or unit.Nameless
   local kind = kind or {}
   local filter = filter or ""
 
@@ -338,12 +354,150 @@ function unit.tabulize (name, data, kind, filter) --> (table)
 end ---- tabulize
 
 ---------------------------------------- Show
-function unit.Show (data, filter, name, kind)
-  return far.Show(unpack(unit.tabulize(name, data, kind, filter)))
+do
+
+unit.Separ = "│"
+unit.Space = string.rep(" ", 40)
+unit.TextFmt = "%s%s%s%s"
+--unit.TextFmt = "%s%s %s %s"
+unit.BKeys = {
+  {BreakKey = 'RETURN'},
+  {BreakKey = 'SPACE'}
+} ---
+
+  local slen, format = string.len, string.format
+
+-- Show data as menu.
+-- Показ данных как меню.
+--[[
+  -- @params: @see unit.Show.
+  kind    (t|nil) - conversion kind: @fields additions:
+    ShowMenu (func) - function to show menu with tabulized data.
+  -- @return: @see kind.Show.
+--]]
+function unit.ShowData (data, name, kind) --| (menu)
+  local kind = kind or {}
+  local ShowMenu = kind.ShowMenu or far.Menu
+
+  local Separ = unit.Separ
+  local Space = unit.Space
+  local TextFmt = unit.TextFmt
+
+  local items, n = {}, #data
+  local nlen = slen(tostring(n))
+
+  for k, v in ipairs(data) do
+    local m, sp = tostring(k)
+    local isnum = true
+    for s in v:gmatch("[^\n]+") do
+      if isnum then
+        isnum = false
+        sp = Space:sub(1, nlen - slen(m))
+      else
+        m = ""
+        sp = Space:sub(1, nlen)
+      end
+      items[#items + 1] = {
+        text = format(TextFmt, sp or "", m, Separ, s),
+      }
+    end
+  end
+
+  local props = {
+    Title = name or unit.Nameless,
+    Flags = 'FMENU_SHOWAMPERSAND',
+  } ---
+
+  return ShowMenu(props, items, unit.BKeys)
+end ---- ShowData
+
+-- Show data based on far.Show.
+-- Показ данных, основанный на far.Show.
+function unit.farShow (data) --| (menu)
+  return far.Show(unpack(data))
 end ----
 
---local tconcat = table.concat
+-- Show data.
+-- Показ данных.
+--[[
+  -- @params: @see unit.toarray.
+  kind    (t|nil) - conversion kind: @fields additions:
+    ShowData (func) - function to show tabulized data.
+  -- @return: @see kind.ShowData.
+--]]
+function unit.Show (data, filter, name, kind) --| (menu)
+  local name = name or unit.Nameless
+  local kind = kind or {}
+  kind.filter = filter or ""
 
+  local ShowData = kind.ShowData or unit.ShowData
+  return ShowData(unit.tabulize(name, data, kind, filter), name, kind)
+end ---- Show
+
+end -- do
+---------------------------------------- Logging
+do
+
+local TLogging = {} -- Logging-to-file class
+local MLogging = { __index = TLogging }
+
+function TLogging:log (...)
+  self.file:write(...)
+end ----
+
+local nowDT = os.date
+local fmtDT = "%Y-%m-%d %H:%M:%S "
+
+function TLogging:logln (...)
+  if self.isDT then
+    self:log(nowDT(self.fmtDT))
+  end
+  self:log(...)
+  self:log('\n')
+end ----
+
+function TLogging:logtab (t, name) --< array
+  self:logln(name or "")
+  for k, v in ipairs(t) do
+    self:log(v)
+    self:log('\n')
+  end --
+  self:logln(name or "")
+end ----
+
+function TLogging:data (data, filter, name, kind)
+  self:logtab(unit.tabulize(name, data, kind, filter), name or "data")
+end ----
+
+function TLogging:close (s) --< (file table)
+  self:log('\n')
+  self:logln(s or "Stop logging")
+
+  local f = self.file
+  f:flush()
+  f:close()
+  --return true
+end ----
+
+local io_open = io.open
+
+function unit.open (filename, mode, s) --> (file table)
+   local self = {
+     isDT = true,   -- Show datetime before log-text
+     fmtDT = fmtDT, -- Format of datetime
+
+     name = filename,
+     file = io_open(filename, mode or "w+"),
+   } ---
+   if self.file == nil then return end
+
+   setmetatable(self, MLogging)
+   self:logln(s or "Start logging")
+
+   return self
+end ---- open
+
+end -- do
 --------------------------------------------------------------------------------
 return unit
 --------------------------------------------------------------------------------

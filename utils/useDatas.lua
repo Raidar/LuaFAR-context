@@ -260,7 +260,7 @@ function unit.save (fullname, name, data, kind) --> (bool)
 
   local write = function (...)
                   return f:write(...)
-                end
+                end -- write
 
   res, s = getSerialize(kind.serialize)(name, data, kind, write)
 
@@ -291,7 +291,8 @@ function unit.tostring (name, data, kind) --> (bool)
                     t[n] = select(i, ...)
                   end
                   return true
-                end
+                end -- write
+
   local res, s = getSerialize(kind.serialize)(name, data, kind, write)
 
   if res == nil then return nil, s end
