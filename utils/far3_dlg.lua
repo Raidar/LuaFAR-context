@@ -18,6 +18,8 @@ local bnot, bxor = bit.bnot, bit.bxor
 
 local utils = require 'context.utils.useUtils'
 
+local log = require "context.samples.logging"
+
 --[[
   This module for temporary include to far3 for replace far2.dialog.
   No use (auto)reload user scripts otherwise it is not worked.
@@ -191,6 +193,7 @@ local dialog_meta = {
         item.name = item_name
         item.id = #self --> id is 0-based
 
+        --log.Show(item, item_name)
         -- Change numbering of elements for support LuaFAR3 in LuaFAR2:
         if LFVer < 3 then
           -- Indexes 1, 2--5 are equivalent.
@@ -240,6 +243,7 @@ local dialog_meta = {
             item[9] = 0
           end
 
+        --log.Show(item, item_name)
           -- Ptr (10) is excluded.
           -- UserParam is 10.
           -- MaxLen is 12.

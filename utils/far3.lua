@@ -32,7 +32,7 @@ local bnot, bxor = bit.bnot, bit.bxor
 --local bshl, bshr = bit.lshift, bit.rshift
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+local log = require "context.samples.logging"
 
 --------------------------------------------------------------------------------
 
@@ -308,6 +308,7 @@ do
   local _Dialog = far.Dialog
 
 function far.Dialog (Guid, ...)
+  --far.Message(type(Guid))
   if type(Guid) == 'string' then
     return _Dialog(...)
   end
@@ -318,7 +319,7 @@ end ----
   local DlgInit = far.DialogInit
 
 function far.DialogInit (Guid, ...)
-  --logMsg({...}, "DialogInit", 3)
+  --log.Show({Guid, ...}, "DialogInit")
   if type(Guid) == 'string' then
     return DlgInit(...)
   end
