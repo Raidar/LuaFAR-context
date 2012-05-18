@@ -173,7 +173,6 @@ local spaces = {} -- prepared space strings.
   -- @params (@see unit.serialize and unit.TabToText):
   value   (any) - value to convert.
   kind  (table) - conversion kind: @fields additions:
-    iskey     (table) - flag for key of field (not value).
     numwidth  (n|nil) - min width of number value in string.
     keyhex    (n|nil) - write integer keys as hexadecimal numbers.
     valhex    (n|nil) - write integer values as hexadecimal numbers.
@@ -181,6 +180,7 @@ local spaces = {} -- prepared space strings.
     valfloat   (bool) - write float values using tostring.
     strlong (b|n|nil) - use long brackets for string formatting
                         (strlong as number - string length minimum).
+    iskey      (bool) - @see kind.iskey in unit.KeyToText.
   -- @return:
   (s | nil,tp)  - string representation of value.
 --]]
@@ -223,8 +223,8 @@ local function ValToText (value, kind) --> (string | nil, type)
 
   -- string:
   if tp == 'string' then
-    -- using long brackets:
-    if kind.strlong and
+    -- using long brackets for values:
+    if kind.strlong and kind.iskey and
        value:len() > kind.strlong and
        value:find("\n", 1, true) and
        not value:find("%s\n") and
@@ -250,7 +250,7 @@ unit.ValToText = ValToText
   value   (any) - value to convert.
   kind  (table) - conversion kind: @fields additions: none.
     -- @locals in kind:
-    iskey     (table) - flag for key of field (not value).
+    iskey      (bool) - flag for key of field (not value).
   -- @return:
   (s | nil,tp)  - string representation of value.
 --]]
@@ -705,7 +705,6 @@ function unit.prettyize (name, data, kind, write) --> (bool)
 
   if kind.localret == nil then kind.localret = true end
   if kind.tnaming == nil then kind.tnaming = true end
-  --if kind.lining == nil then kind.lining = "array" end
 
   return unit.serialize(name, data, kind, write)
 end ---- prettyize
