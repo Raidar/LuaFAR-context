@@ -296,14 +296,14 @@ function unit.hcount (n, t) --> (number)
   return l > 14 and l / 3 or l > 5 and l / 2 or l
 end
 
----------------------------------------- Serialize
--- Serialize data for logging.
--- Сериализация данных для протоколирования.
+---------------------------------------- Tabulize
+-- Tabulize data for logging.
+-- "Таблизация" данных для протоколирования.
 --[[
   -- @params: @see unit.toarray.
   -- @return: @see unit.toarray.
 --]]
-function unit.serialize (name, data, kind, filter) --> (table)
+function unit.tabulize (name, data, kind, filter) --> (table)
   name = name or "data"
   local kind = kind or {}
   local filter = filter or ""
@@ -335,10 +335,11 @@ function unit.serialize (name, data, kind, filter) --> (table)
   end
 
   return unit.toarray(name, data, kind, filter)
-end ----
+end ---- tabulize
+
 ---------------------------------------- Show
 function unit.Show (data, filter, name, kind)
-  return far.Show(unpack(unit.serialize(name, data, kind, filter)))
+  return far.Show(unpack(unit.tabulize(name, data, kind, filter)))
 end ----
 
 --local tconcat = table.concat
