@@ -2,7 +2,7 @@
 
 ----------------------------------------
 --[[ description:
-  -- Test: Using serialization (and debug).
+  -- Test: Using serialization (and debugging).
   -- Тест: Использование сериализации (и отладки).
 --]]
 --------------------------------------------------------------------------------
@@ -109,29 +109,37 @@ function TTest:Save ()
 
   local sortkind = {
     --compare = sortcompare,
-    --pairs = ipairs, -- TEST: array fields
-    --pairs = tables.hpairs, -- TEST: hash fields
-    pairs = pairs, -- TEST: array + hash fields
-    --pairs = allpairs, -- TEST: all fields including from metas
+    --pairs = ipairs, -- Test: array fields
+    --pairs = tables.hpairs, -- Test: hash fields
+    pairs = pairs, -- Test: array + hash fields
+    --pairs = allpairs, -- Test: all fields including from metas
   } ---
 
   local kind = {
-    localret = true, -- TEST: local + return instead of global
-    tnaming = true, -- TEST: temporary name of table to access fields
-    astable = true, -- TEST: serialize as one table
-    --nesting = 0, -- TEST: serialize data with max nesting level
+    localret = true, -- Test: local + return instead of global
+    tnaming = true, -- Test: temporary name of table to access fields
+    astable = true, -- Test: serialize as one table
+    --nesting = 0, -- Test: serialize data with max nesting level
 
-    -- TEST: for simple values:
-    --numwidth = 2, -- TEST: min number value width
-    --keyhex = 2, -- TEST: hex width for integer key
-    --valhex = 2, -- TEST: hex width for integer value
-    --valhex = true, -- TEST: hex width for integer value
-    keyfloat = true, -- TEST: using pretty float for key
-    --valfloat = true, -- TEST: using pretty float for value
-    --strlong = 80, -- TEST: long bracket strings
+    -- Test: for simple values:
+    --numwidth = 2, -- Test: min number value width
+    -- Test: hex width for integer key/value
+    --keyhex = 2,
+    --valhex = 2,
+    --valhex = true,
+    -- Test: using pretty int for key/value
+    --keyint = 4,
+    --keyint = 20,
+    -- Test: using pretty real for key/value
+    --keyreal = 5,
+    --keyreal = true,
+    --valreal = 5,
+    --valreal = true,
 
-    --pairs = allpairs, -- TEST: all pairs
-    --pairs = tables.sortpairs, -- TEST: sort pairs
+    --strlong = 80, -- Test: long bracket strings
+
+    --pairs = allpairs, -- Test: all pairs
+    --pairs = tables.sortpairs, -- Test: sort pairs
     --pargs = {},
     --pargs = { sortkind },
 
@@ -140,28 +148,28 @@ function TTest:Save ()
     --lining = "array",
     --lining = "hash",
     --alimit = 33,
-    alimit = 60, -- TEST: length limit for line
-    --acount = 5, -- TEST: max field count on line
-    -- [[ TEST: max field count on line
+    alimit = 60, -- Test: length limit for line
+    --acount = 5, -- Test: max field count on line
+    -- [[ Test: max field count on line
     acount = function (n, t) --> (number)
                local l = #t
                return l > 17 and l / 3 or l > 9 and l / 2 or l
              end,--]]
-    awidth = 4, -- TEST: min field width on line
+    awidth = 4, -- Test: min field width on line
 --[[
   01..09 --> 1..9
   10..17 --> 5..8
   18..30 --> 6..10
 --]]
 
-    hlimit = 60, -- TEST: length limit for line
-    -- [[ TEST: max field count on line
+    hlimit = 60, -- Test: length limit for line
+    -- [[ Test: max field count on line
     hcount = function (n, t) --> (number)
                local l = #t
                return l > 14 and l / 3 or l > 5 and l / 2 or l
              end,--]]
-    hwidth = 3, -- TEST: min field width on line
-    --hwidth = 5, -- TEST: min field width on line -- for hex
+    hwidth = 3, -- Test: min field width on line
+    --hwidth = 5, -- Test: min field width on line -- for hex
 --[[
   01..05 --> 1..5
   06..14 --> 3..7
