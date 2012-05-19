@@ -76,28 +76,43 @@ local addData = unit.add
 -- Формирование списка из всех таблиц конфигурации.
 --[[
   -- @params:
-  t     (table) - base table.
-  list  (table) - list of tables.
+  t       (table) - base table.
+  list    (table) - list of tables.
+  -- @locals:
+  index  (string) - used __index name.
 --]]
-local function _cfglist (t, list) --> (table)
+local function _cfglist (t, list, index) --> (table)
+  --[[ -- old code
   if not list[t] then
     list[t], list[#list+1] = true, t
   end
+  --]]
+  local l = list[t]
 
+  -- Check repeating call for t:
+  if l and l[index] then return list end
+
+  -- Save new found table:
+  if not l then
+    list[t], list[#list+1] = {}, t
+  end
+  list[t][index or ""] = true -- Save used index
+
+  -- Analyze all metaindexes:
   local t = getmetatable(t)
   if type(t) ~= 'table' then return list end
 
   local u = t.__cfgMT     -- Merged __index
-  if type(u) == 'table' then _cfglist(u, list) end
+  if type(u) == 'table' then _cfglist(u, list, "__cfgMT") end
 
   u = t.__oldindex        -- Saved __index
-  if type(u) == 'table' then _cfglist(u, list) end
+  if type(u) == 'table' then _cfglist(u, list, "__oldindex") end
 
   u = t.__index           -- Default __index
-  if type(u) == 'table' then _cfglist(u, list) end
+  if type(u) == 'table' then _cfglist(u, list, "__index") end
 
   return list
-end --
+end -- _cfglist
 unit._cfglist = _cfglist
 
 function unit.cfglist (t) --> (table)
