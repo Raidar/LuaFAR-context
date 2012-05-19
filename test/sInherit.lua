@@ -2,8 +2,8 @@
 
 ----------------------------------------
 --[[ description:
-  -- Test: inherit parameter.
-  -- Тест: Параметр inherit (наследование).
+  -- Test: Inheritance ('inherit' parameter).
+  -- Тест: Наследование (параметр 'inherit').
 --]]
 --------------------------------------------------------------------------------
 context.config.register{ key = 'paraminherit', name = 'inh', inherit = true }

@@ -2,8 +2,8 @@
 
 ----------------------------------------
 --[[ description:
-  -- Test: Handling configuration: descs_config.
-  -- Тест: Обработка конфигурации: descs_config.
+  -- Test: Handling configuration (descs_config).
+  -- Тест: Обработка конфигурации (descs_config).
 --]]
 --------------------------------------------------------------------------------
 local _G = _G
