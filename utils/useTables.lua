@@ -456,7 +456,6 @@ end -- do
 function unit.list (t, list, field) --> (table)
   local t, list = t, list or {}
   local field = field or '__index'
-  --local field = field ~= false and (field or '__index')
   if type(t) ~= 'table' then return list end
 
   if not list[t] then
