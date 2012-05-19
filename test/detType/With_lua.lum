@@ -1,8 +1,5 @@
 -- LUM
 
---local Def = farConfig.OemToDef
---far.Message(Def, "Def")
-
 local Insert = { -- Binding Insert
   text = "&J - Binding Insert",
   MenuView = "RectMenu",
@@ -31,7 +28,7 @@ local Insert = { -- Binding Insert
 local Data = {
 
   Menu = { -- Главное меню
-    Title = Def"Меню",
+    Title = "Меню",
     Items = { Insert },
   },
   ["Insert"] = Insert,

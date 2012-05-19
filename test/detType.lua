@@ -9,11 +9,14 @@
 local _G = _G
 
 ----------------------------------------
+local farMsg = far.Message
+
+----------------------------------------
 local context = context
 if not context then
   farMsg("No 'LuaFAR context' pack installed\n", "test_detType")
   return
-end -- if
+end
 
 local cfgReg = ctxdata.reg
 local readCfg = context.config.read
@@ -27,10 +30,10 @@ end -- if
 local utils = require 'context.utils.useUtils'
 
 ----------------------------------------
-local farMsg = far.Message
-local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+local dbg = require "context.utils.useDebugs"
+local dbgShow = dbg.Show
 
-readCfg(cfgReg.types) -- Reading types_config
+--readCfg(cfgReg.types) -- Reading types_config -- don't work!
 
 local PluginPath = utils.PluginPath
 
@@ -63,7 +66,7 @@ local TestFilesInfo = { -- Ожидаемые результаты detect:
   ["With_cfg.cfg"]  = { bymask = "ini",   byline = "ini", },
   ["With_fl2.cfg"]  = { bymask = "ini",   byline = "ini", },
 
-  ["With_lua.lum"]  = { bymask = "ini_far", byline = "lua_lum", },
+  ["With_lua.lum"]  = { bymask = "none",  byline = "none", },
 
   ["Def_file.tst"]  = { bymask = "tst_def", byline = "tst_def", },
   ["With_fl1.tst"]  = { bymask = "tst_def", byline = "tst_fl1", },
@@ -94,6 +97,7 @@ local function getFilesType (FileList, detTypeFunc, f) --> (table) or nil
     --t[v.name] = { detTypeFunc(tf) }
   end -- for
   f.firstline = checkFline
+
   return t
 end --function getFilesType
 
@@ -112,6 +116,7 @@ local function cmpFilesType (t, FilesType, kind) --> (table | nil, error)
     end
   end -- for
   t[#t+1] = "--- end ---"
+
   return t
 end --function cmpFilesType
 
@@ -131,11 +136,11 @@ local function testTypesCfg (...)
     farMsg(SNoTestFiles, CNoTestFiles, nil, 'l')
     return
   end
-  --logMsg(DirList, 'test_detType Dir List', 2)
+  --dbgShow(DirList, "d2", 'test_detType Dir List')
 
-  --logMsg({ ... }, 'test_detType ...', 2)
+  --dbgShow({ ... }, "d2", 'test_detType ...')
   local DetFuncKinds = select(1, ...)
-  --logMsg(DetFuncKinds, 'test_detType DetFuncKinds', 2)
+  --dbgShow(DetFuncKinds, "d2", 'test_detType DetFuncKinds')
   if DetFuncKinds == nil then DetFuncKinds = { "default" } end
 
   local FileList, Data = {}
@@ -145,19 +150,20 @@ local function testTypesCfg (...)
       Path, Name = v.FileName:match(PathNamePattern)
       FileList[k] = { name = Name, path = Path }
     end
-  end -- for
-  --logMsg(FileList, 'test_detType Files List', 2)
+  end
+  --dbgShow(FileList, "d2", 'test_detType Files List')
 
   local detFunc
   local f   -- Detect file information
   local t   -- Type of files information
   local res -- Test result information
 
-  local Caption, Title = "type detect (det ~= exp): "
+  local Caption = "type detect (det ~= exp): "
 
   for k, v in ipairs(DetFuncKinds) do
     local detFunc = DetFuncsInfo[v] and DetFuncsInfo[v].Value
-    Title = Caption..(v or "#"..tostring(k))
+    local Title = Caption..(v or "#"..tostring(k))
+    --dbgShow(DetFuncsInfo, Title)
     if detFunc then
       f, res = {}
       t = getFilesType(FileList, detFunc, f)
@@ -167,12 +173,13 @@ local function testTypesCfg (...)
       t = getFilesType(FileList, detFunc, f)
       res = cmpFilesType(nil, t, 'byline')
       farMsg(table.concat(res, '\n'), Title)
-    end -- if
-  end -- for
+    end
+  end
 end ---- testTypesCfg
 
 ---------------------------------------- main
 local arg = select(1, ...)
+--dbgShow({ ... }, "d2", 'args')
 if arg == nil then
   return testTypesCfg()
 else
