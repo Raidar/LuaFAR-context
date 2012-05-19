@@ -31,6 +31,7 @@ local string = string
 ----------------------------------------
 local context = context
 
+local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 local lua = require "context.utils.useLua"
 local numbers = require 'context.utils.useNumbers'
@@ -42,8 +43,10 @@ local numbers = require 'context.utils.useNumbers'
 local unit = {}
 
 ---------------------------------------- ValToStr/KeyToStr
+local MaxNumberInt = numbers.MaxNumberInt
+
+local modf = math.modf
 local format = string.format
-local frexp, modf = math.frexp, math.modf
 
 -- Convert simple value to string.
 -- Преобразование простого значения в строку.
@@ -53,8 +56,13 @@ local function ValToStr (value) --> (string | nil, type)
   if tp == 'boolean' then return tostring(value) end
 
   if tp == 'number' then
-    if value == modf(value) then return tostring(value) end -- integer
-    return format("(%.17f * 2^(%d))", frexp(value)) -- preserve accuracy
+    -- integer:
+    if value == modf(value) and value <= MaxNumberInt then
+      return tostring(value)
+    end
+    -- real:
+    return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
+    --return format("math.ldexp(%.17f, %d)", frexp(value)) -- preserve accuracy
   end
 
   if tp == 'string' then return ("%q"):format(value) end -- "string"
@@ -159,11 +167,12 @@ unit.TabToStr = TabToStr
 
 ---------------------------------------- ValToText/KeyToText
 local hex = numbers.hex
+local i2s, r2s = numbers.i2s, numbers.r2s
+local MaxNumberInt = numbers.MaxNumberInt
 
 local srep = string.rep
 
--- TODO: use __index to autocreate required space-string.
-local spaces = {} -- prepared space strings.
+local spaces = utils.spaces
 
 -- Convert simple value to pretty text.
 -- Преобразование простого значения в читабельный текст.
@@ -173,11 +182,20 @@ local spaces = {} -- prepared space strings.
   -- @params (@see unit.serialize and unit.TabToText):
   value   (any) - value to convert.
   kind  (table) - conversion kind: @fields additions:
+    maxint    (n|nil) - max integer number to convert as integer value
+                        (@default = numbers.MaxNumberInt);
+                        it is not used when keyint/valint is specified.
     numwidth  (n|nil) - min width of number value in string.
     keyhex    (n|nil) - write integer keys as hexadecimal numbers.
     valhex    (n|nil) - write integer values as hexadecimal numbers.
-    keyfloat   (bool) - write float keys using tostring.
-    valfloat   (bool) - write float values using tostring.
+    keyint  (b|n|nil) - write integer keys using tostring (true) or
+                        define precision to convert (number) (@default = 14).
+    valint  (b|n|nil) - write integer values using tostring (true) or
+                        define precision to convert (number) (@default = 14).
+    keyreal (b|n|nil) - write real keys using tostring (true) or
+                        define precision to convert (number) (@default = 17).
+    valreal (b|n|nil) - write real values using tostring (true) or
+                        define precision to convert (number) (@default = 17).
     strlong (b|n|nil) - use long brackets for string formatting
                         (strlong as number - string length minimum).
     iskey      (bool) - @see kind.iskey in unit.KeyToText.
@@ -193,37 +211,31 @@ local function ValToText (value, kind) --> (string | nil, type)
   end
 
   if tp == 'number' then
+    local iskey, f = kind.iskey
     -- integer:
-    if value == modf(value) then
-      local w = kind.iskey
-      if w then w = kind.keyhex else w = kind.valhex end
+    if iskey then f = kind.keyint else f = kind.valint end
+    --if value == modf(value) then
+    if value == modf(value) and
+       (f or value <= (kind.maxint or MaxNumberInt)) then
+      local w
+      if iskey then w = kind.keyhex else w = kind.valhex end
       if w then -- hex:
         return hex(value, type(w) == 'number' and w or nil)
       end
 
-      local s = tostring(value)
+      local s = i2s(value, f)
       w = (kind.numwidth or 0) - s:len()
       if w > 0 then -- align:
-        local sp = spaces[w]
-        if not sp then
-          sp = srep(" ", w)
-          spaces[w] = sp
-        end
-        return format("%s%s", sp, w)
+        return format("%s%s", spaces[w], s)
       end
+
       return s
-    end
+    end -- integer
 
-    -- float:
-    local f = kind.iskey
-    if f then f = kind.keyfloat else f = kind.valfloat end
-    if f then return tostring(value) end -- pretty float
-
-    local fr, exp = frexp(value) -- format:
-    f = exp < 0 and "(%.17f * 2^(%d))" or
-        exp > 0 and "(%.17f * 2^%d)" or "(%.17f)"
-    return format(f, fr, exp) -- preserve accuracy
-  end
+    -- real:
+    if iskey then f = kind.keyreal else f = kind.valreal end
+    return r2s(value, f)
+  end -- number
 
   -- string:
   if tp == 'string' then
@@ -283,6 +295,8 @@ unit.KeyToText = KeyToText
 ---------------------------------------- TabToText
 local sortpairs = tables.sortpairs
 local statpairs = tables.statpairs
+
+-- TODO: Support null value and Null table.
 
 -- Convert table to pretty text.
 -- Преобразование таблицы в читабельный текст.
