@@ -2,8 +2,8 @@
 
 ----------------------------------------
 --[[ description:
-  -- Testing LF context localization.
-  -- Тестирование локализации LF context.
+  -- Test: LF context localization.
+  -- Тест: Локализация LF context.
 --]]
 --------------------------------------------------------------------------------
 context.config.register{ key = 'paraminherit', name = '_inh', inherit = true }
