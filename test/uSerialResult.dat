@@ -1,0 +1,107 @@
+local Data
+
+Data = {
+  Formo = {},
+  Hemal = {
+    _Jonal_ = "j",
+    _Lawel_ = "w",
+    _Yocal_ = "y",
+  },
+  Hemil = {
+    "j",  "y",  "w", 
+
+    j = 1,  w = 3,  y = 2, 
+    Test = 1,
+  },
+  Jonal = {
+    "bj", "dj", "vj", "qj", "zj", "gj",
+    "lj", "mj", "nj", "rj", "pj", "tj",
+    "fj", "xj", "sj", "kj", "cj", "hj",
+  },
+  Konal = {
+    "b",  "d",  "v",  "q",  "z",  "g", 
+    "l",  "m",  "n",  "r",  "p",  "t", 
+    "f",  "x",  "s",  "k",  "c",  "h", 
+
+    b = 1,  c = 17, d = 2,  f = 13, g = 6,  h = 18,
+    k = 16, l = 7,  m = 8,  n = 9,  p = 11, q = 4, 
+    r = 10, s = 15, t = 12, v = 3,  x = 14, z = 5, 
+  },
+  Liter = {
+    Hemil = "jyw",
+    Konal = "bdvqzglmnrptfxskch",
+    Sinel = "ptfxskch",
+    Sonor = "bdvqzglmnr",
+    Vocal = "aeiou",
+  },
+  Locale = "Локализация",
+  Morfo = {},
+  Order = {
+    Konal = {
+      "Sonor", "Sinel",
+    },
+    Liter = {
+      "Vocal", "Konal", "Hemil",
+    },
+    aTEST_3 = {
+      "inner table in array",
+      "Это длинная строка - в массиве.  \
+С переходами на новую строку	и табуляциями.\
+Очень длинная предлинная строка текста для представления строки из большого количества символов.\
+  ",
+    },
+    selfref = false, -- Data.Liter
+  },
+  Sinel = {
+    "p",  "t",  "f",  "x",  "s",  "k",  "c",  "h", 
+
+    c = 7,  f = 3,  h = 8,  k = 6, 
+    p = 1,  s = 5,  t = 2,  x = 4, 
+  },
+  Sonor = {
+    "b",  "d",  "v",  "q",  "z", 
+    "g",  "l",  "m",  "n",  "r", 
+
+    b = 1,  d = 2,  g = 6,  l = 7,  m = 8, 
+    n = 9,  q = 4,  r = 10, v = 3,  z = 5, 
+  },
+  Vocal = {
+    "a",  "e",  "i",  "o",  "u", 
+
+    a = 1,  e = 2,  i = 3,  o = 4,  u = 5, 
+  },
+  Yocal = {
+    "ya", "ye", "yi", "yo", "yu",
+  },
+  aTEST = {
+    1,    2,   
+    false, -- Data.Order.aTEST_3
+    (0.56250000000000000 * 2^3),
+    {
+      "new subtable",
+
+      ["some key string"] = "some value string",
+      subsubtable = {
+        "test", "subsub",
+      },
+    },
+    6,    (0.79228162514264333 * 2^(-96)),
+
+    [0.6667] = (0.57142857142857140 * 2^(-2)),
+    nested = {
+      1,    (0.83332499999999998 * 2^2), "nest",
+    },
+  },
+  deepref = false, -- Data.Order.Konal
+  ["nil"] = 1,
+  selfref = false, -- Data.Hemal
+  ["~Test"] = 1,
+  ["Локальность"] = true,
+}
+
+Data.Order.selfref = Data.Liter
+Data.aTEST[3] = Data.Order.aTEST_3
+Data.deepref = Data.Order.Konal
+Data.selfref = Data.Hemal
+
+return Data

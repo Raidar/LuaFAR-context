@@ -1,0 +1,109 @@
+--[[ uSerial: Source ]]--
+
+--------------------------------------------------------------------------------
+local Data = {
+  Vocal = {
+    -- Test array with items:
+    'a', 'e', 'i', 'o', 'u';
+  },
+
+  Konal = {
+  },
+
+  Sonor = {
+    -- Test array with many items:
+    'b', 'd', 'v', 'q', 'z', 'g', 'l', 'm', 'n', 'r';
+  },
+
+  Sinel = {
+    -- Test array with many items:
+    'p', 't', 'f', 'x', 's', 'k', 'c', 'h',
+  },
+
+  Hemil = {
+    'j', 'y', 'w',
+    Test = 1, -- Test order for string with len > 1
+  },
+
+  Hemal = {
+    -- Test hash with items:
+    _Lawel_ = 'w',
+    _Yocal_ = 'y',
+    _Jonal_ = 'j',
+  },
+
+  Order = {
+    -- Test table with subarrays:
+    Liter = { 'Vocal', 'Konal', 'Hemil' },
+    Konal = { 'Sonor', 'Sinel' },
+  },
+
+  Liter = {
+    -- Test hash:
+    Vocal = true,
+    Konal = true,
+    Sonor = true,
+    Sinel = true,
+    Hemil = true,
+  },
+
+  Yocal = {},
+
+  Jonal = {},
+
+  -- Test empty tables:
+  Morfo = {},
+  Formo = {},
+
+  ["nil"] = 1,      -- Test serialize reserved words
+  ["~Test"] = 1,    -- Test serialize keys with symbols
+
+  -- Test serialize utf-8 strings:
+  Locale = "Локализация",
+  ["Локальность"] = true,
+
+--[==[
+  -- Test long strings:
+  string_quot = "Это длинная строка.  \nС переходами на новую строку\tи табуляциями.\nОчень длинная предлинная строка текста для представления строки из большого количества символов.\n  ",
+  string_long = [[
+Это длинная строка.
+С переходами на новую строку	и табуляциями.
+Очень длинная предлинная строка текста для представления строки из большого количества символов.
+  ]],
+  string_lbts = [=[
+Это длинная строка.
+С переходами на новую строку	и табуляциями.
+Очень длинная предлинная строка текста для представления строки из большого количества символов.
+Строка также содержит символы '[[' и другие произвольные комбинации символов.
+  ]=],
+--]==]
+  -- Test nested tables in array and hash:
+  aTEST = {
+    1, 2,
+    { 'inner table in array',
+      "Это длинная строка - в массиве.  \nС переходами на новую строку\tи табуляциями.\nОчень длинная предлинная строка текста для представления строки из большого количества символов.\n  ",
+    },
+    4.5, -- Test float number
+    { 'new subtable';
+      ["some key string"] = "some value string",
+      subsubtable = { "test", "subsub" }
+    },
+    6.000,
+    0.00000000000000000000000000001,   
+
+    nested = { 1, 3.3333, "nest" }, -- Test float number
+    [0.6667] = 1/7,
+  },
+
+} --- Data
+
+-- [[ Test self-references:
+Data.selfref = Data.Hemal
+Data.Order.selfref = Data.Liter
+Data.deepref = Data.Order.Konal
+Data.Order.aTEST_3 = Data.aTEST[3]
+--]]
+
+--------------------------------------------------------------------------------
+return Data
+--------------------------------------------------------------------------------
