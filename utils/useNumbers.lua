@@ -32,10 +32,19 @@ local win, far = win, far
 local unit = {}
 
 ---------------------------------------- Convert
+-- WARN: This is platform-specific values.
+
+-- Max integer number to convert as integer with tostring.
+-- Максимальное целое число, преобразуемое в целое с помощью tostring.
+unit.MaxNumberInt = 99999999999999
+-- Default precisions to convert numbers to string.
+-- Точности по умолчанию при конвертировании чисел в строку.
+unit.DefaultIntPrec  = 14
+unit.DefaultRealPrec = 17
+
 -- Hexadecimal string presentation of number.
 -- 16-ричное строковое представление числа.
 do
-  local tostring = tostring
   local format = string.format
 
 -- Default width for: Ox12345678
@@ -51,9 +60,41 @@ function unit.hex (n, width) --> (string)
   return format("%#x", n or 0)
 end ---- hex
 
+  local tostring = tostring
+  local DefaultIntPrec = unit.DefaultIntPrec
+
+-- Convert an integer number to string.
+-- Преобразование целого числа в строку.
+function unit.i2s (n, prec) --> (string)
+  n = n or 0
+  if prec == true then
+    return tostring(n)
+  end
+
+  return format(format("%%.%dg", prec or DefaultIntPrec), n)
+end ---- i2s
+
+  local frexp = math.frexp
+  local DefaultRealPrec = unit.DefaultRealPrec
+
+-- Convert a real number to string.
+-- Преобразование вещественного числа в строку.
+function unit.r2s (n, prec) --> (string)
+  n = n or 0
+  if prec == true then
+    return tostring(n)
+  end
+
+  local fr, exp = frexp(n) -- format:
+  local f = exp < 0 and "(%%.%df * 2^(%%d))" or
+            exp > 0 and "(%%.%df * 2^%%d)" or "(%%.%df)"
+
+  return format(format(f, prec or DefaultRealPrec), fr, exp)
+end ---- r2s
+
 end -- do
 
--- Conversion of a boolean to number.
+-- Convert a boolean to number.
 -- Преобразование логического значения в число.
 function unit.b2n (b) --< (bool) --> (number)
   return b and 1 or 0 -- tonumber(b) don't work!
