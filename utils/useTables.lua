@@ -462,6 +462,7 @@ function unit.list (t, list, field) --> (table)
   if not list[t] then
     list[t], list[#list+1] = true, t
   end
+
   t = getmetatable(t)
   t = type(t) == 'table' and t[field]
 
