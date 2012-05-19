@@ -2,8 +2,8 @@
 
 ----------------------------------------
 --[[ description:
-  -- Testing localization.
-  -- Тестирование локализации.
+  -- Test: Using localization.
+  -- Тест: Использование локализации.
 --]]
 --------------------------------------------------------------------------------
 local _G = _G
@@ -22,7 +22,7 @@ local Custom = {
 } ---
 
 local DefCustom = {
-  name = "useLoc",
+  name = "uLocale",
   path = scriptPath,
 
   label = "mL",

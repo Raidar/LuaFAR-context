@@ -15,12 +15,7 @@ $ #Scripts for testing#
 
 @test_ScriptFiles
 $ #Script files#: Scripts for testing
-    \37useLoc.lua\-    — ¦~Test of localization~@useLoc@
-
- ~Contents~@Contents@
-
-@useLoc
-$ #Test of localization# (makeLoc.lua)
-  useLoc.lua is a script for test of localization.
+    \37useDescs.lua\-     — ¦Handling configuration.
+    \37useLocale.lua\-    — ¦Using localization.
 
  ~Contents~@Contents@
