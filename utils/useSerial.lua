@@ -54,7 +54,7 @@ local function ValToStr (value) --> (string | nil, type)
 
   if tp == 'number' then
     if value == modf(value) then return tostring(value) end -- integer
-    return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
+    return format("(%.17f * 2^(%d))", frexp(value)) -- preserve accuracy
   end
 
   if tp == 'string' then return ("%q"):format(value) end -- "string"
@@ -217,8 +217,12 @@ local function ValToText (value, kind) --> (string | nil, type)
     -- float:
     local f = kind.iskey
     if f then f = kind.keyfloat else f = kind.valfloat end
-    if f then return tostring(value) end          -- pretty float
-    return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
+    if f then return tostring(value) end -- pretty float
+
+    local fr, exp = frexp(value) -- format:
+    f = exp < 0 and "(%.17f * 2^(%d))" or
+        exp > 0 and "(%.17f * 2^%d)" or "(%.17f)"
+    return format(f, fr, exp) -- preserve accuracy
   end
 
   -- string:
