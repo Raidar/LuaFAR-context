@@ -15,7 +15,10 @@ $ #Scripts for testing#
 
 @test_ScriptFiles
 $ #Script files#: Scripts for testing
-    \37useDescs.lua\-     — ¦Handling configuration.
-    \37useLocale.lua\-    — ¦Using localization.
+    \37sInherit.lua\-   — ¦Inheritance ('inherit' parameter).
+    \37sLocale.lua\-    — ¦LuaFAR context localization.
+    \37uDescs.lua\-     — ¦Handling configuration (descs_config).
+    \37uLocale.lua\-    — ¦Using localization.
+    \37uSerial.lua\-    — ¦Using serialization (and debugging).
 
  ~Contents~@Contents@
