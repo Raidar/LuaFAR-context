@@ -21,15 +21,18 @@
 --------------------------------------------------------------------------------
 local _G = _G
 
-local type = type
+local type, unpack = type, unpack
 local pairs = pairs
-local unpack = unpack
 local tostring = tostring
+local setmetatable = setmetatable
 
 local string = string
 
+local modf, frexp = math.modf, math.frexp
+local format = string.format
+
 ----------------------------------------
-local context = context
+--local context = context
 
 local lua = require "context.utils.useLua"
 local numbers = require 'context.utils.useNumbers'
@@ -37,8 +40,15 @@ local strings = require 'context.utils.useStrings'
 local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 
+local LuaKeywords = lua.keywords
+local KeywordMask = lua.KeywordMask
+
+local MaxNumberInt = numbers.MaxNumberInt
+
+local spaces = strings.spaces -- for ...ToText
+
 ----------------------------------------
---[[
+-- [[
 local log = require "context.samples.logging"
 local logShow = log.Show
 --]]
@@ -46,12 +56,22 @@ local logShow = log.Show
 --------------------------------------------------------------------------------
 local unit = {}
 
+---------------------------------------- types
+local BasicSerialTypes = {
+  ["boolean"]   = true,
+  ["number"]    = true,
+  ["string"]    = true,
+} --- BasicSerialTypes
+unit.BasicSerialTypes = BasicSerialTypes
+
+local DefaultSerialTypes = {
+  __index = BasicSerialTypes,
+  ["table"]     = true,
+} --- DefaultSerialTypes
+setmetatable(DefaultSerialTypes, DefaultSerialTypes)
+unit.DefaultSerialTypes = DefaultSerialTypes
+
 ---------------------------------------- ValToStr/KeyToStr
-local MaxNumberInt = numbers.MaxNumberInt
-
-local modf = math.modf
-local format = string.format
-
 -- Convert simple value to string.
 -- Преобразование простого значения в строку.
 local function ValToStr (value) --> (string | nil, type)
@@ -69,14 +89,13 @@ local function ValToStr (value) --> (string | nil, type)
     --return format("math.ldexp(%.17f, %d)", frexp(value)) -- preserve accuracy
   end
 
-  if tp == 'string' then return ("%q"):format(value) end -- "string"
+  if tp == 'string' then
+    return ("%q"):format(value) -- "string"
+  end
 
   return nil, tp
 end -- ValToStr
 unit.ValToStr = ValToStr
-
-local reserveds = lua.keywords
-local KeywordMask = lua.KeywordMask
 
 -- Convert key name to string.
 -- Преобразование имени ключа в строку.
@@ -90,9 +109,10 @@ local function KeyToStr (key) --> (string)
     return --nil, tp
   end
 
-  if key:find(KeywordMask) and not reserveds[key] then
+  if key:find(KeywordMask) and not LuaKeywords[key] then
     return "."..key, key -- .string
   end
+
   return ("[%q]"):format(key) -- ["string"]
 end -- KeyToStr
 unit.KeyToStr = KeyToStr
@@ -125,6 +145,7 @@ local function TabToStr (name, data, kind, write) --| (write)
   -- Settings to write keys/values:
   local KeyToStr = kind.KeyToStr
   local ValToStr = kind.ValToStr
+  local TypToStr = kind.TypToStr
 
   -- Settings to data nesting:
   kind.level = kind.level + 1
@@ -141,18 +162,24 @@ local function TabToStr (name, data, kind, write) --| (write)
     local s = KeyToStr(k, kind)
     if s then
       local u, tp = ValToStr(v, kind)
-      if isnull and (u or tp == 'table') then
+      if isnull and (u or tp == 'table' or TypToStr) then
         isnull = false
         write(cur_indent, format("do local %s = {}; %s = %s\n",
                                  tname, name, tname)) -- do
       end
       if u then
+        -- boolean, number or string:
         write(new_indent, format("%s%s = %s\n", tname, s, u))
-      elseif tp == 'table' then
-        TabToStr(name..s, v, kind, write)
+      else
+        -- subtable or special type:
+        if tp == 'table' then
+          TabToStr(name..s, v, kind, write)
+        elseif TypToStr then
+          TypToStr(name..s, v, kind, write)
+        end
       end
     end
-  end
+  end -- for
 
   if isnull then
     write(cur_indent, name, " = {}")
@@ -172,11 +199,6 @@ unit.TabToStr = TabToStr
 ---------------------------------------- ValToText/KeyToText
 local hex = numbers.hex
 local i2s, r2s = numbers.i2s, numbers.r2s
-local MaxNumberInt = numbers.MaxNumberInt
-
-local srep = string.rep
-
-local spaces = strings.spaces
 
 -- Convert simple value to pretty text.
 -- Преобразование простого значения в читабельный текст.
@@ -262,8 +284,8 @@ local function ValToText (value, kind) --> (string | nil, type)
 end -- ValToText
 unit.ValToText = ValToText
 
--- Convert key name to pretty text.
--- Преобразование имени ключа в читабельный текст.
+-- Convert field key to pretty text.
+-- Преобразование ключа поля в читабельный текст.
 --[[
   -- @notes: @see unit.ValToText.
   -- @params (@see unit.serialize and unit.TabToText):
@@ -289,9 +311,10 @@ local function KeyToText (key, kind) --> (string)
   end
 
   -- string:
-  if key:find(KeywordMask) and not reserveds[key] then
+  if key:find(KeywordMask) and not LuaKeywords[key] then
     return "."..key, key -- .string
   end
+
   return ("[%q]"):format(key) -- ["string"]
 end -- KeyToText
 unit.KeyToText = KeyToText
@@ -300,7 +323,7 @@ unit.KeyToText = KeyToText
 local sortpairs = tables.sortpairs
 local statpairs = tables.statpairs
 
--- TODO: Support null value and Null table.
+-- TODO: Support null value and Null table --> also to gatherstat!
 
 -- Convert table to pretty text.
 -- Преобразование таблицы в читабельный текст.
@@ -395,6 +418,7 @@ local function TabToText (name, data, kind, write) --| (write)
   -- Settings to write keys/values:
   local KeyToStr = kind.KeyToStr
   local ValToStr = kind.ValToStr
+  local TypToStr = kind.TypToStr
 
   -- Settings to data nesting:
   kind.level = kind.level + 1 -- Current level
@@ -416,7 +440,7 @@ local function TabToText (name, data, kind, write) --| (write)
   local skip = {}
   local isnull = true
 
-  -- 3.1. Write array only fields:
+  -- 3.1. Write array fields:
   if nestless then
     kind.isarray = true -- in array-part only
 
@@ -439,7 +463,7 @@ local function TabToText (name, data, kind, write) --| (write)
       local u, tp = ValToStr(v, kind)
 
       -- Set '{' of array/table to line:
-      if isnull and (u or tp == 'table') then
+      if isnull and (u or tp == 'table' or TypToStr) then
         isnull = false
         if isarray then
           write(cur_indent, "{\n") -- {
@@ -449,6 +473,7 @@ local function TabToText (name, data, kind, write) --| (write)
       end
 
       if u then
+        -- boolean, number or string:
         if islining then
           l = l + 1
           cnt = cnt + 1
@@ -474,16 +499,24 @@ local function TabToText (name, data, kind, write) --| (write)
         else
           write(new_indent, u, ",\n")
         end
-      elseif tp == 'table' then
-        -- New line before subtable:
+
+      else
+        -- subtable or special type:
+
+        -- New line before:
         if islining then
           write("\n")
           l = 0
         end
+
         local s = KeyToStr(k, kind)
         kind.fname = fname..s
-        TabToText(s, v, kind, write)
-      end
+        if tp == 'table' then
+          TabToText(s, v, kind, write)
+        elseif TypToStr then
+          TypToStr(s, v, kind, write)
+        end
+      end -- if u -- value
 
       k = k + 1
       v = data[k]
@@ -528,8 +561,9 @@ local function TabToText (name, data, kind, write) --| (write)
 
         if s then
           local u, tp = ValToStr(v, kind)
+
           -- Set '{' of hash/table to line:
-          if isnull and (u or tp == 'table') then
+          if isnull and (u or tp == 'table' or TypToStr) then
             isnull = false
             --logShow({ nestless, kind }, name, 2)
             if nestless then
@@ -544,7 +578,12 @@ local function TabToText (name, data, kind, write) --| (write)
             end
           end
 
+          local isspec = not BasicSerialTypes[type(k)]
+          if isspec then kind.indent = cur_indent..'--' end
+
           if u then
+            local new_indent = kind.indent
+            -- boolean, number or string:
             if nestless then
               if islining then
                 l = l + 1
@@ -574,21 +613,29 @@ local function TabToText (name, data, kind, write) --| (write)
             else
               write(new_indent, format("%s%s = %s\n", tname, c, u))
             end
-          elseif tp == 'table' then
-            -- New line before subtable:
+
+          else
+            -- subtable or special type:
+
+            -- New line before:
             if islining then
               if l > 0 then write("\n") end
               l = 0
             end
             kind.fname = fname..s
-            if nestless then
-              --if c == "subsubtable" then logShow(kind, name, 1) end
-              TabToText(c, v, kind, write)
-            else
-              TabToText((kind.tnaming and tname or name)..c, v, kind, write)
+
+            local n = nestless and c or (kind.tnaming and tname or name)..c
+            --if c == "subsubtable" then logShow(kind, name, 1) end
+
+            if tp == 'table' then
+              TabToText(n, v, kind, write)
+            elseif TypToStr then
+              TypToStr(n, v, kind, write)
             end
-          end
-        end
+          end -- if u -- value
+
+          if isspec then kind.indent = new_indent end
+        end -- if s -- key
       end
     end -- for
 
@@ -660,6 +707,7 @@ unit.TabToText = TabToText
     ValToStr   (func) - function to convert simple value to string.
     KeyToStr   (func) - function to convert field key to string.
     TabToStr   (func) - function to convert table to string.
+    TypToStr   (func) - function to convert other types to string.
     -- @locals in kind:
     level    (number) - current level of nesting: 0+.
     fname    (string) - full name of table field.
@@ -719,6 +767,8 @@ function unit.prettyize (name, data, kind, write) --> (bool)
 
   if kind.localret == nil then kind.localret = true end
   if kind.tnaming == nil then kind.tnaming = true end
+
+  --logShow(kind)
 
   return unit.serialize(name, data, kind, write)
 end ---- prettyize

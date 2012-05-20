@@ -22,6 +22,8 @@ local setmetatable = setmetatable
 local string = string
 local format = string.format
 
+local tconcat = table.concat
+
 local io_open = io.open
 
 ----------------------------------------
@@ -54,14 +56,14 @@ unit.ExcludeChar = nil
 --unit.ExcludeChar = '-'
 
 local Types = {
-  ["nil"]       = 'i',
+  ["nil"]       = 'o',
   ["boolean"]   = 'b',
   ["number"]    = 'n',
   ["string"]    = 's',
   ["table"]     = 't',
   ["userdata"]  = 'u',
   ["function"]  = 'f',
-  ["thread"]    = 'h',
+  ["thread"]    = 'e',
 } --- Types
 unit.Types = Types
 
@@ -156,8 +158,9 @@ local function str (s, filter) --> (string)
   return sfind(filter, "'") and format("'%s'", s or "") or
          sfind(filter, 'q') and s or ("%q"):format(s)
 end --
-unit.str = str
+--unit.str = str
 
+--[[
 local floor = math.floor
 
 -- Check table key to array-part index.
@@ -165,6 +168,7 @@ local function isArrayKey (k, t) --> (bool)
   return k > 0 and k <= #t and k == floor(k)
 end --
 unit.isArrayKey = isArrayKey
+--]]
 
 -- Check type of value to include.
 local function isFitType (v, filter) --> (bool)
@@ -186,8 +190,98 @@ unit.isFitName = isFitName
 
 ---------------------------------------- Make
 do
+  local getinfo = debug.getinfo
+
+-- Convert function info to pretty text.
+-- Преобразование информации о функции в читабельный текст.
+local function FuncToText (func) --> (string)
+
+  local i = getinfo(func, "uS")
+  local isLua = i.what == "Lua"
+  --logShow(i, "getinfo")
+
+  local t = {}
+  if isLua then
+    t[#t+1] = "lua"
+  else
+    t[#t+1] = "non-lua"
+  end
+  t[#t+1] = "-function"
+
+  if i.nups > 0 then
+    t[#t+1] = " with upvalue"
+    if i.nups > 1 then
+      t[#t+1] = "s"
+    end
+  end
+  t[#t+1] = ": "
+
+  if isLua then
+    t[#t+1] = "in ("
+    t[#t+1] = i.linedefined
+    t[#t+1] = "-"
+    t[#t+1] = i.lastlinedefined
+    t[#t+1] = ") "
+    t[#t+1] = i.source
+  end
+
+  return tconcat(t)
+end ---- FuncToText
+unit.FuncToText = FuncToText
+
+  local DefaultSerialTypes = serial.DefaultSerialTypes
+
+-- Convert special type info to pretty text.
+-- Преобразование информации о спец-типе в читабельный текст.
+local function SpecToText (value, kind) --> (string)
+  local tp = type(value)
+  if DefaultSerialTypes[tp] then return end
+
+  if tp == 'function' then
+    return FuncToText(value)
+  else
+    return tostring(value)
+  end
+end -- SpecToText
+unit.SpecToText = SpecToText
+
+  local BasicKeyToText = serial.KeyToText
+  local BasicSerialTypes = serial.BasicSerialTypes
+
+-- Convert field key to pretty text with special types.
+-- Преобразование ключа поля в читабельный текст со спец-типами.
+function unit.KeyToText (key, kind) --> (string)
+  local tp = type(key)
+
+  if BasicSerialTypes[tp] then
+    return BasicKeyToText(key, kind)
+  end
+
+  if tp == 'table' then
+    return format("[{%q}]", tostring(key))
+  end
+
+  return format("[{%q}]", SpecToText(key, kind))
+end ---- KeyToText
+
+-- Convert special types' information to pretty text.
+-- Преобразование информации о специальных типах в читабельный текст.
+function unit.TypToText (name, data, kind, write) --| (write)
+
+  local u = SpecToText(data, kind)
+  if not u then return end
+
+  local cur_indent = kind.indent
+  if kind.isarray then
+    write(cur_indent, format("nil, -- %s\n", u))
+  else
+    write(cur_indent, format("%s = nil, -- %s\n", name, u))
+  end
+
+  return true
+end ---- TypToText
+  
   local select = select
-  local tconcat = table.concat
 
 -- Save data to array.
 -- Сохранение данных в массив.
@@ -197,26 +291,29 @@ do
   data    (t|nil) - processed data table.
   kind    (t|nil) - conversion kind (@see serial.prettyize):
     -- @fields additions: none.
-  filter (string) - filter to exclude some fields; filter characters:
+    -- @locals in kind:
+    filter (string) - @see filter param.
+  filter (string) - filter some fields; filter characters:
                     -- common:
                     - w - write data as whole table.
                     - d%d+ - max depth (nesting) level to convert.
                     -- fields:
-                    - i|b|n|s|t|u|f|h - exclude some types (@see unit.Types).
+                    - o|b|n|s|t|u|f|e - exclude some types (@see unit.Types).
                     - /|\|.|: - exclude fields containing this characters.
                     - _ - exclude names (@see unit.Names).
                     - m - exclude meta-fields (@see unit.Metas).
                     -- format:
                     - q - exclude quotes from string values.
                     - ' - use apostrophes to quote string values.
-                    - a - preserve accuracy for float keys and values.
-                    - x%d+ | xk%d* | xv%d* - use hexadecimal format for integer
-                      <key+values | keys | values> with specified number width.
+                    - x%d+ | xk%d* | xv%d* - @see kind.keyhex/kind.valhex.
+                    - i%d+ | ik%d* | iv%d* - @see kind.keyint/kind.valint.
+                    - r%d+ | rk%d* | rv%d* - @see kind.keyreal/kind.valreal.
   -- @return:
   array   (table) - array of strings.
 --]]
 function unit.toarray (name, data, kind, filter) --> (table)
   kind = kind or {}
+  kind.filter = filter or ""
 
   -- Copy settings from filter to kind:
 
@@ -226,12 +323,11 @@ function unit.toarray (name, data, kind, filter) --> (table)
   -- Write strings to array.
   --[[ Algorithm:
     for all arguments do
-    1. Repeat by '\n':
-      1.1. Collect all before '\n' to subarray u.
-      1.2. Concat subarray u to array t.
-    2. Save all after last '\n' to subarray u.
+      1. Repeat by '\n':
+        1.1. Collect all before '\n' to subarray u.
+        1.2. Concat subarray u to array t.
+      2. Save all after last '\n' to subarray u.
   --]]
-  -- 3. Создать новую подтаблицу, куда перенести остаток после '\n'.
   local write = function (...)
                   --log({ ... }, tostring(kind.level or -1))
                   for i = 1, select("#", ...) do
@@ -313,7 +409,7 @@ end
 
 ---------------------------------------- Tabulize
 -- Tabulize data for logging.
--- "Таблизация" данных для протоколирования.
+-- Табулирование данных для протоколирования.
 --[[
   -- @params: @see unit.toarray.
   -- @return: @see unit.toarray.
@@ -321,7 +417,17 @@ end
 function unit.tabulize (name, data, kind, filter) --> (table)
   name = name or unit.Nameless
   local kind = kind or {}
-  local filter = filter or ""
+
+  kind.KeyToStr = unit.KeyToText -- to prettyize special types in keys
+  kind.TypToStr = unit.TypToText -- to prettyize special types in values
+
+  -- Nesting level or empty string:
+  if type(filter) == 'number' then
+    filter = format("d%d", filter)
+  else
+    filter = filter or ""
+  end
+  --logShow({ filter, kind })
 
   -- Common:
   kind.localret = false
@@ -337,17 +443,27 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   kind.hcount = kind.hcount or unit.hcount
 
   -- Hexadecimal format:
-  local xw = filter:match("x(%d+)")
-  local w = xw or filter:match("xk(%d*)")
+  local aw, w = filter:match("x(%d+)")
+  w = aw or filter:match("xk(%d*)")
   if w then kind.keyhex = w == "" or tonumber(w) end
-  local w = xw or filter:match("xv(%d*)")
+  w = aw or filter:match("xv(%d*)")
   if w then kind.valhex = w == "" or tonumber(w) end
 
-  -- Float with accuracy:
-  if not sfind(filter, 'a') then
-    kind.keyfloat = true
-    kind.valfloat = true
-  end
+  -- Format for integers:
+  aw = filter:match("i(%d+)")
+  w = aw or filter:match("ik(%d*)")
+  if w then kind.keyint = w == "" or tonumber(w) end
+  w = aw or filter:match("iv(%d*)")
+  if w then kind.valint = w == "" or tonumber(w) end
+
+  -- Format for integers:
+  aw = filter:match("r(%d+)")
+  w = aw or filter:match("rk(%d*)")
+  if w then kind.keyreal = w == "" or tonumber(w) end
+  w = aw or filter:match("rv(%d*)")
+  if w then kind.valreal = w == "" or tonumber(w) end
+
+  --logShow({ filter, kind })
 
   return unit.toarray(name, data, kind, filter)
 end ---- tabulize
@@ -427,11 +543,6 @@ end ----
 function unit.Show (data, name, filter, kind) --| (menu)
   local name = name or unit.Nameless
   local kind = kind or {}
-  if type(filter) == 'number' then
-    kind.filter = format
-  else
-    kind.filter = filter or ""
-  end
 
   local ShowData = kind.ShowData or unit.ShowData
   return ShowData(unit.tabulize(name, data, kind, filter), name, kind)
