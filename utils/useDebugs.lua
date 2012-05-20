@@ -67,7 +67,7 @@ local Types = {
 } --- Types
 unit.Types = Types
 
-local Names = {
+local Words = {
   -- standard modules
   ["string"] = true,
   ["package"] = true,
@@ -133,8 +133,8 @@ local Names = {
   flags = true,
   -- RectMenu
   LMap = true,
-} --- Names
-unit.Names = Names
+} --- Words
+unit.Words = Words
 
 local Metas = {
   -- LuaFAR context
@@ -149,16 +149,14 @@ local function sfind (s, pat) --> (bool)
 end --
 unit.sfind = sfind
 
--- Convert to hexadecimal presentation.
-local hex8 = numbers.hex8
-local hex = numbers.hex
-
+--[[
 -- Convert to string checking quotes.
 local function str (s, filter) --> (string)
   return sfind(filter, "'") and format("'%s'", s or "") or
          sfind(filter, 'q') and s or ("%q"):format(s)
 end --
 --unit.str = str
+--]]
 
 --[[
 local floor = math.floor
@@ -170,23 +168,29 @@ end --
 unit.isArrayKey = isArrayKey
 --]]
 
--- Check type of value to include.
-local function isFitType (v, filter) --> (bool)
-  return not sfind(filter, Types[type(v)] or '?')
-end -- isFitType
-unit.isFitType = isFitType
+-- Check field type to exclude.
+local function isUnfitValType (tp, filter) --> (bool)
+  return sfind(filter, Types[tp] or '?')
+end -- isUnfitValType
+unit.isUnfitValType = isUnfitValType
 
--- Check name of value to include.
-local function isFitName (n, filter) --> (bool)
-  return not (sfind(filter, '_') and Names[n] or
-              sfind(filter, '/') and sfind(n, '/') or
-              sfind(filter, '\\') and sfind(n, '\\') or
-              sfind(filter, '.') and sfind(n, '.') or
-              sfind(filter, ':') and sfind(n, ':') or
-              sfind(filter, 'm') and (Metas[n] or n:find("^__"))
-             )
-end -- isFitName
-unit.isFitName = isFitName
+local supper = string.upper
+
+local function isUnfitKeyType (tp, filter) --> (bool)
+  return sfind(filter, supper(Types[tp] or '?'))
+end -- isUnfitKeyType
+unit.isUnfitKeyType = isUnfitKeyType
+
+-- Check field string key to exclude.
+local function isUnfitKeyName (n, filter) --> (bool)
+  return sfind(filter, 'W') and Words[n] or
+         sfind(filter, '/') and sfind(n, '/') or
+         sfind(filter, '\\') and sfind(n, '\\') or
+         sfind(filter, '.') and sfind(n, '.') or
+         sfind(filter, ':') and sfind(n, ':') or
+         sfind(filter, 'M') and (Metas[n] or n:find("^__"))
+end -- isUnfitKey
+unit.isUnfitKeyName = isUnfitKeyName
 
 ---------------------------------------- Make
 do
@@ -245,13 +249,30 @@ local function SpecToText (value, kind) --> (string)
 end -- SpecToText
 unit.SpecToText = SpecToText
 
+  local BasicValToText = serial.ValToText
+
+-- Convert field value to pretty text with special types.
+-- Преобразование значения поля в читабельный текст со спец-типами.
+function unit.ValToText (value, kind)
+  local tp = type(value)
+
+  local filter = kind.filter
+  if not kind.iskey and isUnfitValType(tp, filter) then return end
+
+  return BasicValToText(value, kind)
+end ----
+
   local BasicKeyToText = serial.KeyToText
   local BasicSerialTypes = serial.BasicSerialTypes
 
 -- Convert field key to pretty text with special types.
 -- Преобразование ключа поля в читабельный текст со спец-типами.
-function unit.KeyToText (key, kind) --> (string)
+function unit.KeyToText (key, kind) --> (string[, string] | nil)
   local tp = type(key)
+
+  local filter = kind.filter
+  if isUnfitKeyType(tp, filter) then return end
+  if tp == 'string' and isUnfitKeyName(key, filter) then return end
 
   if BasicSerialTypes[tp] then
     return BasicKeyToText(key, kind)
@@ -298,13 +319,14 @@ end ---- TypToText
                     - w - write data as whole table.
                     - d%d+ - max depth (nesting) level to convert.
                     -- fields:
-                    - o|b|n|s|t|u|f|e - exclude some types (@see unit.Types).
-                    - /|\|.|: - exclude fields containing this characters.
-                    - _ - exclude names (@see unit.Names).
-                    - m - exclude meta-fields (@see unit.Metas).
+                    - O|B|N|S|T|U|F|E - exclude some key types
+                                        (@see unit.Types).
+                    - o|b|n|s|t|u|f|e - exclude some value types.
+                                        (@see unit.Types).
+                    - /|\|.|: - exclude fields containing this chars in keys.
+                    - W - exclude some word names in keys (@see unit.Words).
+                    - M - exclude meta-fields names in keys (@see unit.Metas).
                     -- format:
-                    - q - exclude quotes from string values.
-                    - ' - use apostrophes to quote string values.
                     - x%d+ | xk%d* | xv%d* - @see kind.keyhex/kind.valhex.
                     - i%d+ | ik%d* | iv%d* - @see kind.keyint/kind.valint.
                     - r%d+ | rk%d* | rv%d* - @see kind.keyreal/kind.valreal.
@@ -418,8 +440,10 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   name = name or unit.Nameless
   local kind = kind or {}
 
-  kind.KeyToStr = unit.KeyToText -- to prettyize special types in keys
-  kind.TypToStr = unit.TypToText -- to prettyize special types in values
+  -- Prettyize special types and filter all types:
+  kind.KeyToStr = unit.KeyToText -- in keys
+  kind.ValToStr = unit.ValToText -- in values
+  kind.TypToStr = unit.TypToText -- in special values
 
   -- Nesting level or empty string:
   if type(filter) == 'number' then
