@@ -207,10 +207,10 @@ function unit.Execute (Data) --> (bool | nil)
   --logShow(_Test.test, "Test")
   _Test:Fill() -- Fill fields
   --logShow(_Test.test, "Test")
-  _Test:Save() -- Save result
+  --_Test:Save() -- Save result
 
   --logShow(_Test.test, "test", "w") -- Test samples/logging
-  --dbgShow(_Test.test, "test", "w") -- Test utils/useDebugs
+  dbgShow(_Test.test, "test", "w") -- Test utils/useDebugs
   --[[
   -- Test "logging-to-file" object:
   local l = dbg.open("uSerialFile.log")
