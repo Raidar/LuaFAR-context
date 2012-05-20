@@ -72,8 +72,8 @@ setmetatable(DefaultSerialTypes, DefaultSerialTypes)
 unit.DefaultSerialTypes = DefaultSerialTypes
 
 ---------------------------------------- ValToStr/KeyToStr
--- Convert simple value to string.
--- Преобразование простого значения в строку.
+-- Convert field value to string.
+-- Преобразование значения поля в строку.
 local function ValToStr (value) --> (string | nil, type)
   local tp = type(value)
 
@@ -99,14 +99,15 @@ unit.ValToStr = ValToStr
 
 -- Convert key name to string.
 -- Преобразование имени ключа в строку.
-local function KeyToStr (key) --> (string)
+local function KeyToStr (key) --> (string[, string] | nil)
   local tp = type(key)
   if tp ~= 'string' then
     local key = ValToStr(key)
     if key then
       return format("[%s]", key)
     end
-    return --nil, tp
+
+    return
   end
 
   if key:find(KeywordMask) and not LuaKeywords[key] then
@@ -200,8 +201,8 @@ unit.TabToStr = TabToStr
 local hex = numbers.hex
 local i2s, r2s = numbers.i2s, numbers.r2s
 
--- Convert simple value to pretty text.
--- Преобразование простого значения в читабельный текст.
+-- Convert field value to pretty text.
+-- Преобразование значения поля в читабельный текст.
 --[[
   -- @notes:
      Convert value of following types: boolean, number, string.
@@ -296,7 +297,7 @@ unit.ValToText = ValToText
   -- @return:
   (s | nil,tp)  - string representation of value.
 --]]
-local function KeyToText (key, kind) --> (string)
+local function KeyToText (key, kind) --> (string[, string] | nil)
   local tp = type(key)
 
   -- boolean & number:
@@ -307,7 +308,8 @@ local function KeyToText (key, kind) --> (string)
     if key then
       return format("[%s]", key)
     end
-    return --nil, tp
+
+    return
   end
 
   -- string:
@@ -463,7 +465,8 @@ local function TabToText (name, data, kind, write) --| (write)
       local u, tp = ValToStr(v, kind)
 
       -- Set '{' of array/table to line:
-      if isnull and (u or tp == 'table' or TypToStr) then
+      if isnull and (u or tp == 'table' or
+                     TypToStr and tp ~= nil) then
         isnull = false
         if isarray then
           write(cur_indent, "{\n") -- {
@@ -513,7 +516,7 @@ local function TabToText (name, data, kind, write) --| (write)
         kind.fname = fname..s
         if tp == 'table' then
           TabToText(s, v, kind, write)
-        elseif TypToStr then
+        elseif TypToStr and tp ~= nil then
           TypToStr(s, v, kind, write)
         end
       end -- if u -- value
@@ -563,7 +566,8 @@ local function TabToText (name, data, kind, write) --| (write)
           local u, tp = ValToStr(v, kind)
 
           -- Set '{' of hash/table to line:
-          if isnull and (u or tp == 'table' or TypToStr) then
+          if isnull and (u or tp == 'table' or
+                         TypToStr and tp ~= nil) then
             isnull = false
             --logShow({ nestless, kind }, name, 2)
             if nestless then
@@ -629,7 +633,7 @@ local function TabToText (name, data, kind, write) --| (write)
 
             if tp == 'table' then
               TabToText(n, v, kind, write)
-            elseif TypToStr then
+            elseif TypToStr and tp ~= nil then
               TypToStr(n, v, kind, write)
             end
           end -- if u -- value
