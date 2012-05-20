@@ -68,8 +68,14 @@ local Data = {
   Morfo = {},
   Formo = {},
 
-  ["nil"] = 1,      -- Test serialize reserved words
-  ["~Test"] = 1,    -- Test serialize keys with symbols
+  -- Test serialize reserved words
+  ["nil"] = 1,
+  ["do"] = 2,
+  ["package"] = 3,
+  -- Test serialize keys with symbols
+  ["~Test"] = 1,
+  ["~Test.Sub"] = 2,
+  ["~Test.Sub.Under"] = 3,
 
   -- Test serialize utf-8 strings:
   Locale = "Локализация",
@@ -148,6 +154,16 @@ local Data = {
   -- Test functions as keys:
   [f_w_ups] = true,
   [f_w_up] = f_w_up,
+
+  f_w_subtable = {
+    f_w_up,
+    [f_w_up] = function () return 1 end,
+    [f_w_ups] = {
+      1, 2, 3,
+      __index = false,
+    },
+    __newindex = { 1, 2, },
+  },
 
 } --- Data
 

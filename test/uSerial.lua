@@ -209,8 +209,18 @@ function unit.Execute (Data) --> (bool | nil)
   --logShow(_Test.test, "Test")
   --_Test:Save() -- Save result
 
+  -- Test filter:
+  local filter
+  --filter = "w" -- Whole table as table
+  --filter = "wf" -- Exclude functions in values
+  --filter = "wnTFf" -- Exclude tables in keys and functions
+  --filter = "wfWM" -- Exclude Words and Metas
+  --filter = "wd1" -- Nesting level
+  --filter = "wxv2" -- Hexadecimal number
+  filter = "wi20r5" -- Integer and real number
+
   --logShow(_Test.test, "test", "w") -- Test samples/logging
-  dbgShow(_Test.test, "test", "w") -- Test utils/useDebugs
+  dbgShow(_Test.test, "test", filter) -- Test utils/useDebugs
   --[[
   -- Test "logging-to-file" object:
   local l = dbg.open("uSerialFile.log")
