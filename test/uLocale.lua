@@ -13,7 +13,11 @@ local context = context
 
 local locale = require 'context.utils.useLocale'
 
-local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+----------------------------------------
+--[[
+local dbg = require "context.utils.useDebugs"
+local logShow = dbg.Show
+--]]
 
 --------------------------------------------------------------------------------
 local scriptPath = "context\\test\\"
@@ -36,12 +40,12 @@ local loc, error1, error2 = locale.create(DefCustom)
 loc.b = loc.button
 
 if loc == nil then
-  logMsg({ error1, error2 }, 'Error')
+  logShow({ error1, error2 }, 'Error')
   return
 end
 
---logMsg(Custom, 'Custom', 1, "#q")
---logMsg(loc, 'loc', 1, "#q")
+--logShow(Custom, 'Custom', "#qd1")
+--logShow(loc, 'loc', "#qd1")
 
 far.Message(loc:t'TestMessage', loc:t'Test', loc:b'Apply')
 loc:w1('Warning', 'WarnMsg')

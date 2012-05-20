@@ -207,7 +207,10 @@ far23.FarNameToKey = far.FarNameToKey
 far23.FarInputRecordToKey = far.FarInputRecordToKey
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local dbg = require "context.utils.useDebugs"
+local logShow = dbg.Show
+--]]
 
 --------------------------------------------------------------------------------
 -- Пространства, выделенные из far.

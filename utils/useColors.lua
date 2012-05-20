@@ -28,9 +28,8 @@ local F = far.Flags
 
 ----------------------------------------
 --[[
-local logUt = (require "Rh_Scripts.Utils.Logging")
-local logMsg = logUt.Message
-local linMsg = logUt.lineMessage
+local log = require "context.samples.logging"
+local logShow = log.Show
 --]]
 
 --------------------------------------------------------------------------------

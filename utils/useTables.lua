@@ -25,7 +25,10 @@ local table = table
 local context = context
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -286,8 +289,8 @@ local function _asmeta (t, u, tpairs, field, force) --|> (t)
       _asmeta(t[k], v, tpairs, field)
     end
   end
-  --if (t or {}).TabSize then logMsg({ tdef = t, udef = u }, "asmeta", 3) end
-  --if (t.default or {}).TabSize then logMsg({ tdef = t.default, udef = u.default }, "asmeta", 3) end
+  --if (t or {}).TabSize then logShow({ tdef = t, udef = u }, "asmeta", 3) end
+  --if (t.default or {}).TabSize then logShow({ tdef = t.default, udef = u.default }, "asmeta", 3) end
 
   local m = getmetatable(t) or {}
   if m[field] and not force then return t end
@@ -301,7 +304,7 @@ function unit.asmeta (t, u, tpairs, deep, field, force) --|> (t)
   local t = t or {}
   if u == nil then return t end
 
-  --if (t.default or {}).TabSize then logMsg({ t = t, u = u, deep = deep, field = field }, "asmeta", 3) end
+  --if (t.default or {}).TabSize then logShow({ t = t, u = u, deep = deep, field = field }, "asmeta", 3) end
   if deep then
     return _asmeta(t, u, tpairs or pairs, field or '__index')
   end
@@ -504,7 +507,7 @@ function unit.allpairs (t, make, ...) --> (func)
           m = m - 1
         end
         if m <= 0 then
-          --logMsg({ n, k, v }, "next")
+          --logShow({ n, k, v }, "next")
           return k, v, n -- Not found --> pairing
         end
       else

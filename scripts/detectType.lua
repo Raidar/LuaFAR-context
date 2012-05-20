@@ -36,6 +36,12 @@ local useprofiler = false
 
 if useprofiler then require "profiler" end -- Lua Profiler
 
+----------------------------------------
+--[[
+local dbg = require "context.utils.useDebugs"
+local logShow = dbg.Show
+--]]
+
 --------------------------------------------------------------------------------
 local unit = {}
 
@@ -210,7 +216,7 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     --local t = { k, mlen, mask, llen, line } -- DEBUG
     --[[
     if checkname and fname == checkname and (mlen or llen) then
-      logMsg(t, "Types: pass ["..fname.."]", 1)
+      logShow(t, "Types: pass ["..fname.."]", 1)
     end
     --]]
 
@@ -229,7 +235,7 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
       if not lines or mlen >= dmasklen then         -- Учёт длины маски
         --[[
         if checkname and fname == checkname and (mlen or llen) then
-          logMsg(t, "Types: pass ["..fname.."]", 1)
+          logShow(t, "Types: pass ["..fname.."]", 1)
         end
         --]]
 
@@ -248,7 +254,7 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     end -- if mlen
 
     if sines and slen and slen > blinelen then      -- Учёт только строгой линии:
-      --if checkname and fname == checkname then logMsg(t, "Types: pass ["..fname.."]", 1) end
+      --if checkname and fname == checkname then logShow(t, "Types: pass ["..fname.."]", 1) end
       blinelen, bline, blinewei, blineidx = slen, sine, w, k
     end -- if llen
   end -- for
@@ -264,7 +270,7 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     t.bmask = { bmasklen, bmask, bmaskwei, bmaskidx }
     t.bline = { blinelen, bline, blinewei, blineidx }
     t.dtype = { dmasklen, dmask, dtypewei, dlinelen, dline, dtypeidx }
-    logMsg(t, "Types: pass ["..fname.."]", 1)
+    logShow(t, "Types: pass ["..fname.."]", 1)
   end -- if
   --]]
 
@@ -288,7 +294,7 @@ unit.TypePass = detTypePass
 -- Detect a type by filename and first line.
 -- Определяет тип по имени файла и первой линии.
 local function detectType (f) --> (see detTypePass)
-  --logMsg(f, "detType", 1)
+  --logShow(f, "detType", 1)
   if not types then return end
 
   local ff = { __index = f }; setmetatable(ff, ff)

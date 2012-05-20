@@ -33,7 +33,10 @@ local descriptors = ctxdata.descriptors
 local cfgpairs = datas.cfgpairs
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local dbg = require "context.utils.useDebugs"
+local logShow = dbg.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -107,7 +110,7 @@ function unit.merge (base, user, mode) --> (config table)
   if mode.basis == 'user' then base, user = user, base end
 
   local merge = mode.merge
-  --logMsg(mode, "Config merge mode")
+  --logShow(mode, "Config merge mode")
   if merge == 'none' then return base end
 
   local tpairs = mode.pairs --or defMeta.pairs
@@ -386,8 +389,8 @@ end ---- loadDescriptor
 -- via ctxdata.config.<key name of config data> table.
 local function cfg_index (t, key) --> (config table)
   local regdata = cfgReg[key]
-  --logMsg(regdata, key)
-  --if key == "lfa_editor" then logMsg(regdata, key) end
+  --logShow(regdata, key)
+  --if key == "lfa_editor" then logShow(regdata, key) end
   if not regdata then
     L:w1('CNoRegConfig', 'SNoRegConfig', key)
     return
@@ -400,7 +403,7 @@ local function cfg_index (t, key) --> (config table)
   return cfg
 end -- cfg_index
 
---logMsg(cfgDat, "cfgDat")
+--logShow(cfgDat, "cfgDat")
 setmetatable(cfgDat, { __index = cfg_index })
 
 ---------------------------------------- Using
@@ -514,7 +517,7 @@ function unit.register (regdata) --> (bool)
   local t = fillRegData(regdata)
   local key = t.key
 
-  --if key == "lfa_editor" then logMsg(regdata, "lfa_editor") end
+  --if key == "lfa_editor" then logShow(regdata, "lfa_editor") end
 
   if cfgReg[key] then
     if not isRegDataEqual(cfgReg[key], t) then

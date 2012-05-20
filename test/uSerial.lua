@@ -122,7 +122,7 @@ function TTest:Save ()
     --nesting = 0, -- Test: serialize data with max nesting level
 
     -- Test: for simple values:
-    --numwidth = 2, -- Test: min number value width
+    numwidth = 2, -- Test: min number value width
     -- Test: hex width for integer key/value
     --keyhex = 2,
     --valhex = 2,
@@ -209,12 +209,12 @@ function unit.Execute (Data) --> (bool | nil)
   --logShow(_Test.test, "Test")
   _Test:Save() -- Save result
 
-  --logShow(_Test.test, "w") -- Test samples/logging
-  --dbgShow(_Test.test, "w") -- Test utils/useDebugs
+  --logShow(_Test.test, "test", "w") -- Test samples/logging
+  --dbgShow(_Test.test, "test", "w") -- Test utils/useDebugs
   --[[
   -- Test "logging-to-file" object:
   local l = dbg.open("uSerialFile.log")
-  l:data(_Test.test, "w")
+  l:data(_Test.test, "test", "w")
   l:close()
   --]]
 end ---- Execute

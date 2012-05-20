@@ -14,10 +14,13 @@
 --------------------------------------------------------------------------------
 local _G = _G
 
-local type = type
+local type, unpack = type, unpack
 local pairs, ipairs = pairs, ipairs
 local tonumber, tostring = tonumber, tostring
 local setmetatable = setmetatable
+
+local string = string
+local format = string.format
 
 local io_open = io.open
 
@@ -144,13 +147,9 @@ local function sfind (s, pat) --> (bool)
 end --
 unit.sfind = sfind
 
-local format = string.format
-
 -- Convert to hexadecimal presentation.
 local hex8 = numbers.hex8
-unit.hex8 = hex8
 local hex = numbers.hex
-unit.hex = hex
 
 -- Convert to string checking quotes.
 local function str (s, filter) --> (string)
@@ -365,7 +364,7 @@ unit.BKeys = {
   {BreakKey = 'SPACE'}
 } ---
 
-  local slen, format = string.len, string.format
+  local slen = string.len
 
 -- Show data as menu.
 -- Показ данных как меню.
@@ -425,10 +424,14 @@ end ----
     ShowData (func) - function to show tabulized data.
   -- @return: @see kind.ShowData.
 --]]
-function unit.Show (data, filter, name, kind) --| (menu)
+function unit.Show (data, name, filter, kind) --| (menu)
   local name = name or unit.Nameless
   local kind = kind or {}
-  kind.filter = filter or ""
+  if type(filter) == 'number' then
+    kind.filter = format
+  else
+    kind.filter = filter or ""
+  end
 
   local ShowData = kind.ShowData or unit.ShowData
   return ShowData(unit.tabulize(name, data, kind, filter), name, kind)
@@ -463,7 +466,7 @@ function TLogging:logtab (t, name) --< array
     self:log('\n')
   end --
   self:logln(name or "")
-end ----
+end ---- logtab
 
 function TLogging:data (data, filter, name, kind)
   self:logtab(unit.tabulize(name, data, kind, filter), name or "data")
@@ -477,7 +480,7 @@ function TLogging:close (s) --< (file table)
   f:flush()
   f:close()
   --return true
-end ----
+end ---- close
 
 local io_open = io.open
 

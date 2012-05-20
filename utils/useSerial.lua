@@ -31,13 +31,17 @@ local string = string
 ----------------------------------------
 local context = context
 
-local utils = require 'context.utils.useUtils'
-local tables = require 'context.utils.useTables'
 local lua = require "context.utils.useLua"
 local numbers = require 'context.utils.useNumbers'
+local strings = require 'context.utils.useStrings'
+local utils = require 'context.utils.useUtils'
+local tables = require 'context.utils.useTables'
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -113,7 +117,7 @@ local function TabToStr (name, data, kind, write) --| (write)
       return
     end
     kind.saved[data] = name
-    --logMsg({ name, kind, data or "nil" }, "kind", 3)
+    --logShow({ name, kind, data or "nil" }, "kind", 3)
   end
 
   -- 2. Settings to write current table:
@@ -172,7 +176,7 @@ local MaxNumberInt = numbers.MaxNumberInt
 
 local srep = string.rep
 
-local spaces = utils.spaces
+local spaces = strings.spaces
 
 -- Convert simple value to pretty text.
 -- Преобразование простого значения в читабельный текст.
@@ -374,7 +378,7 @@ local function TabToText (name, data, kind, write) --| (write)
       local tp = type(name)
       if astable then
         if kind.isarray then
-          --logMsg(kind, name, 1)
+          --logShow(kind, name, 1)
           write(cur_indent, format("{}, -- skip\n"))
         else
           write(cur_indent, format("%s = {}, -- skip\n", name))
@@ -401,7 +405,7 @@ local function TabToText (name, data, kind, write) --| (write)
 
   local sortkind = kind.pargs[1] or {}
   local sortnext = statpairs(data, sortkind, unpack(kind.pargs, 2))
-  --logMsg(sortkind.stats, "statpairs stats")
+  --logShow(sortkind.stats, "statpairs stats")
 
   -- Settings to check table nesting:
   local nestless = sortkind.stats['table'] == 0
@@ -455,10 +459,6 @@ local function TabToText (name, data, kind, write) --| (write)
           if w > 0 then
             len = len + w
             sp = spaces[w]
-            if not sp then
-              sp = srep(" ", w)
-              spaces[w] = sp
-            end
           end
           -- Write field:
           if l == 1 or
@@ -524,14 +524,14 @@ local function TabToText (name, data, kind, write) --| (write)
       if not skip[k] then
         local s, c = KeyToStr(k, kind)
         c = nestless and c or s -- Check using dot
-        --logMsg({ nestless, s, c, kind }, name, 2)
+        --logShow({ nestless, s, c, kind }, name, 2)
 
         if s then
           local u, tp = ValToStr(v, kind)
           -- Set '{' of hash/table to line:
           if isnull and (u or tp == 'table') then
             isnull = false
-            --logMsg({ nestless, kind }, name, 2)
+            --logShow({ nestless, kind }, name, 2)
             if nestless then
               if isarray then
                 write(cur_indent, "{\n") -- {
@@ -556,10 +556,6 @@ local function TabToText (name, data, kind, write) --| (write)
                 if w > 0 then
                   len = len + w
                   sp = spaces[w]
-                  if not sp then
-                    sp = srep(" ", w)
-                    spaces[w] = sp
-                  end
                 end
                 -- Write field:
                 if l == 1 or
@@ -586,7 +582,7 @@ local function TabToText (name, data, kind, write) --| (write)
             end
             kind.fname = fname..s
             if nestless then
-              --if c == "subsubtable" then logMsg(kind, name, 1) end
+              --if c == "subsubtable" then logShow(kind, name, 1) end
               TabToText(c, v, kind, write)
             else
               TabToText((kind.tnaming and tname or name)..c, v, kind, write)
@@ -715,7 +711,7 @@ end -- serialize
 -- Сериализация данных в читабельный текст.
 function unit.prettyize (name, data, kind, write) --> (bool)
   local kind = kind or {}
-  --logMsg(kind, "kind")
+  --logShow(kind, "kind")
 
   kind.KeyToStr = kind.KeyToStr or KeyToText
   kind.ValToStr = kind.ValToStr or ValToText

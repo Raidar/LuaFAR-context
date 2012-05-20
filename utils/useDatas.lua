@@ -32,7 +32,10 @@ local tables = require 'context.utils.useTables'
 local PluginPath = utils.PluginPath
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -231,11 +234,11 @@ function unit.make (path, name, ext, t, kind) --> (table | nil, error)
 
   local fullname = utils.fullname(path, name, ext)
   local u, loadError, reqError = unit.load(fullname, t, kind)
-  --if u then logMsg(u, 'loadData', 1, '#q') end
+  --if u then logShow(u, 'loadData', '#qd1') end
   if u ~= nil then return u end
 
   u, reqError = unit.require(name, t, kind)
-  --if u then logMsg(u, 'requireData', 1, '#q') end
+  --if u then logShow(u, 'requireData', '#qd1') end
   if u ~= nil then return u end
 
   return nil, ('%s\n%s'):format(loadError, reqError)
@@ -407,7 +410,7 @@ function unit.customize (Custom, defCustom) --> (table)
   local t, u = addData(Custom or {}, defCustom, 'extend', pairs, true)
   local name, path = t.name, t.path:gsub('/', '\\'):gsub('%.', '\\')
   t.path = path
-  --logMsg(t, "data")
+  --logShow(t, "data")
 
   -- Options:
   t.options = t.options or {}
@@ -441,7 +444,7 @@ function unit.customize (Custom, defCustom) --> (table)
   u.dir  = u.dir or 'locales\\'
   u.path = u.path or path..u.dir
   u.fullpath = t.base..u.path
-  --logMsg(t, "data")
+  --logShow(t, "data")
 
   return t
 end -- customize

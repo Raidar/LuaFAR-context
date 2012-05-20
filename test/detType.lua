@@ -31,7 +31,7 @@ local utils = require 'context.utils.useUtils'
 
 ----------------------------------------
 local dbg = require "context.utils.useDebugs"
-local dbgShow = dbg.Show
+local logShow = dbg.Show
 
 --readCfg(cfgReg.types) -- Reading types_config -- don't work!
 
@@ -136,11 +136,11 @@ local function testTypesCfg (...)
     farMsg(SNoTestFiles, CNoTestFiles, nil, 'l')
     return
   end
-  --dbgShow(DirList, "d2", 'test_detType Dir List')
+  --logShow(DirList, 'test_detType Dir List', 2)
 
-  --dbgShow({ ... }, "d2", 'test_detType ...')
+  --logShow({ ... }, 'test_detType ...', 2)
   local DetFuncKinds = select(1, ...)
-  --dbgShow(DetFuncKinds, "d2", 'test_detType DetFuncKinds')
+  --logShow(DetFuncKinds, 'test_detType DetFuncKinds', 2)
   if DetFuncKinds == nil then DetFuncKinds = { "default" } end
 
   local FileList, Data = {}
@@ -151,7 +151,7 @@ local function testTypesCfg (...)
       FileList[k] = { name = Name, path = Path }
     end
   end
-  --dbgShow(FileList, "d2", 'test_detType Files List')
+  --logShow(FileList, 'test_detType Files List', 2)
 
   local detFunc
   local f   -- Detect file information
@@ -163,7 +163,7 @@ local function testTypesCfg (...)
   for k, v in ipairs(DetFuncKinds) do
     local detFunc = DetFuncsInfo[v] and DetFuncsInfo[v].Value
     local Title = Caption..(v or "#"..tostring(k))
-    --dbgShow(DetFuncsInfo, Title)
+    --logShow(DetFuncsInfo, Title)
     if detFunc then
       f, res = {}
       t = getFilesType(FileList, detFunc, f)
@@ -179,7 +179,7 @@ end ---- testTypesCfg
 
 ---------------------------------------- main
 local arg = select(1, ...)
---dbgShow({ ... }, "d2", 'args')
+--logShow({ ... }, 'args', 2)
 if arg == nil then
   return testTypesCfg()
 else

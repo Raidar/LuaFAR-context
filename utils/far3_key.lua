@@ -38,6 +38,12 @@ local hex = numbers.hex8 -- for far.Message
 
 local far23 = context.use.far23
 
+----------------------------------------
+--[[
+local dbg = require "context.utils.useDebugs"
+local logShow = dbg.Show
+--]]
+
 --------------------------------------------------------------------------------
 local unit = {}
 
@@ -318,7 +324,7 @@ do
   for k, v in pairs(SKEY_Shifts) do
     AKEY_Shifts[charkey(k)] = charkey(v)
   end
-  --logMsg(AKEY_Shifts, "AKEY_Shifts", "h2")
+  --logShow(AKEY_Shifts, "AKEY_Shifts", "h2")
 end -- do
 
 local VKey_Chars = {

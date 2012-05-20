@@ -26,7 +26,10 @@ local bshl, bshr = bit.lshift, bit.rshift
 local win, far = win, far
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}

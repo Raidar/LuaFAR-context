@@ -20,12 +20,16 @@ local setmetatable = setmetatable
 ----------------------------------------
 local context, ctxdata = context, ctxdata
 
+local strings = require 'context.utils.useStrings'
 local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -51,7 +55,7 @@ function unit.text (Data, Index) --> (string | nil)
 end ----
 
 do
-  local initcap = utils.initcap
+  local initcap = strings.initcap
 
 -- Get codes for used languages
 -- Получение "кодов" используемых языков.
@@ -101,7 +105,7 @@ function unit.customize (Custom) --> (table)
   u.lang, u.codes   = unit.language()
   u.help, u.defhelp = unit.bothname(u.path, u.file, u.codes.Help)
   u.name, u.defname = unit.bothname(u.path, u.file, u.codes.Main)
-  --logMsg(Custom, 'Custom', 2, '#q')
+  --logShow(Custom, 'Custom', '#qd2')
 
   return Custom
 end ---- customize
@@ -144,8 +148,8 @@ function unit.getData (Custom, locBasis, defBasis) --> (table | nil, errors)
   else  defData, defError = _makeData(Custom, Locale.defname, defBasis) end
   local locData, locError = _makeData(Custom, Locale.name, locBasis)
   --[[
-  if defData then logMsg(defData, 'defData', 1, '#q') end
-  if locData then logMsg(locData, 'locData', 1, '#q') end
+  if defData then logShow(defData, 'defData', '#qd1') end
+  if locData then logShow(locData, 'locData', '#qd1') end
   --]]
 
   if defData then -- Make data hierarchy:
@@ -177,12 +181,12 @@ function unit.getDual (Custom, genCustom, ...) --> (table)
   local genData, genError = _getData(genCustom)   -- general
   --[[
   if curData then
-    logMsg({ curData = curData,
-             defData = curData.__index }, 'curData', 1, '#q')
+    logShow({ curData = curData,
+              defData = curData.__index }, 'curData', '#qd1')
   end
   if genData then
-    logMsg({ genData = genData,
-             defData = genData.__index }, 'genData', 1, '#q')
+    logShow({ genData = genData,
+              defData = genData.__index }, 'genData', '#qd1')
   end
   --]]
 
@@ -192,10 +196,10 @@ function unit.getDual (Custom, genCustom, ...) --> (table)
     idxData.__index = genData
     --[[
     local gi_Data = (genData or tables.NULL).__index
-    logMsg({ idxData = idxData, genData = genData,
-             gi1Data = gi_Data,
-             gi2Data = (gi_Data or tables.NULL).__index,
-            }, 'idxData', 1, '#qtfn') -- '#q')
+    logShow({ idxData = idxData, genData = genData,
+              gi1Data = gi_Data,
+              gi2Data = (gi_Data or tables.NULL).__index,
+            }, 'idxData', '#qtfnd1') -- '#qd1')
     --]]
     return setmetatable(idxData, idxData)
 

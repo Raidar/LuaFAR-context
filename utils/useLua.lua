@@ -17,14 +17,18 @@ local _G = _G
 local context = context
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
 
----------------------------------------- base
+---------------------------------------- const
 unit.KeywordMask = "^[a-zA-Z_][a-zA-Z_0-9]-$"
 
+---------------------------------------- base
 unit.keywords = {
   ["do"] = true,
   ["end"] = true,

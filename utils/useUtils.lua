@@ -24,7 +24,10 @@ local bshl, bshr = bit.lshift, bit.rshift
 local win, far = win, far
 
 ----------------------------------------
---local logMsg = (require "Rh_Scripts.Utils.Logging").Message
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -49,83 +52,6 @@ unit.null = setmetatable({}, Tnull)
 end -- do
 
 local null = unit.null -- null value instead of nil
-
----------------------------------------- Lua
-
----------------------------------------- Spaces
-do
-  local srep = string.rep
-
--- Prepared spaced strings.
--- Подготовленные строки из пробелов.
-local Tspaces = {
-  __index = function (t, k)
-    if type(k) == 'number' and k >= 0 then
-      local v = ""
-      if k > 0 then v = srep(" ", k) end
-
-      rawset(t, k, v)
-      return v
-    end
-
-    error("Attempt to get spaced string with not number count", 2)
-  end,
-} ---
-
-unit.spaces = setmetatable({}, Tspaces)
-
-end -- do
-
----------------------------------------- String
-local format = string.format
-
--- Convert initial letter of string to upper.
--- Преобразование начальной буквы строки в верхний регистр.
-function unit.initcap (s) --| (string)
-  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1))
-end --
-
--- Capitalize word (lowercase word with first uppercase letter).
--- Преобразование слова в строчное слово с первой заглавной буквой.
-function unit.capit (s) --> (string)
-  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1):lower())
-end ----
-
----------------------------------------- Unicode
-do
-  local schar, sbyte = string.char, string.byte
-
--- Convert codepoint to UTF-16 LE two-byte char.
--- Преобразование кодовой точки в двухбайтный UTF-16 LE символ.
-function unit.char16 (n) --< (number) --> (string)
-  return schar(band(n, 0xFF), band(bshr(n, 8), 0xFF))
-end ----
-
--- Convert UTF-16 LE two-byte char to codepoint.
--- Преобразование двухбайтного UTF-16 LE символа в кодовую точку.
-function unit.byte16 (s) --< (string) --> (number)
-  local n1, n2 = sbyte(s, 1, 2)
-  return bor(n1 or 0x00, bshl(n2 or 0x00, 8))
-end ----
-
-end -- do
-
-do
-  local char16, byte16 = unit.char16, unit.byte16
-  local U16toU8, U8toU16 = win.Utf16ToUtf8, win.Utf8ToUtf16
-
--- Convert a codepoint to UTF-8 char.
--- Преобразование кодовой точки в UTF-8 символ.
-function unit.u8char (n) --< (code) --> (char)
-  return U16toU8(char16(n))
-end ----
--- Convert a UTF-8 char to codepoint.
--- Преобразование UTF-8 символа в кодовую точку.
-function unit.u8byte (c) --< (char) --> (code)
-  return byte16(U8toU16(c))
-end ----
-
-end -- do
 
 ---------------------------------------- Flags
 local F = far.Flags
