@@ -649,6 +649,7 @@ local function NameToKeyState (KeyName) --> (number)
   return KeyState, key or ""
 end -- NameToKeyState
 
+-- Check Rev.279 to own KeyToName
 function unit.InputRecordToName (Rec, isSeparate) --> (string)
   if isSeparate then
     local KeyName = unit.InputRecordToName(Rec) -- , false
