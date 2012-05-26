@@ -4,6 +4,7 @@ local F = far.Flags
 local format = string.format
 
 local fkeys = require "far2.keynames"
+local InputRecordToName = fkeys.InputRecordToName
 
 local VKeys = win.GetVirtualKeys()
 
@@ -29,11 +30,11 @@ for k = 1, count do
       --UnicodeChar     = "",
       ControlKeyState = 0x00,
     } ---
-    local s = fkeys.InputToKeyName(Input) or ""
+    local s = InputRecordToName(Input) or ""
     if s:len() <= 1 or s ~= s:upper() then
       t[#t + 1] = format("%s -> %s", v, s)
       Input.ControlKeyState = 0x0100 -- ENHANCED_KEY
-      s = fkeys.InputToKeyName(Input) or ""
+      s = InputRecordToName(Input) or ""
       local s = format("%s -> %s", v, s)
       if s ~= t[#t] then
         t[#t + 1] = s.." (enhanced)"
