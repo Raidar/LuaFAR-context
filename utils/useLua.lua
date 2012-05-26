@@ -26,7 +26,14 @@ local logShow = log.Show
 local unit = {}
 
 ---------------------------------------- const
-unit.KeywordMask = "^[a-zA-Z_][a-zA-Z_0-9]-$"
+local format = string.format
+
+local IdentFirstChars = "a-zA-Z_"
+local IdentOtherChars = "a-zA-Z_0-9"
+
+unit.IdentFirstChars = FirstChars
+unit.IdentOtherChars = OtherChars
+unit.IdentMask = format("^[%s][%s]-$", IdentFirstChars, IdentOtherChars)
 
 ---------------------------------------- base
 unit.keywords = {
@@ -67,6 +74,15 @@ unit.types = {
   ["function"] = true,
   ["thread"] = true,
 } -- types
+
+---------------------------------------- utils
+local TextFirstCharMask = format("^[^%s]", IdentFirstChars)
+local TextOtherCharMask = format("[^%s]", IdentOtherChars)
+
+function unit.NameToIdent (name) --> (string)
+  return name:gsub(TextOtherCharMask, "_")
+             :gsub(TextFirstCharMask, "_%1")
+end ----
 
 --------------------------------------------------------------------------------
 return unit

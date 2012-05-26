@@ -40,8 +40,8 @@ local strings = require 'context.utils.useStrings'
 local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 
-local LuaKeywords = lua.keywords
-local KeywordMask = lua.KeywordMask
+local luaKeywords = lua.keywords
+local luaIdentMask = lua.IdentMask
 
 local MaxNumberInt = numbers.MaxNumberInt
 
@@ -110,7 +110,7 @@ local function KeyToStr (key) --> (string[, string] | nil)
     return
   end
 
-  if key:find(KeywordMask) and not LuaKeywords[key] then
+  if key:find(luaIdentMask) and not luaKeywords[key] then
     return "."..key, key -- .string
   end
 
@@ -313,7 +313,7 @@ local function KeyToText (key, kind) --> (string[, string] | nil)
   end
 
   -- string:
-  if key:find(KeywordMask) and not LuaKeywords[key] then
+  if key:find(luaIdentMask) and not luaKeywords[key] then
     return "."..key, key -- .string
   end
 
@@ -694,6 +694,8 @@ end -- TabToText
 unit.TabToText = TabToText
 
 ---------------------------------------- serialize
+local luaNameToIdent = lua.NameToIdent
+
 -- Serialize data.
 -- Сериализация данных.
 --[[
@@ -724,15 +726,20 @@ unit.TabToText = TabToText
 function unit.serialize (name, data, kind, write) --> (bool)
   if data == nil then return false end
 
-  -- Fix name as lua identifier.
-  local name = name == nil and "n_Nil" or name
-  local tp = type(name)
-  if tp ~= 'string' then
+  -- Fix name as lua identifier:
+  local name, tp = name, type(name)
+  if tp == 'string' then
+    name = luaNameToIdent(name)
+  else
     if tp == 'boolean' or tp == 'number' then
       name = "n_"..tostring(name)
     else
       name = "n_"..tp
     end
+  end
+  -- Fix name as non-keyword:
+  if luaKeywords[name] then
+    name = "n_"..name
   end
 
   -- Prepare basic kind fields:
@@ -763,7 +770,7 @@ function unit.serialize (name, data, kind, write) --> (bool)
   kind.tname = (name == "t") and "u" or "t"
 
   -- Serialize data as table
-  if kind.localret then write(kind.indent, "local ", name, "\n\n") end;
+  if kind.localret then write(kind.indent, "local ", name, "\n\n") end
   (kind.TabToStr or TabToStr)(name, data, kind, write)
   if kind.localret then write(kind.indent, "\nreturn ", name, "\n") end
 
