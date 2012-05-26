@@ -104,7 +104,7 @@ function unit.find (t, v, tpairs) --> (key | nil)
   for k, w in (tpairs or pairs)(t) do
     if w == v then return k end
   end
-end ----
+end ---- find
 
 do
   local modf = math.modf
