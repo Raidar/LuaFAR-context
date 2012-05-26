@@ -722,11 +722,25 @@ unit.TabToText = TabToText
   isOk   (bool) - operation success flag.
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
-  local kind = kind or {}
+  if data == nil then return false end
 
+  -- Fix name as lua identifier.
+  local name = name == nil and "n_Nil" or name
+  local tp = type(name)
+  if tp ~= 'string' then
+    if tp == 'boolean' or tp == 'number' then
+      name = "n_"..tostring(name)
+    else
+      name = "n_"..tp
+    end
+  end
+
+  -- Prepare basic kind fields:
+  local kind = kind or {}
   kind.KeyToStr = kind.KeyToStr or KeyToStr
   kind.ValToStr = kind.ValToStr or ValToStr
 
+  -- Serialize data as simple value:
   local s, tp = kind.ValToStr(data, kind)
   if s then
     if kind.localret then
@@ -736,25 +750,22 @@ function unit.serialize (name, data, kind, write) --> (bool)
   end
   if tp ~= 'table' then return end
 
+  -- Fill kind with defaults:
   kind.saved = kind.saved or {}
   kind.indent = kind.indent or ""
   kind.shift = kind.shift or "  "
   kind.pairs = kind.pairs or pairs
   kind.pargs = kind.pargs or {}
 
+  -- Fill kind locals:
   kind.level = 0
   kind.fname = name
   kind.tname = (name == "t") and "u" or "t"
 
-  if kind.localret then
-    write(kind.indent, "local ", name, "\n\n")
-  end;
-
+  -- Serialize data as table
+  if kind.localret then write(kind.indent, "local ", name, "\n\n") end;
   (kind.TabToStr or TabToStr)(name, data, kind, write)
-
-  if kind.localret then
-    write(kind.indent, "\nreturn ", name, "\n")
-  end
+  if kind.localret then write(kind.indent, "\nreturn ", name, "\n") end
 
   return true
 end -- serialize
@@ -765,10 +776,12 @@ function unit.prettyize (name, data, kind, write) --> (bool)
   local kind = kind or {}
   --logShow(kind, "kind")
 
+  -- Fill kind to pretty text:
   kind.KeyToStr = kind.KeyToStr or KeyToText
   kind.ValToStr = kind.ValToStr or ValToText
   kind.TabToStr = kind.TabToStr or TabToText
 
+  -- Fill kind with defaults:
   if kind.localret == nil then kind.localret = true end
   if kind.tnaming == nil then kind.tnaming = true end
 
