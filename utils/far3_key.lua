@@ -285,6 +285,21 @@ local FK_ = {
   -- KEY_LAST_BASE --
 } --- FK_ / FKEY_Keys
 
+local FK_EnhKeys = {
+  [FK_.NUMENTER] = VK_.RETURN,  -- NumEnter
+  [FK_.PGUP]  = VK_.PRIOR,
+  [FK_.PGDN]  = VK_.NEXT,
+  [FK_.END]   = VK_.END,
+  [FK_.HOME]  = VK_.HOME,
+  [FK_.LEFT]  = VK_.LEFT,
+  [FK_.UP]    = VK_.UP,
+  [FK_.RIGHT] = VK_.RIGHT,
+  [FK_.DOWN]  = VK_.DOWN,
+  [FK_.PRNTSCRN] = VK_.SNAPSHOT,
+  [FK_.INS]   = VK_.INSERT,
+  [FK_.DEL]   = VK_.DELETE,
+} --- FK_EnhKeys
+
 -- Различие кодов: KEY_ --> VK_
 local FKEY_to_VKEY = {
   --[0x000]       = 0x00,         -- NULL
@@ -293,6 +308,9 @@ local FKEY_to_VKEY = {
   [FK_.ENTER]   = VK_.RETURN,   -- Enter / Return
   [FK_.ESC]     = VK_.ESCAPE,   -- Escape / Esc
   [FK_.SPACE]   = VK_.SPACE,    -- Space
+  [FK_.NUMDEL]  = VK_.DELETE,   -- NumDel
+  --[FK_.NUMDEL]  = VK_.DECIMAL,  -- NumDel
+
   [0x2D]    = VK_.OEM_MINUS,    -- "-_"
   [0x3D]    = VK_.OEM_PLUS,     -- "=+"
   [0x2C]    = VK_.OEM_COMMA,    -- ",<"
@@ -306,9 +324,9 @@ local FKEY_to_VKEY = {
   --[0x22]    = VK_.OEM_7,    -- "'"'"'
   [0x27]    = VK_.OEM_7,    -- "'"'"'
   --[0x??]    = VK_.OEM_102,  -- "<>" / "\\|"
-  [FK_.NUMENTER]= VK_.RETURN,   -- NumEnter
+  --[FK_.NUMENTER] = VK_.RETURN,   -- NumEnter
   --[FK_.CLEAR]    = VK_.CLEAR,   -- Numpad5 / Clear
-  [FK_.NUMDEL]  = VK_.DELETE,   -- NumDel / Decimal
+  --[FK_.NUMDEL]   = VK_.DELETE,   -- NumDel / Decimal
 } -- FKEY_to_VKEY
 
 ---------------------------------------- VK Chars & Names
@@ -365,7 +383,8 @@ local VKey_Names = {
 
   SNAPSHOT  = "PrntScrn",
   INSERT    = "Ins",
-  DELETE    = "Del",
+  --DELETE    = "Del",
+  DELETE    = "NumDel",
 
   LWIN      = "LWin",
   RWIN      = "RWin",
@@ -377,7 +396,8 @@ local VKey_Names = {
   NUMPAD2   = "Num2",
   NUMPAD3   = "Num3",
   NUMPAD4   = "Num4",
-  NUMPAD5   = "Num5",
+  --NUMPAD5   = "Num5",
+  NUMPAD5   = "Clear",
   NUMPAD6   = "Num6",
   NUMPAD7   = "Num7",
   NUMPAD8   = "Num8",
@@ -428,6 +448,14 @@ local VKey_Names = {
   OEM_7         = "'",     -- "'"..'"'
   --OEM_8         = "",       -- ""
 } --- VKey_Names
+
+-- Enhanced keys:
+local SKEY_Enhanced = {
+  Enter = "NumEnter",
+  Clear = "Clear",
+  NumDel = "Delete",
+  --["."] = "NumDel",
+} --- SKEY_Enhanced
 
 ----------------------------------------
 local function ismod (mod, flag) --> (bool)
@@ -490,9 +518,15 @@ local function FarKeyToVir (key, state, name, loc) --> (Key, State, Name, Scan)
   elseif state == 0x00 and inseg(key, 0x61, 0x7A) and name:find("%l") then
     key = key - 0x20
   else
-    if inseg(key, FKB_.KEY_FKEY_BEGIN, FKB_.KEY_END_FKEY) then
+    --far.Message(hex(key), hex(FKB_.KEY_FKEY_BEGIN))
+    local aKey = FK_EnhKeys[key]
+    --far.Message(hex(key), hex(aKey))
+    if aKey then
+      key, state = aKey, bor(state, VKCS_.ENHANCED_KEY)
+    elseif inseg(key, FKB_.KEY_FKEY_BEGIN, FKB_.KEY_END_FKEY) then
       --far.Message(hex(key), hex(FKB_.KEY_FKEY_BEGIN))
       key = key - FKB_.EXTENDED_KEY_BASE
+      --state = bor(state, VKCS_.ENHANCED_KEY)
     elseif inseg(key, FKB_.KEY_VK_0xFF_BEGIN, FKB_.KEY_VK_0xFF_END) then
       --far.Message(hex(key), hex(FKB_.KEY_VK_0xFF_BEGIN))
       key, scan = 0xFF, key - FKB_.KEY_VK_0xFF_BEGIN
@@ -507,6 +541,7 @@ local function FarKeyToVir (key, state, name, loc) --> (Key, State, Name, Scan)
       key = FKEY_to_VKEY[key] or key
     end
   end
+
   --far.Message(hex(key).."\n"..hex(state), name)
   if loc and loc:len() > 1 then
     loc = nil
@@ -527,7 +562,7 @@ function unit.FarKeyToRecFields (FarKey) --> (key, state, char)
   local KeyState = FarModToKeyState(FMod) -- Управляющее состояние
   local KeyName = FarKeyToName(FKey) -- Локализованное имя
 
-  --far.Message(hex(FKey).."\n"..hex(KeyState), KeyName)
+  --far.Message(hex(FarKey).."\n"..hex(FKey).."\n"..hex(FMod).."\n"..hex(KeyState), KeyName)
   if KeyName == nil then return nil, KeyState, nil end
   if not inseg(FKey, FKB_.KEY_CHAR_EXT, FKB_.KEY_CHAR_END) then
     --far.Message(hex(FKey).."\n"..hex(KeyState), KeyName)
@@ -542,7 +577,7 @@ function unit.FarKeyToRecFields (FarKey) --> (key, state, char)
     LatKey = LocNameToLatKey(KeyName)
     --far.Message(KeyName.."\n"..tostring(LatKey), "KeyName")
     if LatKey == -1 then -- ??
-      far.Message(KeyName, "-1")
+      --far.Message(KeyName, "-1")
       return nil, KeyState, nil
     end
 
@@ -605,7 +640,7 @@ end ---- FarKeyToInputRecord
 end -- do
 do
 
-local function KeyStateToName (KeyState)
+local function KeyStateToName (KeyState) --> (string)
   local t = {}
 
   if ismod(KeyState, VKCS_.RIGHT_CTRL_PRESSED) then t[#t+1] = "RCtrl" end
@@ -615,7 +650,7 @@ local function KeyStateToName (KeyState)
   if ismod(KeyState, VKCS_.SHIFT_PRESSED)      then t[#t+1] = "Shift" end
 
   return tconcat(t)
-end --function KeyStateToName
+end -- KeyStateToName
 
 local farMatch = regex.match
 
@@ -693,6 +728,10 @@ function unit.InputRecordToName (Rec, isSeparate) --> (string)
   -- Учёт спец. названий клавиш-символов
   if VMod == 0 then
     SKey = SKEY_Names[SKey] or SKey
+  end
+
+  if ismod(VMod, VKCS_.ENHANCED_KEY) then
+    SKey = SKEY_Enhanced[SKey] or SKey
   end
 
   if VMod ~= 0 then
