@@ -361,7 +361,7 @@ function unit.toarray (name, data, kind, filter) --> (table)
       2. Save all after last '\n' to subarray u.
   --]]
   local write = function (...)
-                  --log({ ... }, tostring(kind.level or -1))
+                  --logShow({ tostring(kind.level or -1), ... })
                   for i = 1, select("#", ...) do
                     local s = select(i, ...)
                     -- Match for first '\n':
@@ -396,6 +396,7 @@ function unit.toarray (name, data, kind, filter) --> (table)
                   return true
                 end -- write
 
+  --logShow("Start")
   local res, s = serial.prettyize(name, data, kind, write)
 
   -- Move last collected to t:
@@ -404,6 +405,7 @@ function unit.toarray (name, data, kind, filter) --> (table)
     t[n] = tconcat(u)
   end
   t.n = n
+  --logShow("Stop")
 
   --logShow(t, "toarray")
 
