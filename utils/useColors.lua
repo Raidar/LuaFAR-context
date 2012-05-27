@@ -80,7 +80,7 @@ do
     white    = 0xF, -- FFFFFF | FFFFFF | FFFFFF          | white
   } ---
 
-  --linMsg(BaseColors, "BaseColors")
+  --logShow(BaseColors, "BaseColors")
 
   -- All colors.
   -- Все цвета.
@@ -112,7 +112,7 @@ do
   -- Специальные цвета:
   Colors.darkgray = Colors.gray
 
-  --linMsg(Colors, "Additional Colors", 0)
+  --logShow(Colors, "Additional Colors", 1)
 
   unit.Colors = Colors
   unit.BaseColors = BaseColors
