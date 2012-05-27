@@ -388,6 +388,7 @@ end ---- loadDescriptor
 -- Autoload and access to registered config data
 -- via ctxdata.config.<key name of config data> table.
 local function cfg_index (t, key) --> (config table)
+  if type(key) ~= 'string' then return end
   local regdata = cfgReg[key]
   --logShow(regdata, key)
   --if key == "lfa_editor" then logShow(regdata, key) end
