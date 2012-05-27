@@ -38,7 +38,10 @@ local far_Message, far_Show = far.Message, far.Show
 local context = context
 
 local numbers = require 'context.utils.useNumbers'
+local strings = require 'context.utils.useStrings'
 local serial = require 'context.utils.useSerial'
+
+local spaces = strings.spaces -- for ShowData
 
 ----------------------------------------
 -- [[
@@ -204,23 +207,19 @@ local function FuncToText (func) --> (string)
   local isLua = i.what == "Lua"
   --logShow(i, "getinfo")
 
-  local t = {}
-  if isLua then
-    t[#t+1] = "lua"
-  else
-    t[#t+1] = "non-lua"
-  end
-  t[#t+1] = "-function"
+  local t = { "", "", "", "", "" }
 
+  t[1] = isLua and "lua" or "non-lua"
+  t[2] = "-function"
   if i.nups > 0 then
-    t[#t+1] = " with upvalue"
+    t[3] = " w/ upvalue"
     if i.nups > 1 then
-      t[#t+1] = "s"
+      t[4] = "s"
     end
   end
-  t[#t+1] = ": "
 
   if isLua then
+    t[5] = ": "
     t[#t+1] = "in ("
     t[#t+1] = i.linedefined
     t[#t+1] = "-"
@@ -407,6 +406,7 @@ end -- do
 ---------------------------------------- Linearize
 unit.linewidth = 60
 
+-- Get array items count on one line.
 --[[
   @return:
   1..9  - for count in 01..09.
@@ -418,6 +418,7 @@ function unit.acount (n, t) --> (number)
   return l > 17 and l / 3 or l > 9 and l / 2 or l
 end
 
+-- Get hash items count on one line.
 --[[
   @return:
   1..5  - for count in 01..05.
@@ -494,9 +495,7 @@ end ---- tabulize
 
 ---------------------------------------- Show
 do
-
 unit.Separ = "│"
-unit.Space = string.rep(" ", 40)
 unit.TextFmt = "%s%s%s%s"
 --unit.TextFmt = "%s%s %s %s"
 unit.BKeys = {
@@ -519,7 +518,6 @@ function unit.ShowData (data, name, kind) --| (menu)
   local ShowMenu = kind.ShowMenu or far.Menu
 
   local Separ = unit.Separ
-  local Space = unit.Space
   local TextFmt = unit.TextFmt
 
   local items, n = {}, #data
@@ -531,13 +529,13 @@ function unit.ShowData (data, name, kind) --| (menu)
     for s in v:gmatch("[^\n]+") do
       if isnum then
         isnum = false
-        sp = Space:sub(1, nlen - slen(m))
+        sp = spaces[nlen - slen(m)]
       else
         m = ""
-        sp = Space:sub(1, nlen)
+        sp = spaces[nlen]
       end
       items[#items + 1] = {
-        text = format(TextFmt, sp or "", m, Separ, s),
+        text = format(TextFmt, sp, m, Separ, s),
       }
     end
   end
