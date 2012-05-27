@@ -82,6 +82,7 @@ local TextOtherCharMask = format("[^%s]", IdentOtherChars)
 function unit.NameToIdent (name) --> (string)
   return name:gsub(TextOtherCharMask, "_")
              :gsub(TextFirstCharMask, "_%1")
+             :gsub("_+", "_")
 end ----
 
 --------------------------------------------------------------------------------
