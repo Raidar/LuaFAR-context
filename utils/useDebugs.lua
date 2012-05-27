@@ -201,7 +201,7 @@ do
 
 -- Convert function info to pretty text.
 -- Преобразование информации о функции в читабельный текст.
-local function FuncToText (func) --> (string)
+local function FuncToText (func, kind) --> (string)
 
   local i = getinfo(func, "uS")
   local isLua = i.what == "Lua"
@@ -219,7 +219,16 @@ local function FuncToText (func) --> (string)
   end
 
   if isLua then
-    t[5] = ": "
+    -- [[
+    if kind.lining then
+      t[5] = ":\n"
+      t[6] = kind.indent
+      t[7] = kind.shift
+      t[8] = "-- "
+    else
+    --]]
+      t[5] = ": "
+    end
     t[#t+1] = "in ("
     t[#t+1] = i.linedefined
     t[#t+1] = "-"
@@ -241,7 +250,7 @@ local function SpecToText (value, kind) --> (string)
   if DefaultSerialTypes[tp] then return end
 
   if tp == 'function' then
-    return FuncToText(value)
+    return FuncToText(value, kind)
   else
     return tostring(value)
   end
@@ -329,6 +338,8 @@ end ---- TypToText
                     - x%d+ | xk%d* | xv%d* - @see kind.keyhex/kind.valhex.
                     - i%d+ | ik%d* | iv%d* - @see kind.keyint/kind.valint.
                     - r%d+ | rk%d* | rv%d* - @see kind.keyreal/kind.valreal.
+                    - a%d+ | ak%d+ | av%d+ - @see kind.alimit/.acount/.awidth.
+                    - h%d+ | hk%d+ | hv%d+ - @see kind.hlimit/.hcount/.hwidth.
   -- @return:
   array   (table) - array of strings.
 --]]
@@ -353,8 +364,8 @@ function unit.toarray (name, data, kind, filter) --> (table)
                   --log({ ... }, tostring(kind.level or -1))
                   for i = 1, select("#", ...) do
                     local s = select(i, ...)
-                    -- Match for first "\n":
-                    local sl, sr = s:match("^([^\n]*)\n([^\n]*)$")
+                    -- Match for first '\n':
+                    local sl, sr = s:match("^([^\n]-)\n(.*)$")
                     while sl do
                       -- Collect strings before "\n":
                       if sl ~= "" then
@@ -367,10 +378,10 @@ function unit.toarray (name, data, kind, filter) --> (table)
                         t[n] = tconcat(u)
                         u, m = {}, 0 -- reset
                       end
-                      -- Next match for "\n":
+                      -- Match for next '\n':
                       if sr ~= "" then
                         s = sr
-                        sl, sr = s:match("^([^\n]*)\n([^\n]*)$")
+                        sl, sr = s:match("^([^\n]-)\n(.*)$")
                       else
                         s, sl = "", false
                       end
@@ -405,6 +416,7 @@ end -- do
 
 ---------------------------------------- Linearize
 unit.linewidth = 60
+unit.fieldwidth = 1
 
 -- Get array items count on one line.
 --[[
@@ -461,14 +473,26 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   if depth then kind.nesting = tonumber(depth) end
 
   -- Linearization:
+  local w, aw -- value, common value
+    -- common:
   if kind.lining == nil then kind.lining = "all" end
-  kind.alimit = kind.alimit or unit.linewidth
-  kind.hlimit = kind.hlimit or unit.linewidth
-  kind.acount = kind.acount or unit.acount
-  kind.hcount = kind.hcount or unit.hcount
+    -- for array:
+  w = filter:match("a(%d+)")
+  kind.alimit = w and tonumber(w) or kind.alimit or unit.linewidth
+  w = filter:match("ak(%d+)")
+  kind.acount = w and tonumber(w) or kind.acount or unit.acount
+  w = filter:match("av(%d+)")
+  kind.awidth = w and tonumber(w) or kind.awidth or unit.fieldwidth
+    -- for hash:
+  w = filter:match("h(%d+)")
+  kind.hlimit = w and tonumber(w) or kind.hlimit or unit.linewidth
+  w = filter:match("hk(%d+)")
+  kind.hcount = w and tonumber(w) or kind.hcount or unit.hcount
+  w = filter:match("hv(%d+)")
+  kind.hwidth = w and tonumber(w) or kind.hwidth or kind.fieldwidth
 
   -- Hexadecimal format:
-  local aw, w = filter:match("x(%d+)")
+  aw = filter:match("x(%d+)")
   w = aw or filter:match("xk(%d*)")
   if w then kind.keyhex = w == "" or tonumber(w) end
   w = aw or filter:match("xv(%d*)")
@@ -481,7 +505,7 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   w = aw or filter:match("iv(%d*)")
   if w then kind.valint = w == "" or tonumber(w) end
 
-  -- Format for integers:
+  -- Format for reals:
   aw = filter:match("r(%d+)")
   w = aw or filter:match("rk(%d*)")
   if w then kind.keyreal = w == "" or tonumber(w) end
