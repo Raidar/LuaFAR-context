@@ -26,9 +26,11 @@ local pairs = pairs
 local tostring = tostring
 local setmetatable = setmetatable
 
-local string = string
-
+local math = math
+local mhuge = math.huge
 local modf, frexp = math.modf, math.frexp
+
+local string = string
 local format = string.format
 
 ----------------------------------------
@@ -80,10 +82,13 @@ local function ValToStr (value) --> (string | nil, type)
   if tp == 'boolean' then return tostring(value) end
 
   if tp == 'number' then
+    if value == mhuge then return "math.huge" end
+
     -- integer:
     if value == modf(value) and value <= MaxNumberInt then
       return tostring(value)
     end
+
     -- real:
     return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
     --return format("math.ldexp(%.17f, %d)", frexp(value)) -- preserve accuracy
@@ -238,10 +243,13 @@ local function ValToText (value, kind) --> (string | nil, type)
   end
 
   if tp == 'number' then
+    if value == mhuge then return "math.huge" end
+
     local iskey, f = kind.iskey
+
     -- integer:
     if iskey then f = kind.keyint else f = kind.valint end
-    --if value == modf(value) then
+    --if value == modf(value) then -- old code
     if value == modf(value) and
        (f or value <= (kind.maxint or MaxNumberInt)) then
       local w
@@ -357,6 +365,7 @@ local statpairs = tables.statpairs
 --]]
 local function TabToText (name, data, kind, write) --| (write)
 
+  --logShow(name)
   local level = kind.level -- Prior level
   local fname = kind.fname or name
   local cur_indent = kind.indent
