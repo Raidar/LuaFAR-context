@@ -443,7 +443,7 @@ local function TabToText (name, data, kind, write) --| (write)
   local isnull = true
 
   -- 3.1. Write array fields:
-  if nestless then
+  if nestless and #data > 0 then
     kind.isarray = true -- in array-part only
 
     -- Settings to write fields of array in one line:
