@@ -55,7 +55,7 @@ function unit.text (Data, Index) --> (string | nil)
 end ----
 
 do
-  local initcap = strings.initcap
+  local upfirst = strings.upfirst
 
 -- Get codes for used languages
 -- Получение "кодов" используемых языков.
@@ -64,7 +64,7 @@ function unit.language () --> (table, table)
   local codes, s = {}
   for k, v in pairs(lang) do
     s = lCodes[v:lower()] -- Код языка
-    if s then codes[k] = initcap(s) end
+    if s then codes[k] = upfirst(s) end
   end
 
   return lang, codes

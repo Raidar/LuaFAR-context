@@ -64,6 +64,26 @@ function unit.at (s, pos) --> (string)
   return s:sub(pos, pos)
 end ----
 
+-- Convert first character of string to upper.
+-- Преобразование первого символа строки в верхний регистр.
+function unit.upfirst (s) --> (string)
+  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1))
+end --
+
+-- Capitalize first character of string
+-- (first to upper, and others to lower).
+-- Преобразование первого символа строки в заглавный
+-- (первый - в верхний регистр, а остальные - в нижний).
+function unit.capfirst (s) --> (string)
+  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1):lower())
+end ----
+
+-- Capitalize words in string.
+-- Преобразование первого символа слов в заглавный.
+function unit.capital (s) --> (string)
+  return s:gsub("%w+", unit.capfirst)
+end ----
+
 ---------------------------------------- String
 -- Set a replace string to specified position of string.
 -- Установка строки-замены в заданную позиции строки.
@@ -89,19 +109,6 @@ function unit.del (s, pos, count) --> (string)
          pos == s:len() and s:sub(1, -count - 1) or
          format("%s%s", s:sub(1, pos - 1), s:sub(pos + count, -1))
 end ---- del
-
----------------------------------------- Word
--- Convert initial letter of string to upper.
--- Преобразование начальной буквы строки в верхний регистр.
-function unit.initcap (s) --> (string)
-  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1))
-end --
-
--- Capitalize word (lowercase word with first uppercase letter).
--- Преобразование слова в строчное слово с первой заглавной буквой.
-function unit.capit (s) --> (string)
-  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1):lower())
-end ----
 
 ---------------------------------------- LuaExp
 -- Convert pattern to plain kind.
