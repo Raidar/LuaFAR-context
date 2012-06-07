@@ -11,10 +11,9 @@
   -- group: Datas.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 ----------------------------------------
-local context = context
+--local context = context
 
 ----------------------------------------
 --[[
@@ -31,8 +30,8 @@ local format = string.format
 local IdentFirstChars = "a-zA-Z_"
 local IdentOtherChars = "a-zA-Z_0-9"
 
-unit.IdentFirstChars = FirstChars
-unit.IdentOtherChars = OtherChars
+unit.IdentFirstChars = IdentFirstChars
+unit.IdentOtherChars = IdentOtherChars
 unit.IdentMask = format("^[%s][%s]-$", IdentFirstChars, IdentOtherChars)
 
 ---------------------------------------- base

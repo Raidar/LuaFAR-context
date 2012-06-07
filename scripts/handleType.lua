@@ -13,7 +13,6 @@
   -- areas: editor, viewer.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local type = type
 local rawget, rawset = rawget, rawset
@@ -33,8 +32,10 @@ local utils = require 'context.utils.useUtils'
 
 local detect = context.detect
 local cfgDat = ctxdata.config
+--[[
 local types = cfgDat.types
---far.Message(types, "types")
+far.Show("types", unpack(types))
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -193,7 +194,7 @@ do
   local EE_SAVE     = F.EE_SAVE
   local EE_CLOSE    = F.EE_CLOSE
   local EE_GOTFOCUS = F.EE_GOTFOCUS
-  local EE_CHANGE   = F.EE_CHANGE
+  --local EE_CHANGE   = F.EE_CHANGE
 
 -- Process type autodetection for editor.
 function unit.editorEvent (id, event, param)

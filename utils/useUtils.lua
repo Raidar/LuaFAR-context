@@ -12,13 +12,12 @@
   -- group: LFc utils.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 ----------------------------------------
 local bit = bit64
 local band, bor  = bit.band, bit.bor
 local bnot, bxor = bit.bnot, bit.bxor
-local bshl, bshr = bit.lshift, bit.rshift
+--local bshl, bshr = bit.lshift, bit.rshift
 
 ----------------------------------------
 local win, far = win, far
@@ -51,7 +50,7 @@ unit.null = setmetatable({}, Tnull)
 
 end -- do
 
-local null = unit.null -- null value instead of nil
+--local null = unit.null -- null value instead of nil
 
 ---------------------------------------- Flags
 local F = far.Flags
@@ -157,7 +156,7 @@ function unit.numFlag (flags, numflags) --> (flags number)
   for k, v in pairs(flags) do
     --if type(v) == 'boolean' then v = b2n(v) end
     if v then n = bor(n, F[k] or 0) end
-    if numFlags[k] then n = bor(n, tonumber(v)) end
+    if numflags[k] then n = bor(n, tonumber(v)) end
   end
 
   return n

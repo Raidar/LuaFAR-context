@@ -12,7 +12,6 @@
   -- group: LFc utils, Datas.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local type = type
 local next, pairs = next, pairs
@@ -22,7 +21,7 @@ local rawget = rawget
 local table = table
 
 ----------------------------------------
-local context = context
+--local context = context
 
 ----------------------------------------
 --[[

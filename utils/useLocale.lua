@@ -12,18 +12,20 @@
   -- group: Locale, Datas.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local pairs = pairs
 local setmetatable = setmetatable
 
 ----------------------------------------
-local context, ctxdata = context, ctxdata
+--local context, ctxdata = context, ctxdata
 
 local strings = require 'context.utils.useStrings'
 local utils = require 'context.utils.useUtils'
-local tables = require 'context.utils.useTables'
+--local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
+
+local languages = require "context.data.languages" -- languages and codes
+local lCodes = languages.alpha_3
 
 ----------------------------------------
 --[[
@@ -33,9 +35,6 @@ local logShow = log.Show
 
 --------------------------------------------------------------------------------
 local unit = {}
-
-----------------------------------------
-local lCodes = ctxdata.languages.alpha_3
 
 ---------------------------------------- Messages
 local Msgs = {

@@ -12,10 +12,10 @@
   -- group: Debug.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local type, unpack = type, unpack
-local pairs, ipairs = pairs, ipairs
+local ipairs = ipairs
+--local pairs, ipairs = pairs, ipairs
 local tonumber, tostring = tonumber, tostring
 local setmetatable = setmetatable
 
@@ -24,27 +24,25 @@ local format = string.format
 
 local tconcat = table.concat
 
-local io_open = io.open
-
 ----------------------------------------
-local bit = bit64
+--local bit = bit64
 
 ----------------------------------------
 local far = far
-local F = far.Flags
-local far_Message, far_Show = far.Message, far.Show
+--local F = far.Flags
+--local far_Message, far_Show = far.Message, far.Show
 
 ----------------------------------------
-local context = context
+--local context = context
 
-local numbers = require 'context.utils.useNumbers'
+--local numbers = require 'context.utils.useNumbers'
 local strings = require 'context.utils.useStrings'
 local serial = require 'context.utils.useSerial'
 
 local spaces = strings.spaces -- for ShowData
 
 ----------------------------------------
--- [[
+--[[
 local log = require "context.samples.logging"
 local logShow = log.Show
 --]]
@@ -620,7 +618,7 @@ end ----
 
 function TLogging:logtab (t, name) --< array
   self:logln(name or "")
-  for k, v in ipairs(t) do
+  for _, v in ipairs(t) do
     self:log(v)
     self:log('\n')
   end --

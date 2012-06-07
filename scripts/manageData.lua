@@ -12,7 +12,6 @@
   -- group: LFc scripts, Datas.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local pairs = pairs
 
@@ -38,7 +37,7 @@ local unit = {}
 do
    -- Sort abstract types.
    local absorted = {}
-   for k, v in pairs(abstypes) do
+   for k, _ in pairs(abstypes) do
      absorted[#absorted] = k
    end
    table.sort(absorted)

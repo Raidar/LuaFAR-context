@@ -13,9 +13,8 @@
   -- areas: basic.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
-local assert = assert
+--local assert = assert
 local pairs = pairs
 
 ----------------------------------------
@@ -651,7 +650,7 @@ function checkType.reset (cfg) --| cfg
   local cfg = cfg or types
   if not cfg then return end
 
-  for k, v in cfgpairs(cfg) do
+  for _, v in cfgpairs(cfg) do
     v._checked_ = false -- nil
   end
   checked[cfg] = false

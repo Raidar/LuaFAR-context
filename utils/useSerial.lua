@@ -19,7 +19,6 @@
   URL: http://lua-users.org/wiki/TableSerialization
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local type, unpack = type, unpack
 local pairs = pairs
@@ -39,7 +38,7 @@ local format = string.format
 local lua = require "context.utils.useLua"
 local numbers = require 'context.utils.useNumbers'
 local strings = require 'context.utils.useStrings'
-local utils = require 'context.utils.useUtils'
+--local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 
 local luaKeywords = lua.keywords
@@ -50,7 +49,7 @@ local MaxNumberInt = numbers.MaxNumberInt
 local spaces = strings.spaces -- for ...ToText
 
 ----------------------------------------
--- [[
+--[[
 local log = require "context.samples.logging"
 local logShow = log.Show
 --]]
@@ -409,7 +408,7 @@ local function TabToText (name, data, kind, write) --| (write)
     -- Check nesting level:
     local nesting = kind.nesting
     if nesting and level > nesting then
-      local tp = type(name)
+      --local tp = type(name)
       if astable then
         if kind.isarray then
           --logShow(kind, name, 1)
@@ -757,7 +756,8 @@ function unit.serialize (name, data, kind, write) --> (bool)
   kind.ValToStr = kind.ValToStr or ValToStr
 
   -- Serialize data as simple value:
-  local s, tp = kind.ValToStr(data, kind)
+  local s
+  s, tp = kind.ValToStr(data, kind)
   if s then
     if kind.localret then
       return write(format("local %s = %s\nreturn %s\n", name, s, name))

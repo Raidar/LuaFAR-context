@@ -12,7 +12,6 @@
   -- group: LFc utils.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local string = string
 local format = string.format
@@ -20,7 +19,7 @@ local format = string.format
 ----------------------------------------
 local bit = bit64
 local band, bor  = bit.band, bit.bor
-local bnot, bxor = bit.bnot, bit.bxor
+--local bnot, bxor = bit.bnot, bit.bxor
 local bshl, bshr = bit.lshift, bit.rshift
 
 ----------------------------------------
@@ -97,7 +96,7 @@ end ---- sat
 -- Вставка новой строки в заданную позицию строки.
 function unit.ins (s, pos, str) --> (string)
   return pos <= 1      and format("%s%s", str, s) or
-         pos > s:len() and format("%s%s", s, v) or
+         pos > s:len() and format("%s%s", s, str) or
          format("%s%s%s", s:sub(1, pos - 1), str, s:sub(pos, -1))
 end ---- ins
 

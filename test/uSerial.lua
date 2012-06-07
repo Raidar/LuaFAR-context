@@ -6,31 +6,34 @@
   -- Тест: Использование сериализации (и отладки).
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 ----------------------------------------
-local context = context
+--local context = context
 
 local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
-local locale = require 'context.utils.useLocale'
+--local locale = require 'context.utils.useLocale'
 local serial = require 'context.utils.useSerial'
 
-local allpairs = tables.allpairs
-local addNewData = tables.extend
+--local allpairs = tables.allpairs
+--local addNewData = tables.extend
 
 ----------------------------------------
+-- [[
 local log = require "context.samples.logging"
-local dbg = require "context.utils.useDebugs"
 local logShow = log.Show
+--]]
+-- [[
+local dbg = require "context.utils.useDebugs"
 local dbgShow = dbg.Show
 --local logShow = dbgShow
+--]]
 
 --------------------------------------------------------------------------------
 local unit = {}
 
 ----------------------------------------
-local scriptPath = "context\\test\\"
+--local scriptPath = "context\\test\\"
 
 ---------------------------------------- Test class
 local TTest = { -- Информация по умолчанию:
@@ -191,7 +194,7 @@ end ---- GenerateFormo
 end -- do
 
 ---------------------------------------- main
-local FullNameFmt = "%s%s.%s"
+--local FullNameFmt = "%s%s.%s"
 
 function unit.Execute (Data) --> (bool | nil)
 --[[ 1. Analyzing ]]

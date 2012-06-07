@@ -86,7 +86,7 @@ end
 
 local F = far.Flags
 --local L = far.GetMsg
-local _PluginDir = far.PluginStartupInfo().ModuleName:match(".*\\")
+--local _PluginDir = far.PluginStartupInfo().ModuleName:match(".*\\")
 
 lfp = lfp or {}
 

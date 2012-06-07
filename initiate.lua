@@ -24,9 +24,6 @@ ctxdata.reg     = ctxdata.reg or {}     -- register of configs
 ctxdata.checked = ctxdata.checked or {} -- type checked configs
 ctxdata.descriptors = ctxdata.descriptors or {} -- config descriptors
 
-ctxdata.languages = ctxdata.languages or
-                    require "context.data.languages" -- languages and codes
-
 ---------------------------------------- -- FAR23 begin
 --[[
   Блок кода работы скриптов для LuaFAR3 под LuaFAR2.

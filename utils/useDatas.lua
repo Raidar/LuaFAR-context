@@ -17,7 +17,6 @@
   © Shmuel Zeigerman.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local type = type
 local pairs = pairs

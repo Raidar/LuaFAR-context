@@ -13,17 +13,22 @@
   -- areas: any.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
+--local _G = _G
 
 ----------------------------------------
 local context = context
 
-----------------------------------------
 local LFVer = context.use.LFVer
 if LFVer < 3 then
   far.Flags = far.GetFlags()
 end
 local F = far.Flags
+
+----------------------------------------
+-- [[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 --------------------------------------------------------------------------------
 do
@@ -63,18 +68,19 @@ function far.RepairInput (Input) --|> (Input)
     Input.VirtualKeyCode, Input.wVirtualKeyCode = VKEY_Keys[Input.wVirtualKeyCode] or 0x00, nil
   end
 
-  if Input.dwMousePositionX then
-    Input.MousePositionX, Input.dwMousePositionX = Input.dwMousePositionX, nil
-  end
-  if Input.dwMousePositionY then
-    Input.MousePositionY, Input.dwMousePositionY = Input.dwMousePositionY, nil
-  end
   if Input.dwButtonState then
     Input.ButtonState, Input.dwButtonState = Input.dwButtonState, nil
   end
   if Input.dwEventFlags then
     Input.EventFlags,  Input.dwEventFlags = Input.dwEventFlags, nil
   end
+  if Input.dwMousePositionX then
+    Input.MousePositionX, Input.dwMousePositionX = Input.dwMousePositionX, nil
+  end
+  if Input.dwMousePositionY then
+    Input.MousePositionY, Input.dwMousePositionY = Input.dwMousePositionY, nil
+  end
+
   if Input.dwSizeX then
     Input.SizeX, Input.dwSizeX = Input.dwSizeX, nil
   end
@@ -104,6 +110,7 @@ end ---- RepairInput
 function far.ParseInput (Input) --> (VirKey, FarKey)
 
   if LFVer >= 3 then
+    logShow(Input)
     local c = Input.UnicodeChar
     if type(c) == 'number' then
       Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
@@ -117,6 +124,13 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
     far.RepairInput(Input)
     if Input.ButtonState then
       Input.EventType = F.MOUSE_EVENT
+      --[[
+      ButtonState
+      EventFlags
+      ControlKeyState
+      MousePositionX
+      MousePositionY
+      --]]
       return
     end
 
@@ -135,9 +149,7 @@ end ---- ParseInput
 -- WARN: Call far.Parse...Event(...) before using args in Process...Event.
 
 local EE_REDRAW = F.EE_REDRAW
-local EE_REDRAW_ALL = 0
-local EE_CLOSE = F.EE_CLOSE
-local VE_CLOSE = F.VE_CLOSE
+--local EE_REDRAW_ALL = 0
 
 local NullParamEditorEvents = {
   [F.EE_GOTFOCUS]  = true,

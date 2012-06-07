@@ -13,12 +13,14 @@ local SendDlgMessage = far.SendDlgMessage
 local LFVer = context.use.LFVer
 
 local bit = LFVer >= 3 and bit64 or bit
-local band, bor  = bit.band, bit.bor
-local bnot, bxor = bit.bnot, bit.bxor
+local band = bit.band
+local bnot = bit.bnot
+--local band, bor  = bit.band, bit.bor
+--local bnot, bxor = bit.bnot, bit.bxor
 
 local utils = require 'context.utils.useUtils'
 
-local log = require "context.samples.logging"
+--local log = require "context.samples.logging"
 
 --[[
   This module for temporary include to far3 for replace far2.dialog.

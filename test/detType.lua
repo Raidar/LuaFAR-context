@@ -6,7 +6,6 @@
   -- Тест: Определение типа.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 ----------------------------------------
 local farMsg = far.Message
@@ -18,30 +17,34 @@ if not context then
   return
 end
 
-local cfgReg = ctxdata.reg
+--local cfgReg = ctxdata.reg
 local readCfg = context.config.read
 
 if not readCfg then
   farMsg("No types for detect\n\n"..
               "'LuaFAR context' pack is required\n", "test_detType")
   return
-end -- if
+end
 
 local utils = require 'context.utils.useUtils'
 
 ----------------------------------------
+--[[
 local dbg = require "context.utils.useDebugs"
 local logShow = dbg.Show
+--]]
 
 --readCfg(cfgReg.types) -- Reading types_config -- don't work!
 
 local PluginPath = utils.PluginPath
 
+--[[
 -- Protected require.
 local function prequire (modname)
   local st, res = pcall(require, modname)
   return st and res or nil
 end -- prequire
+--]]
 
 local detect = context.detect
 
@@ -86,7 +89,7 @@ local function getFilesType (FileList, detTypeFunc, f) --> (table) or nil
   if not detTypeFunc then return nil, 'no detect function' end
   local t, tf = {}, f or {}
   local checkFline = f.firstline
-  for k, v in ipairs(FileList) do
+  for _, v in ipairs(FileList) do
     tf.name = v.name
     tf.filename = v.name
     tf.path = v.path
@@ -143,7 +146,7 @@ local function testTypesCfg (...)
   --logShow(DetFuncKinds, 'test_detType DetFuncKinds', 2)
   if DetFuncKinds == nil then DetFuncKinds = { "default" } end
 
-  local FileList, Data = {}
+  local FileList = {}
   local Path, Name
   for k, v in ipairs(DirList) do
     if not v.FileAttributes:find('d', 1, true) then
@@ -153,11 +156,6 @@ local function testTypesCfg (...)
   end
   --logShow(FileList, 'test_detType Files List', 2)
 
-  local detFunc
-  local f   -- Detect file information
-  local t   -- Type of files information
-  local res -- Test result information
-
   local Caption = "type detect (det ~= exp): "
 
   for k, v in ipairs(DetFuncKinds) do
@@ -165,7 +163,9 @@ local function testTypesCfg (...)
     local Title = Caption..(v or "#"..tostring(k))
     --logShow(DetFuncsInfo, Title)
     if detFunc then
-      f, res = {}
+      local f = {}  -- Detect file information
+      local t       -- Type of files information
+      local res     -- Test result information
       t = getFilesType(FileList, detFunc, f)
       res = cmpFilesType(nil, t, 'bymask')
       farMsg(table.concat(res, '\n'), Title)

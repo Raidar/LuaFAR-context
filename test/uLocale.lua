@@ -6,15 +6,14 @@
   -- Тест: Использование локализации.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 ----------------------------------------
-local context = context
+--local context = context
 
 local locale = require 'context.utils.useLocale'
 
 ----------------------------------------
---[[
+-- [[
 local dbg = require "context.utils.useDebugs"
 local logShow = dbg.Show
 --]]
@@ -22,8 +21,9 @@ local logShow = dbg.Show
 --------------------------------------------------------------------------------
 local scriptPath = "context\\test\\"
 
-local Custom = {
-} ---
+--local Custom = {
+--} ---
+
 
 local DefCustom = {
   name = "uLocale",

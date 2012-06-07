@@ -13,7 +13,7 @@
   -- areas: any.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
+--local _G = _G
 
 ----------------------------------------
 local context = context
@@ -26,13 +26,16 @@ if context.use.AsFAR3 then return end
 context.use.AsFAR3 = true
 
 ----------------------------------------
---bit64 = bit
-local band, bor  = bit.band, bit.bor
-local bnot, bxor = bit.bnot, bit.bxor
---local bshl, bshr = bit.lshift, bit.rshift
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
 
 ----------------------------------------
-local log = require "context.samples.logging"
+--bit64 = bit
+local band, bor  = bit.band, bit.bor
+--local bnot, bxor = bit.bnot, bit.bxor
+--local bshl, bshr = bit.lshift, bit.rshift
 
 --------------------------------------------------------------------------------
 
@@ -466,11 +469,12 @@ do
                end
                return Functions[k](...)
              end ----
-    local s = k:match(sFarEditor)
+    local s
+    s = k:match(sFarEditor)
     if s then
       editor[s] = far[k]
     end
-    local s = k:match(sFarViewer)
+    s = k:match(sFarViewer)
     if s then
       editor[s] = far[k]
     end
@@ -613,7 +617,7 @@ do
   end
 end -- do
 
---[[ TODO: build > 2704, excluding:
+--[[ TODO: build > 2720, excluding:
            -- Macros:
            2576, 2629 (добавки),
            2626 (ограничение на имена клавиш),

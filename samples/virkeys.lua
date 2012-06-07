@@ -9,7 +9,7 @@ local InputRecordToName = fkeys.InputRecordToName
 local VKeys = win.GetVirtualKeys()
 
 local count = 0
-for k, v in pairs(VKeys) do
+for k, _ in pairs(VKeys) do
   if type(k) == 'number' and k > count then
     count = k
   end

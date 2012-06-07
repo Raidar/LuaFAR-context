@@ -21,7 +21,7 @@ local tps = {
 local t = {}
 
 for _, t1 in pairs(tps) do
-  for __, t2 in pairs(tps) do
+  for _, t2 in pairs(tps) do
      t[#t+1] = ('%s %s %s'):format(t1, t1:isType(t2) and 'is' or 'is not', t2)
   end
 end

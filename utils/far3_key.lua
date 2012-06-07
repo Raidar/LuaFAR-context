@@ -6,9 +6,10 @@
   -- Скрипт совместимости обработки клавиш с FAR3 для временного использования.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
+--local _G = _G
 
-local pairs, ipairs = pairs, ipairs
+local pairs = pairs
+--local pairs, ipairs = pairs, ipairs
 
 -- INPUT_RECORD (build 2103—2104):
 
@@ -17,8 +18,8 @@ local keyUt = require "Rh_Scripts.Utils.keyUtils"
 ----------------------------------------
 local bit = bit64
 local band, bor = bit.band, bit.bor
-local bnot, bxor = bit.bnot, bit.bxor
-local bshl, bshr = bit.lshift, bit.rshift
+--local bnot, bxor = bit.bnot, bit.bxor
+--local bshl, bshr = bit.lshift, bit.rshift
 
 ----------------------------------------
 local far = far
@@ -30,11 +31,11 @@ local context = context
 
 --local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
-local numbers = require 'context.utils.useNumbers'
+--local numbers = require 'context.utils.useNumbers'
 
 local tconcat, tfind = table.concat, tables.find
 
-local hex = numbers.hex8 -- for far.Message
+--local hex = numbers.hex8 -- for far.Message
 
 local far23 = context.use.far23
 
@@ -128,7 +129,7 @@ local FKM_ = {
 local EXTENDED_KEY_BASE   = FKB_.EXTENDED_KEY_BASE
 local INTERNAL_KEY_BASE   = FKB_.INTERNAL_KEY_BASE
 local INTERNAL_KEY_BASE_2 = FKB_.INTERNAL_KEY_BASE_2
-local KEY_OP_BASE         = FKB_.KEY_OP_BASE
+--local KEY_OP_BASE         = FKB_.KEY_OP_BASE
 
 -- Код KEY_ клавиш по их названию.
 local FK_ = {
@@ -742,7 +743,7 @@ function unit.InputRecordToName (Rec, isSeparate) --> (string)
 end ---- InputRecordToName
 
 function unit.NameToInputRecord (Name) --> (table)
-  local k = 0 / 0
+  local _ = 0 / 0
   local VState, VName = NameToKeyState(Name)
 
   VName = tfind(VKey_Names, VName) or VName

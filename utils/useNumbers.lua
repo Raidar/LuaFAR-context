@@ -12,18 +12,17 @@
   -- group: LFc utils.
 --]]
 --------------------------------------------------------------------------------
-local _G = _G
 
 local floor = math.floor
 
 ----------------------------------------
-local bit = bit64
-local band, bor  = bit.band, bit.bor
-local bnot, bxor = bit.bnot, bit.bxor
-local bshl, bshr = bit.lshift, bit.rshift
+--local bit = bit64
+--local band, bor  = bit.band, bit.bor
+--local bnot, bxor = bit.bnot, bit.bxor
+--local bshl, bshr = bit.lshift, bit.rshift
 
 ----------------------------------------
-local win, far = win, far
+--local win, far = win, far
 
 ----------------------------------------
 --[[
