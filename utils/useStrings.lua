@@ -140,6 +140,25 @@ function unit.s2b (s, default) --< (string) --> (bool)
   if v ~= nil then return v else return default end -- Without and-or!
 end ---- s2b
 
+do
+  local tostring = tostring
+  local sbyte = string.byte
+
+-- Quote a string.
+-- Заключение строки в кавычки.
+function unit.quote (s) --< (string) --> (string)
+  --[[
+  local function ctlesc (s1, s2)
+    return s1..tostring(sbyte(s2))
+  end --
+
+  return ("%q"):format(s):gsub("([^%\]%\)([\001-\031])", ctlesc)
+  --]]
+  return ("%q"):format(s)
+end ---- quote
+
+end -- do
+
 ---------------------------------------- Unicode
 do
   local schar, sbyte = string.char, string.byte

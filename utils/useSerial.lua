@@ -47,6 +47,7 @@ local luaIdentMask = lua.IdentMask
 local MaxNumberInt = numbers.MaxNumberInt
 
 local spaces = strings.spaces -- for ...ToText
+local squote = strings.quote -- for quoting string
 
 ----------------------------------------
 --[[
@@ -85,6 +86,8 @@ local function ValToStr (value) --> (string | nil, type)
       return "math.huge"
     elseif -value == mhuge then
       return "-math.huge"
+    elseif value ~= value then
+      return "0/0"
     end
 
     -- integer:
@@ -98,7 +101,8 @@ local function ValToStr (value) --> (string | nil, type)
   end
 
   if tp == 'string' then
-    return ("%q"):format(value) -- "string"
+    return squote(value) -- "string"
+    --return ("%q"):format(value) -- "string"
   end
 
   return nil, tp
@@ -240,6 +244,7 @@ local i2s, r2s = numbers.i2s, numbers.r2s
 local function ValToText (value, kind) --> (string | nil, type)
   local tp = type(value)
 
+  --far.Message(tostring(value), tp)
   -- boolean:
   if tp == 'boolean' then
     return tostring(value)
@@ -250,6 +255,8 @@ local function ValToText (value, kind) --> (string | nil, type)
       return "math.huge"
     elseif -value == mhuge then
       return "-math.huge"
+    elseif value ~= value then
+      return "0/0"
     end
 
     local iskey, f = kind.iskey
@@ -293,7 +300,8 @@ local function ValToText (value, kind) --> (string | nil, type)
     end
 
     -- quoted:
-    return ("%q"):format(value) -- "string"
+    return squote(value) -- "string"
+    --return ("%q"):format(value) -- "string"
   end
 
   return nil, tp
@@ -372,6 +380,7 @@ local statpairs = tables.statpairs
 --]]
 local function TabToText (name, data, kind, write) --| (write)
 
+  --far.Message(tostring(data), name)
   --logShow(name)
   local level = kind.level -- Prior level
   local fname = kind.fname or name

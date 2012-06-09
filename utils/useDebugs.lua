@@ -150,25 +150,6 @@ local function sfind (s, pat) --> (bool)
 end --
 unit.sfind = sfind
 
---[[
--- Convert to string checking quotes.
-local function str (s, filter) --> (string)
-  return sfind(filter, "'") and format("'%s'", s or "") or
-         sfind(filter, 'q') and s or ("%q"):format(s)
-end --
---unit.str = str
---]]
-
---[[
-local floor = math.floor
-
--- Check table key to array-part index.
-local function isArrayKey (k, t) --> (bool)
-  return k > 0 and k <= #t and k == floor(k)
-end --
-unit.isArrayKey = isArrayKey
---]]
-
 -- Check field type to exclude.
 local function isUnfitValType (tp, filter) --> (bool)
   return sfind(filter, Types[tp] or '?')
