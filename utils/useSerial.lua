@@ -81,7 +81,11 @@ local function ValToStr (value) --> (string | nil, type)
   if tp == 'boolean' then return tostring(value) end
 
   if tp == 'number' then
-    if value == mhuge then return "math.huge" end
+    if value == mhuge then
+      return "math.huge"
+    elseif -value == mhuge then
+      return "-math.huge"
+    end
 
     -- integer:
     if value == modf(value) and value <= MaxNumberInt then
@@ -242,7 +246,11 @@ local function ValToText (value, kind) --> (string | nil, type)
   end
 
   if tp == 'number' then
-    if value == mhuge then return "math.huge" end
+    if value == mhuge then
+      return "math.huge"
+    elseif -value == mhuge then
+      return "-math.huge"
+    end
 
     local iskey, f = kind.iskey
 

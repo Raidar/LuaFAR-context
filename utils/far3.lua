@@ -617,7 +617,7 @@ do
   end
 end -- do
 
---[[ TODO: build > 2720, excluding:
+--[[ TODO: build > 2725, excluding:
            -- Macros:
            2576, 2629 (добавки),
            2626 (ограничение на имена клавиш),
