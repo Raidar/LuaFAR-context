@@ -1,0 +1,33 @@
+local Data
+
+Data = {
+  [true] = {
+    {
+      ["co\
+l or"] = "bl\"ue",
+      str = "\"\
+'\\\000",
+      text = "ha'ns",
+    },
+  },
+  [false] = 2,
+  [math.huge] = -math.huge,
+  c = false, -- Data
+  x = 1,
+  ["label 2"] = false, -- Data[true][1]
+  list = {
+    "a",
+
+    [4] = "f",
+    [5] = "g",
+    [7] = {},
+    [9] = "i",
+  },
+  nan = 0/0,
+  ["true"] = "some value",
+}
+
+Data.c = Data
+Data["label 2"] = Data[true][1]
+
+return Data

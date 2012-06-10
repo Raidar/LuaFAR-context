@@ -1,0 +1,30 @@
+--[[ uSerial2: Source ]]--
+
+--------------------------------------------------------------------------------
+--[[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
+
+local b = {text="ha'ns", ['co\nl or']='bl"ue', str="\"\n'\\\000"}
+local c = function() return 1 end
+local a = {
+  x=1, [true] = {b}, [not true]=2, -- boolean as key
+  ['true'] = 'some value', -- keyword as a key
+  z = c, -- function as value
+  list={'a',nil,nil, -- embedded nils
+        [9]='i','f',[5]='g',[7]={}}, -- empty table
+  [c] = print, -- function as key, global as value
+  [io.stdin] = 3, -- global userdata as key
+  ['label 2'] = b, -- shared reference
+  nan = 0/0, -- undefined value as value
+  [b] = 0/0, -- table as key, undefined value as value
+  [math.huge] = -math.huge, -- huge as number value
+}
+a.c = a -- self-reference
+a[a] = a -- self-reference with table as key
+
+--------------------------------------------------------------------------------
+return a
+--logShow(a)
+--------------------------------------------------------------------------------
