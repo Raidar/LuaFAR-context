@@ -9,7 +9,7 @@
 --[[ uses:
   LuaFAR,
   LF context.
-  -- group: Locale, Datas.
+  -- group: Datas, Locale.
 --]]
 --------------------------------------------------------------------------------
 
