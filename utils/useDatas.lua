@@ -158,7 +158,7 @@ function unit.load (fullname, t, kind) --> (table | nil, error)
   local u = setfenv(chunk, env)()
   if u == nil then u = env.Data end
   if u == nil and t == nil then
-    return nil, Msgs.FileDataNotFound:format(name)
+    return nil, Msgs.FileDataNotFound:format(fullname)
   end
 
   return addData(t, u, kind or 'update', pairs, false)
