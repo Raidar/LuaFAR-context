@@ -37,6 +37,12 @@ local types = cfgDat.types
 far.Show("types", unpack(types))
 --]]
 
+----------------------------------------
+-- [[
+local dbg = require "context.utils.useDebugs"
+local logShow = dbg.Show
+--]]
+
 --------------------------------------------------------------------------------
 local unit = {}
 
@@ -152,6 +158,7 @@ end --
 end -- do
 
 local function reloadEditorConfig (id) --| editors
+  --logShow({ "reset", editor.GetInfo() })
   editors.current = nil           -- reset
   local current = editors.current -- new config via mt
   editors.current = current
@@ -200,6 +207,8 @@ do
 function unit.editorEvent (id, event, param)
   local eid = id
   if event == EE_READ then
+    --logShow(eid, "EE_READ")
+    --logShow(editor.GetInfo())
     eid = editor.GetInfo().EditorID -- TEST and DELETE
     reloadEditorConfig(eid)
     --far.Message(('%i %s'):format(eid, editors.current.type))

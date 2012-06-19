@@ -36,7 +36,7 @@ local useprofiler = false
 if useprofiler then require "profiler" end -- Lua Profiler
 
 ----------------------------------------
---[[
+-- [[
 local dbg = require "context.utils.useDebugs"
 local logShow = dbg.Show
 --]]
@@ -119,7 +119,9 @@ do
 -- Чтение первой линии из файла в редакторе.
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
   local k, line, assumed = 0
+  --logShow({ "get", editor.GetInfo() })
   local Info = editor.GetInfo()
+  --logShow(Info)
 
   repeat
     line = EditorGetStr(nil, k, 2)
@@ -129,7 +131,7 @@ function unit.readEditorFirstLine () --> (string, string|nil | nil)
   until check == nil
 
   editor.SetPosition(nil, Info) -- Restore cursor pos!
-  --far.Message(tostring(Info.CurLine)..'\n'..tostring(Info.CurPos), 'Info')
+  --logShow({ "end", editor.GetInfo() })
 
   return line, assumed
 end -- readEditorFirstLine
