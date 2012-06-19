@@ -122,16 +122,16 @@ function unit.readEditorFirstLine () --> (string, string|nil | nil)
   local Info = editor.GetInfo()
 
   repeat
-    line = EditorGetStr(nil, k, 2)
-    local check = checkSkipLines(line)
+    line = EditorGetStr(nil, k)
+    if not line then break end
+    local check = checkSkipLines(line.StringText)
     if check and not assumed then assumed = check end
     k = k + 1
   until check == nil
 
-  editor.SetPosition(nil, Info) -- Restore cursor pos!
   --far.Message(tostring(Info.CurLine)..'\n'..tostring(Info.CurPos), 'Info')
 
-  return line, assumed
+  return line and line.StringText, assumed
 end -- readEditorFirstLine
 
 end -- do
