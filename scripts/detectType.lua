@@ -119,21 +119,17 @@ do
 -- Чтение первой линии из файла в редакторе.
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
   local k, line, assumed = 0
-  --logShow({ "get", editor.GetInfo() })
-  local Info = editor.GetInfo()
-  --logShow(Info)
 
+  -- FAR API SetPosition bug workaround (by Shmuel):
   repeat
-    line = EditorGetStr(nil, k, 2)
-    local check = checkSkipLines(line)
+    line = EditorGetStr(nil, k)
+    if not line then break end
+    local check = checkSkipLines(line.StringText)
     if check and not assumed then assumed = check end
     k = k + 1
   until check == nil
 
-  editor.SetPosition(nil, Info) -- Restore cursor pos!
-  --logShow({ "end", editor.GetInfo() })
-
-  return line, assumed
+  return line and line.StringText, assumed
 end -- readEditorFirstLine
 
 end -- do
