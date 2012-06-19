@@ -119,7 +119,6 @@ do
 -- Чтение первой линии из файла в редакторе.
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
   local k, line, assumed = 0
-  local Info = editor.GetInfo()
 
   repeat
     line = EditorGetStr(nil, k)
@@ -129,6 +128,7 @@ function unit.readEditorFirstLine () --> (string, string|nil | nil)
     k = k + 1
   until check == nil
 
+  --local Info = editor.GetInfo()
   --far.Message(tostring(Info.CurLine)..'\n'..tostring(Info.CurPos), 'Info')
 
   return line and line.StringText, assumed
