@@ -13,7 +13,7 @@
 --]]
 --------------------------------------------------------------------------------
 
-local floor = math.floor
+local floor, ceil = math.floor, math.ceil
 
 ----------------------------------------
 --local bit = bit64
@@ -120,6 +120,16 @@ end ----
 function unit.max2 (x, y) --> (number)
   return y <= x and x or y
 end ----
+
+-- Round of number.
+-- Округление числа.
+function unit.round (x) --> (number)
+  if x >= 0 then
+    return floor(x + 0.5)
+  else
+    return ceil(x - 0.5)
+  end
+end -- round
 
 ---------------------------------------- Numbers
 -- Increment of 2 numbers.

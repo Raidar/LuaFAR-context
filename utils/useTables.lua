@@ -183,7 +183,7 @@ function unit.clone (t, usemeta, tpairs) --> (table)
     for k, v in tpairs(t) do u[_clone(k)] = _clone(v, usemeta) end
 
     return usemeta and setmetatable(u, getmetatable(t)) or u
-  end --function _clone
+  end -- _clone
 
   return _clone(t, usemeta)
 end ---- clone
