@@ -185,9 +185,12 @@ local function reloadViewerConfig (id) --| viewers
 end -- reloadViewerConfig
 
 -- Change type for areaid config.
-function unit.changeType (areaid, newtype)
+function unit.changeType (areaid, newtype, force)
+  if not newtype then return end
+
   local oldtype = rawget(areaid, 'type')
-  if not newtype or newtype == oldtype then return end
+  if not force and newtype == oldtype then return end
+
   handleEvent('changeType', oldtype, false)
   areaid.type = newtype
   handleEvent('changeType', newtype, true)
