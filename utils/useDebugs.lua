@@ -41,7 +41,7 @@ local serial = require 'context.utils.useSerial'
 local spaces = strings.spaces -- for ShowData
 
 ----------------------------------------
--- [[
+--[[
 local log = require "context.samples.logging"
 local logShow = log.Show
 --]]
