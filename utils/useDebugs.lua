@@ -519,11 +519,13 @@ unit.BKeys = {
   -- @params: @see unit.Show.
   kind    (t|nil) - conversion kind: @fields additions:
     ShowMenu (func) - function to show menu with tabulized data.
+    ShowLineNumber (bool) - show line numbers (@default = true).
   -- @return: @see kind.Show.
 --]]
 function unit.ShowData (data, name, kind) --| (menu)
   local kind = kind or {}
   local ShowMenu = kind.ShowMenu or far.Menu
+  local ShowLineNumber = kind.ShowLineNumber == nil or kind.ShowLineNumber
 
   local Separ = unit.Separ
   local TextFmt = unit.TextFmt
@@ -535,16 +537,22 @@ function unit.ShowData (data, name, kind) --| (menu)
     local m, sp = tostring(k)
     local isnum = true
     for s in v:gmatch("[^\n]+") do
-      if isnum then
-        isnum = false
-        sp = spaces[nlen - slen(m)]
+      if ShowLineNumber then
+        if isnum then
+          isnum = false
+          sp = spaces[nlen - slen(m)]
+        else
+          m = ""
+          sp = spaces[nlen]
+        end
+        items[#items + 1] = {
+          text = format(TextFmt, sp, m, Separ, s),
+        }
       else
-        m = ""
-        sp = spaces[nlen]
+        items[#items + 1] = {
+          text = s,
+        }
       end
-      items[#items + 1] = {
-        text = format(TextFmt, sp, m, Separ, s),
-      }
     end
   end
 
