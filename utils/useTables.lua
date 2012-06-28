@@ -481,6 +481,7 @@ end ---- list
   Use this function instead of 'pairs' for right search of all config fields.
 --]]
 do
+  --local ulog = false
   local t_list = unit.list
 
 -- 'pairs' function with metatables support.
@@ -494,11 +495,14 @@ do
 function unit.allpairs (t, make, ...) --> (func)
   if not t then return end
   local list = (make or t_list)(t, ...) -- tables list
+  --if #list == 2 and list[1].CurrentClause then ulog = true end
+  --if ulog then logShow(list) end
 
   local n, k, v = #list
   local function _next ()
     while n > 0 do
       k, v = next(list[n], k)
+      --if ulog then logShow{ n, k, v } end
 
       if k ~= nil then
         local m = n - 1 -- Find in previous tables:
@@ -513,6 +517,7 @@ function unit.allpairs (t, make, ...) --> (func)
         n, list[n] = n - 1, nil
       end
     end
+    --ulog = false
     --return nil, nil, 0
   end --
 
