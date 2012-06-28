@@ -94,6 +94,20 @@ function unit.r2s (n, prec) --> (string)
   return format(format(f, prec or DefaultRealPrec), fr, exp)
 end ---- r2s
 
+  local gsub, reverse = string.gsub, string.reverse
+
+-- Convert an integer number to string with thousand separator.
+-- Преобразование целого числа в строку с разделителем тысяч.
+function unit.n2s (n, fmt, milsep, force) --> (string)
+  n = n or 0
+
+  local s = format(fmt or "%.f", n)
+  if n < 1000 or (not force and n < 10000) then return s end
+
+  --return s:reverse():gsub("...","%0"..milsep):reverse()
+  return reverse(gsub(reverse(s), "...", "%0"..(milsep or " ")))
+end ---- n2s
+
 end -- do
 
 -- Convert a boolean to number.
