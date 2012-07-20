@@ -36,7 +36,7 @@ local useprofiler = false
 if useprofiler then require "profiler" end -- Lua Profiler
 
 ----------------------------------------
---[[
+-- [[
 local dbg = require "context.utils.useDebugs"
 local logShow = dbg.Show
 --]]
@@ -120,6 +120,7 @@ do
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
   local k, line, assumed = 0
 
+  -- FAR API SetPosition bug workaround (by Shmuel):
   repeat
     line = EditorGetStr(nil, k)
     if not line then break end
@@ -127,9 +128,6 @@ function unit.readEditorFirstLine () --> (string, string|nil | nil)
     if check and not assumed then assumed = check end
     k = k + 1
   until check == nil
-
-  --local Info = editor.GetInfo()
-  --far.Message(tostring(Info.CurLine)..'\n'..tostring(Info.CurPos), 'Info')
 
   return line and line.StringText, assumed
 end -- readEditorFirstLine

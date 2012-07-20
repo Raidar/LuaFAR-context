@@ -18,6 +18,12 @@ require "context.initiate"               -- LFc initiate
 MakeResident(require "context.resident") -- LFc resident
 --
 --]]
+----------------------------------------
+-- [[
+local log = require "context.samples.logging"
+local logShow = log.Show
+--]]
+
 --------------------------------------------------------------------------------
 -- Type autodetect functions
 local handle = context.handle
@@ -25,6 +31,8 @@ ctxdata.isResident = true
 
 ----------------------------------------
 function ProcessEditorEvent (id, event, param)
+  --logShow({ id, event, param })
+  --logShow(editor.GetInfo())
   id, event, param = far.ParseEditorEvent(id, event, param)
   handle.editorEvent(id, event, param)
   return 0

@@ -503,8 +503,12 @@ unit.Separ = "│"
 unit.TextFmt = "%s%s%s%s"
 --unit.TextFmt = "%s%s %s %s"
 unit.BKeys = {
-  {BreakKey = 'RETURN'},
-  {BreakKey = 'SPACE'}
+  { BreakKey = 'RETURN' },
+  { BreakKey = 'SPACE' },
+  -- Copy to clipboard:
+  { BreakKey = 'C', Action = "Copy" },    -- original text
+  { BreakKey = 'X', Action = "CopyEx" },  -- text with numbers
+  { BreakKey = 'Z', Action = "CopyAs" },  -- text without numbers
 } ---
 
   local slen = string.len
@@ -549,7 +553,34 @@ function unit.ShowData (data, name, kind) --| (menu)
     Flags = 'FMENU_SHOWAMPERSAND',
   } ---
 
-  return ShowMenu(props, items, unit.BKeys)
+  local Item = ShowMenu(props, items, unit.BKeys)
+
+  if Item and Item.Action then
+    --logShow(Item, "Item")
+    if string.find(Item.Action, "Copy", 1, true) == 1 then
+      local s
+      if Item.Action == "Copy" then
+        s = tconcat(data, "\n")
+      elseif Item.Action == "CopyEx" then
+        local t = {}
+        for k, v in ipairs(items) do
+          t[k] = v.text
+        end
+        s = tconcat(t, "\n")
+      elseif Item.Action == "CopyAs" then
+        local t = {}
+        local f = format("^(.-%s)", unit.Separ)
+        --logShow(f)
+        for k, v in ipairs(items) do
+          t[k] = v.text:gsub(f, "")
+        end
+        s = tconcat(t, "\n")
+      end
+      far.CopyToClipboard(s)
+    end
+  end
+
+  return Item
 end ---- ShowData
 
 -- Show data based on far.Show.

@@ -480,7 +480,7 @@ local function LocNameToLatKey (KeyStr) --> (number)
   end
 
   return Key
-end --function LocNameToLatKey
+end -- LocNameToLatKey
 
 local function FarModToKeyState (FarMod) --> (table)
   local KeyState = 0

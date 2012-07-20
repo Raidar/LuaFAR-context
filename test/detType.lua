@@ -102,7 +102,7 @@ local function getFilesType (FileList, detTypeFunc, f) --> (table) or nil
   f.firstline = checkFline
 
   return t
-end --function getFilesType
+end -- getFilesType
 
 local function cmpFilesType (t, FilesType, kind) --> (table | nil, error)
   if not FilesType then return nil, 'no file types' end
@@ -121,7 +121,7 @@ local function cmpFilesType (t, FilesType, kind) --> (table | nil, error)
   t[#t+1] = "--- end ---"
 
   return t
-end --function cmpFilesType
+end -- cmpFilesType
 
 local PathNamePattern = '^(.-)([^\\/]+)$'
 
