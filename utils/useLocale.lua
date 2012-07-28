@@ -21,7 +21,7 @@ local setmetatable = setmetatable
 
 local strings = require 'context.utils.useStrings'
 local utils = require 'context.utils.useUtils'
---local tables = require 'context.utils.useTables'
+local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
 
 local languages = require "context.data.languages" -- languages and codes
@@ -287,7 +287,7 @@ end ---- free
 -- Show localization error message.
 -- Показ сообщения об ошибке локализации.
 function unit.showError (...)
-  return utils.warning('Localization', utils.concat(...), 'l')
+  return utils.warning('Localization', tables.concat(...), 'l')
 end ----
 
 ---------------------------------------- Methods

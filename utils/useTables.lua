@@ -435,7 +435,9 @@ function unit.hpairs (t) --> (func)
   if not t then return end
 
   local skip = {}
-  for i in ipairs(t) do skip[i] = true end
+  for i in ipairs(t) do
+    skip[i] = true
+  end
 
   local k
   local function _next ()
