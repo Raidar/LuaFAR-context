@@ -167,7 +167,8 @@ end -- do
 ---------------------------------------- FAR
 -- Plugin path.
 function unit.pluginPath ()
-  return far.PluginStartupInfo().ModuleDir
+  return far.PluginStartupInfo().ModuleDir or
+         far.PluginStartupInfo().ModuleName:match("(.*[/\\])") -- FAR23
 end --
 
 unit.PluginPath = unit.pluginPath() -- Current plugin path
