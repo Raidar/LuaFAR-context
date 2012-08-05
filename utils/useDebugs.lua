@@ -546,10 +546,12 @@ function unit.ShowData (data, name, kind) --| (menu)
           sp = spaces[nlen]
         end
         items[#items + 1] = {
+          line = k,
           text = format(TextFmt, sp, m, Separ, s),
         }
       else
         items[#items + 1] = {
+          line = k,
           text = s,
         }
       end
