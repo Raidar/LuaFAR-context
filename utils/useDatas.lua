@@ -359,39 +359,40 @@ do
 -- Warning: Fields with '*' are required, others are optional.
 --[[
 local defCustom = {
- *name = ScriptName,  -- имя скрипта (для формирования имён файлов).
- *path = ScriptPath,  -- относительный путь к файлам скрипта.
-  base = PluginPath,  -- базовая часть пути для файлов скрипта.
+ *name = ScriptName,    -- имя скрипта (для формирования имён файлов).
+ *path = ScriptPath,    -- относительный путь к файлам скрипта.
+  base = PluginPath,    -- базовая часть пути для файлов скрипта.
 
   -- Options: -- Опции скрипта.
-  options = {},       -- таблица параметров, настраиваемых скриптом.
+  options = {},         -- таблица параметров, настраиваемых скриптом.
 
   -- Common:  -- Общие параметры:
-  label = '',         -- обозначение скрипта (обычно сокращённое).
-  file  = '',         -- общая часть имени (без расширения) для файлов.
+  label = '',           -- обозначение скрипта (обычно сокращённое).
+  file  = '',           -- общая часть имени (без расширения) для файлов.
 
   -- History:
   history = { -- История (обработка настроек скрипта):
-    field = name,     -- поле настроек скрипта в таблице файла.
-    dir  = '',        -- каталог файла.
-    name = '',        -- имя файла (без расширения).
-    ext  = '.cfg',    -- расширение файла.
-    file = '',        -- относительный путь и имя файла.
+    field = name,       -- поле настроек скрипта в таблице файла.
+    dir  = '',          -- каталог файла.
+    name = '',          -- имя файла (без расширения).
+    ext  = '.cfg',      -- расширение файла.
+    file = '',          -- относительный путь и имя файла.
   },
 
   -- Help:
   help = {    -- Справка по скрипту:
-    ext  = '.hlf',    -- расширение файла.
-    topic = '',       -- название темы.
-    tlink = '',       -- ссылка на тему.
+    ext  = '.hlf',      -- расширение файла.
+    topic = '',         -- название темы.
+    tlink = '',         -- ссылка на тему.
   },
 
   -- Locale:
   locale = {  -- Файлы локализации скрипта:
-    kind = 'both',    -- способ обработки файлов.
-    ext  = '.lua',    -- расширение файлов.
+    kind = 'both',      -- способ обработки файлов.
+    ext  = '.lua',      -- расширение файлов.
     dir  = "locales\\", -- каталог файлов.
-    path = '',        -- относительный путь к файлам.
+    pdir = nil,         -- относительный путь к каталогу файлов.
+    path = '',          -- относительный путь к файлам.
   }
 } --- defCustom
 --]]
@@ -425,15 +426,17 @@ function unit.customize (Custom, defCustom) --> (table)
   u.ext   = u.ext  or '.cfg'
   u.dir   = u.dir  or ''
   u.name  = u.name or name..u.ext
-  u.file  = u.file or f_fpath:format(path, u.dir, u.name)
+  u.path  = u.path or path
+  u.file  = u.file or f_fpath:format(u.path, u.dir, u.name)
   u.full  = t.base..u.file
 
   -- Help:
   u = t.help or {}; t.help = u
-  u.ext   = u.ext  or '.hlf'
   u.file  = u.file or t.file or name
+  u.ext   = u.ext  or '.hlf'
   u.topic = u.topic or u.file
-  u.tlink = u.tlink or f_tlink:format(t.base, path, u.topic)
+  u.path  = u.path or path
+  u.tlink = u.tlink or f_tlink:format(t.base, u.path, u.topic)
 
   -- Locale:
   u = t.locale or {}; t.locale = u
@@ -441,8 +444,10 @@ function unit.customize (Custom, defCustom) --> (table)
   u.file = u.file or t.file or name
   u.ext  = u.ext  or '.lua'
   u.dir  = u.dir or 'locales\\'
-  u.path = u.path or path..u.dir
-  u.fullpath = t.base..u.path
+  u.pdir = u.pdir or path
+  u.path = u.pdir..u.dir
+  --u.path = u.path or u.pdir..u.dir
+  --u.fullpath = t.base..u.path
   --logShow(t, "data")
 
   return t
