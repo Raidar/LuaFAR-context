@@ -368,20 +368,25 @@ local defCustom = {
 
   -- Common:  -- Общие параметры:
   label = '',           -- обозначение скрипта (обычно сокращённое).
-  file  = '',           -- общая часть имени (без расширения) для файлов.
+  file  = '',           -- общая часть имени (без расширения)
+                           для файлов справки и локализации.
 
   -- History:
   history = { -- История (обработка настроек скрипта):
     field = name,       -- поле настроек скрипта в таблице файла.
     dir  = '',          -- каталог файла.
-    name = '',          -- имя файла (без расширения).
     ext  = '.cfg',      -- расширение файла.
-    file = '',          -- относительный путь и имя файла.
+    name = '',          -- имя файла с расширением.
+    path = '',          -- относительный путь к файлу.
+    file = '',          -- относительный путь с именем файла.
+    full = '',          -- полный путь с именем файла.
   },
 
   -- Help:
   help = {    -- Справка по скрипту:
     ext  = '.hlf',      -- расширение файла.
+    file = '',          -- имя файла.
+    path = '',          -- относительный путь к файлу.
     topic = '',         -- название темы.
     tlink = '',         -- ссылка на тему.
   },
@@ -389,8 +394,9 @@ local defCustom = {
   -- Locale:
   locale = {  -- Файлы локализации скрипта:
     kind = 'both',      -- способ обработки файлов.
-    ext  = '.lua',      -- расширение файлов.
     dir  = "locales\\", -- каталог файлов.
+    ext  = '.lua',      -- расширение файлов.
+    file = '',          -- общее имя файлов.
     pdir = nil,         -- относительный путь к каталогу файлов.
     path = '',          -- относительный путь к файлам.
   }
@@ -423,8 +429,8 @@ function unit.customize (Custom, defCustom) --> (table)
   -- History:
   u = t.history or {}; t.history = u
   u.field = u.field or name
-  u.ext   = u.ext  or '.cfg'
   u.dir   = u.dir  or ''
+  u.ext   = u.ext  or '.cfg'
   u.name  = u.name or name..u.ext
   u.path  = u.path or path
   u.file  = u.file or f_fpath:format(u.path, u.dir, u.name)
@@ -432,18 +438,18 @@ function unit.customize (Custom, defCustom) --> (table)
 
   -- Help:
   u = t.help or {}; t.help = u
-  u.file  = u.file or t.file or name
   u.ext   = u.ext  or '.hlf'
-  u.topic = u.topic or u.file
+  u.file  = u.file or t.file or name
   u.path  = u.path or path
+  u.topic = u.topic or u.file
   u.tlink = u.tlink or f_tlink:format(t.base, u.path, u.topic)
 
   -- Locale:
   u = t.locale or {}; t.locale = u
   u.kind = u.kind or 'both'
-  u.file = u.file or t.file or name
-  u.ext  = u.ext  or '.lua'
   u.dir  = u.dir or 'locales\\'
+  u.ext  = u.ext  or '.lua'
+  u.file = u.file or t.file or name
   u.pdir = u.pdir or path
   u.path = u.pdir..u.dir
   --u.path = u.path or u.pdir..u.dir
