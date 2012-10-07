@@ -617,19 +617,31 @@ do
   end
 end -- do
 
---[[ TODO: build > 2738, excluding:
-           -- Macros:
-           2576, 2629 (добавки),
-           2626 (ограничение на имена клавиш),
-           2663—2664, 2669, 2674 (работа со строками редактора),
-           2672 ($break),
-           -- Others:
-           2580 (PFLAGS_SHORTCUT + FCTL_GETPANELDIRECTORY).
----- TODO: Учитывать в скриптах:
+--[[ TODO: build > 2875, excluding:
+           -- Макросы:
+           2851 (Lua-макросы !!!),
+           2856 (Plugin.Exist),
+           2859 (Panel.Item, panel.setpath, fexist, beep, Window.Scroll),
+           2869 (Plugin.Menu, Plugin.Config, Plugin.Command),
+---- TODO: -- Скрипты:
            2435 (EEREDRAW_), 2438 (EE_CHANGE),
            2478—2479, 2541 (переход на FSSF_…),
            2542, 2544, 2546 (FSSF_…),
-           2564 (sqlite 3.7.11).
+           2804 (DM_GETTEXTLENGTH & DM_GETTEXTPTR удалены),
+           --2810 (добавлена ACTL_ENABLEREDRAW), -- 2818 (удалена),
+           2811 (изменения в ProcessPanelEventInfo),
+           2813 (FSF.CopyToClipboard / FSF.PasteFromClipboard),
+           2815 (EditorBookMarks -> EditorBookmarks),
+           2820 (ViewerInfo.FileName -> VCTL_GETFILENAME),
+           2825 (InfoPanelLine Separator -> Flags + флаг IPLFLAGS_SEPARATOR),
+           2828 (ViewerMode: Wrap&WordWrap -> Flags, Hex -> Type),
+           2834 (PluginPanelItem),
+           2835 (удалена ACTL_EJECTMEDIA),
+           2837 (ProcessConsoleInput), 2843 (ProcessConsoleInputInfo),
+---- TODO: -- Остальное:
+           2580 (PFLAGS_SHORTCUT + FCTL_GETPANELDIRECTORY).
+           2802 (OPEN_COMMANDLINE),
+           2870 (sqlite 3.7.14.1).
 … ]]--
 --[[ TODO: Checking FAR builds: 2246; 2516; 2574(?), 2686(?) ]]--
 
