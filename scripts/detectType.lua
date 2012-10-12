@@ -498,7 +498,9 @@ end --
 function useType.configNextType (ctype, cfg, equiv, field) --> (string)
   --assert(not cfg, "No config for configNextType")
   local field = field or 'inherit'
-  local tp = ctype and cfg[ctype] and cfg[ctype][field] or -- by cfg
+  local tp = ctype and cfg[ctype] and -- by cfg
+               type(cfg[ctype]) == 'table' and
+               cfg[ctype][field] or -- by cfg field
              nextType(ctype, field) -- by types (find next by default)
   return nextConfigType(tp, cfg, equiv, field)
 end ----
