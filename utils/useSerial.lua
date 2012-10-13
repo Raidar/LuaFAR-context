@@ -77,6 +77,8 @@ unit.DefaultSerialTypes = DefaultSerialTypes
 -- Convert field value to string.
 -- Преобразование значения поля в строку.
 local function ValToStr (value) --> (string | nil, type)
+  if value == nil then return 'nil' end
+
   local tp = type(value)
 
   if tp == 'boolean' then return tostring(value) end
@@ -749,7 +751,8 @@ local luaNameToIdent = lua.NameToIdent
   isOk   (bool) - operation success flag.
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
-  if data == nil then return false end
+  --logShow(data)
+  --if data == nil then return end
 
   -- Fix name as lua identifier:
   local name, tp = name, type(name)

@@ -523,6 +523,10 @@ unit.BKeys = {
   -- @return: @see kind.Show.
 --]]
 function unit.ShowData (data, name, kind) --| (menu)
+  if type(data) ~= 'table' then
+    return far.Message(tostring(data), name or unit.Nameless)
+  end
+
   local kind = kind or {}
   local ShowMenu = kind.ShowMenu or far.Menu
   local ShowLineNumber = kind.ShowLineNumber == nil or kind.ShowLineNumber
@@ -611,7 +615,11 @@ function unit.Show (data, name, filter, kind) --| (menu)
   local name = name or unit.Nameless
   local kind = kind or {}
 
+  --logShow(data)
+  --logShow(type(data))
   local ShowData = kind.ShowData or unit.ShowData
+  --logShow(unit.tabulize(name, data, kind, filter))
+  --logShow(type(unit.tabulize(name, data, kind, filter)))
   return ShowData(unit.tabulize(name, data, kind, filter), name, kind)
 end ---- Show
 
