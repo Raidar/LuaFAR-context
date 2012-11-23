@@ -1,5 +1,6 @@
 LuaFAR context pack 3.0x
 
+[Info]
 Ver. : 3.0.4.3
 Date : 2012-11-23
 Ware : Freeware
@@ -23,8 +24,11 @@ Copy : 2009/2012+
 Mail : pmi-rai@narod.ru
 
 Home : http://pmi-rai.narod.ru/
-Link : /Programs/FScripts.htm
+Link : /Programs/FarUsing.htm
 
+Repo : https://github.com/Raidar/LuaFAR-context
+
+[Anons]
   LuaFAR context is a package of scripts for detecting file type
 and working with parameter configuration files linked to file types.
   LuaFAR context — пакет для определения типов файлов и работы
