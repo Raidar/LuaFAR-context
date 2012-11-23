@@ -28,8 +28,6 @@ local context = context
 local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 
-local PluginPath = utils.PluginPath
-
 ----------------------------------------
 --[[
 local log = require "context.samples.logging"
@@ -337,7 +335,21 @@ function unit.history (path, name, kind) --> (object)
 end -- history
 
 -- Create history object.
-function unit.newHistory (name) --> (object)
+function unit.newHistory (data, check) --> (object)
+
+  local tp = type(data)
+
+  local name, path
+  if tp == 'table' then
+    name, path = data.full, data.work
+  elseif tp == 'string' then
+    name = data
+    path = data:match("(.*[/\\])")
+    --logShow(path..'\n'..name)
+  end
+
+  utils.makedir(path)
+  
 if context.use.LFVer >= 3 then
   local history = require "far2.history"
 
@@ -374,31 +386,31 @@ local defCustom = {
   -- History:
   history = { -- История (обработка настроек скрипта):
     field = name,       -- поле настроек скрипта в таблице файла.
-    dir  = '',          -- каталог файла.
-    ext  = '.cfg',      -- расширение файла.
-    name = '',          -- имя файла с расширением.
-    path = '',          -- относительный путь к файлу.
-    file = '',          -- относительный путь с именем файла.
-    full = '',          -- полный путь с именем файла.
+    dir   = '',         -- каталог файла.
+    ext   = '.cfg',     -- расширение файла.
+    name  = '',         -- имя файла (без расширения).
+    file  = '',         -- полное имя файла (с расширением).
+    path  = '',         -- относительный путь к файлу.
+    work  = '',         -- полный путь к файлу.
+    full  = '',         -- полный путь с именем файла.
   },
 
   -- Help:
   help = {    -- Справка по скрипту:
-    ext  = '.hlf',      -- расширение файла.
-    file = '',          -- имя файла.
-    path = '',          -- относительный путь к файлу.
+    ext   = '.hlf',     -- расширение файла.
+    file  = '',         -- имя файла.
+    path  = '',         -- относительный путь к файлу.
     topic = '',         -- название темы.
     tlink = '',         -- ссылка на тему.
   },
 
   -- Locale:
   locale = {  -- Файлы локализации скрипта:
-    kind = 'both',      -- способ обработки файлов.
-    dir  = "locales\\", -- каталог файлов.
-    ext  = '.lua',      -- расширение файлов.
-    file = '',          -- общее имя файлов.
-    pdir = nil,         -- относительный путь к каталогу файлов.
-    path = '',          -- относительный путь к файлам.
+    kind  = 'both',     -- способ обработки файлов.
+    dir   = "locales\\",-- каталог файлов.
+    ext   = '.lua',     -- расширение файлов.
+    file  = '',         -- общее имя файлов.
+    path  = '',         -- относительный путь к файлам.
   }
 } --- defCustom
 --]]
@@ -424,17 +436,20 @@ function unit.customize (Custom, defCustom) --> (table)
   -- Common:
   t.label = t.label or name
   t.file  = t.file  or name
-  t.base  = t.base  or PluginPath
+  t.base  = t.base  or utils.PluginPath
+  --t.profile = t.profile or utils.PluginPath
+  t.profile = t.profile or utils.ProfilePath
 
   -- History:
   u = t.history or {}; t.history = u
   u.field = u.field or name
   u.dir   = u.dir  or ''
   u.ext   = u.ext  or '.cfg'
-  u.name  = u.name or name..u.ext
+  u.name  = u.name or name
+  u.file  = u.file or u.name..u.ext
   u.path  = u.path or path
-  u.file  = u.file or f_fpath:format(u.path, u.dir, u.name)
-  u.full  = t.base..u.file
+  u.work  = f_fpath:format(t.profile, u.path, u.dir)
+  u.full  = u.work..u.file
 
   -- Help:
   u = t.help or {}; t.help = u
@@ -446,14 +461,13 @@ function unit.customize (Custom, defCustom) --> (table)
 
   -- Locale:
   u = t.locale or {}; t.locale = u
-  u.kind = u.kind or 'both'
-  u.dir  = u.dir or 'locales\\'
-  u.ext  = u.ext  or '.lua'
-  u.file = u.file or t.file or name
-  u.pdir = u.pdir or path
-  u.path = u.pdir..u.dir
-  --u.path = u.path or u.pdir..u.dir
-  --u.fullpath = t.base..u.path
+  u.kind  = u.kind or 'both'
+  u.dir   = u.dir or 'locales\\'
+  u.ext   = u.ext  or '.lua'
+  u.file  = u.file or t.file or name
+  u.path  = u.path or path
+  u.work  = f_fpath:format(u.path, u.dir, '')
+  --u.work = t.base..u.path
   --logShow(t, "data")
 
   return t

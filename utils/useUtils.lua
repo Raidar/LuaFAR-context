@@ -173,6 +173,14 @@ end --
 
 unit.PluginPath = unit.pluginPath() -- Current plugin path
 
+-- Profile path.
+function unit.profilePath ()
+  return win.GetEnv("FARPORFILE") or
+         win.GetEnv("FARHOME").."\\Profile\\"
+end --
+
+unit.ProfilePath = unit.profilePath() -- Current profile path
+
 -- Used interface and help language.
 -- Используемый язык интерфейса и справки.
 --[[
@@ -249,6 +257,12 @@ function unit.filesize (filename) --> (number)
   f:close()
 
   return len
+end ----
+
+-- Создание каталога с подкаталогами.
+-- Create directory with subdirectories.
+function unit.makedir (path) --> (boolean)
+  return assert(far.CreateDir(path, true))
 end ----
 
 end -- do

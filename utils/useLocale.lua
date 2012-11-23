@@ -102,8 +102,8 @@ end ----
 function unit.customize (Custom) --> (table)
   local u = Custom.locale
   u.lang, u.codes   = unit.language()
-  u.help, u.defhelp = unit.bothname(u.path, u.file, u.codes.Help)
-  u.name, u.defname = unit.bothname(u.path, u.file, u.codes.Main)
+  u.help, u.defhelp = unit.bothname(u.work, u.file, u.codes.Help)
+  u.name, u.defname = unit.bothname(u.work, u.file, u.codes.Main)
   --logShow(Custom, 'Custom', '#qd2')
 
   return Custom
