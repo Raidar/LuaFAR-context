@@ -225,7 +225,7 @@ function unit.warning (Title, Msg, Flags) --| (window)
 end --
 
 end -- do
----------------------------------------- I/O
+---------------------------------------- System
 do
   local format = string.format
 
