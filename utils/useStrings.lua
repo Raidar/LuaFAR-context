@@ -141,6 +141,30 @@ function unit.s2b (s, default) --< (string) --> (bool)
 end ---- s2b
 
 do
+  local tonumber = tonumber
+
+-- Convert a string to required type value.
+-- Преобразование строки к значению нужного типа.
+--[[
+  -- @params:
+  s    (string) - converted string.
+  tp   (string) - required type.
+  default (any) - default value (type(default) == required type!).
+  ...     (any) - additional arguments to send to conversion functions.
+--]]
+function unit.s2v (s, tp, default, ...) --< (string) --> (value)
+  if tp == 'nil' then return nil end
+
+  local v = tp == 'string' and s or
+            tp == 'number' and (tonumber(s, ...) or default) or
+            tp == 'boolean' and unit.s2b(s, default) or
+            nil
+  if v ~= nil then return v else return default end
+end ---- s2v
+
+end -- do
+
+do
   local tostring = tostring
   local sbyte = string.byte
 
