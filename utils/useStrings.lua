@@ -40,12 +40,17 @@ do
 -- Подготовленные строки из пробелов.
 local Tspaces = {
   __index = function (t, k)
-    if type(k) == 'number' and k >= 0 then
-      local v = ""
-      if k > 0 then v = srep(" ", k) end
+    if type(k) == 'number' then
+      if  k >= 0 then
+        local v = ""
+        if k > 0 then v = srep(" ", k) end
 
-      rawset(t, k, v)
-      return v
+        rawset(t, k, v)
+        return v
+
+      else
+        return ""
+      end
     end
 
     error("Attempt to get spaced string with not number count", 2)
