@@ -262,7 +262,7 @@ end ----
 -- Создание каталога с подкаталогами.
 -- Create directory with subdirectories.
 function unit.makedir (path) --> (boolean)
-  return assert(far.CreateDir(path, true))
+  return assert(win.CreateDir(path, true))
 end ----
 
 end -- do
