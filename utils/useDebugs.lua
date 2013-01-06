@@ -509,9 +509,11 @@ unit.BKeys = {
   { BreakKey = 'C', Action = "Copy" },    -- original text
   { BreakKey = 'X', Action = "CopyEx" },  -- text with numbers
   { BreakKey = 'Z', Action = "CopyAs" },  -- text without numbers
+  { BreakKey = 'V', Action = "Value" },   -- text of selected item
 } ---
 
-  local slen = string.len
+  local slen  = string.len
+  local sfind = string.find
 
 -- Show data as menu.
 -- Показ данных как меню.
@@ -520,6 +522,7 @@ unit.BKeys = {
   kind    (t|nil) - conversion kind: @fields additions:
     ShowMenu (func) - function to show menu with tabulized data.
     ShowLineNumber (bool) - show line numbers (@default = true).
+    ChosenToClip   (bool) - copy chosen text to clipboard (@default = false).
   -- @return: @see kind.Show.
 --]]
 function unit.ShowData (data, name, kind) --| (menu)
@@ -540,6 +543,7 @@ function unit.ShowData (data, name, kind) --| (menu)
   for k, v in ipairs(data) do
     local m, sp = tostring(k)
     local isnum = true
+
     for s in v:gmatch("[^\n]+") do
       if ShowLineNumber then
         if isnum then
@@ -553,6 +557,7 @@ function unit.ShowData (data, name, kind) --| (menu)
           line = k,
           text = format(TextFmt, sp, m, Separ, s),
         }
+
       else
         items[#items + 1] = {
           line = k,
@@ -567,30 +572,42 @@ function unit.ShowData (data, name, kind) --| (menu)
     Flags = 'FMENU_SHOWAMPERSAND',
   } ---
 
-  local Item = ShowMenu(props, items, unit.BKeys)
+  local Item, Pos = ShowMenu(props, items, unit.BKeys)
 
-  if Item and Item.Action then
-    --logShow(Item, "Item")
-    if string.find(Item.Action, "Copy", 1, true) == 1 then
-      local s
-      if Item.Action == "Copy" then
-        s = tconcat(data, "\n")
-      elseif Item.Action == "CopyEx" then
-        local t = {}
-        for k, v in ipairs(items) do
-          t[k] = v.text
+  if Item then
+    if Item.Action then
+      --logShow({ Pos, Item }, "Item")
+      if Item.Action == "Value" and Pos then
+        far.CopyToClipboard(items[Pos].text)
+
+      elseif sfind(Item.Action, "Copy", 1, true) == 1 then
+        local s
+        if Item.Action == "Copy" then
+          s = tconcat(data, "\n")
+
+        elseif Item.Action == "CopyEx" then
+          local t = {}
+          for k, v in ipairs(items) do
+            t[k] = v.text
+          end
+          s = tconcat(t, "\n")
+
+        elseif Item.Action == "CopyAs" then
+          local t = {}
+          local f = format("^(.-%s)", unit.Separ)
+          --logShow(f)
+          for k, v in ipairs(items) do
+            t[k] = v.text:gsub(f, "")
+          end
+          s = tconcat(t, "\n")
         end
-        s = tconcat(t, "\n")
-      elseif Item.Action == "CopyAs" then
-        local t = {}
-        local f = format("^(.-%s)", unit.Separ)
-        --logShow(f)
-        for k, v in ipairs(items) do
-          t[k] = v.text:gsub(f, "")
-        end
-        s = tconcat(t, "\n")
+
+        far.CopyToClipboard(s)
       end
-      far.CopyToClipboard(s)
+
+    elseif kind.ChosenToClip and Pos then
+      --logShow({ Pos, Item }, "Item")
+      far.CopyToClipboard(items[Pos].text)
     end
   end
 
