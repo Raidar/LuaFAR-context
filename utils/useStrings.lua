@@ -41,11 +41,13 @@ do
 local Tspaces = {
   __index = function (t, k)
     if type(k) == 'number' then
-      if  k >= 0 then
+      if k >= 0 then
         local v = ""
         if k > 0 then v = srep(" ", k) end
 
-        rawset(t, k, v)
+        --if k < 1000000 then
+          rawset(t, k, v)
+        --end
         return v
 
       else
@@ -137,6 +139,32 @@ end ---- gsubcount
 end -- do
 
 ---------------------------------------- Convert
+do
+  local digits = '0123456789'
+  local ssub = string.sub
+
+-- Convert a digit to character.
+-- Преобразование цифры в символ.
+function unit.digit (d) --< (digit) --> (char)
+  return ssub(digits, d + 1, d + 1)
+end ---- digit
+
+  local sfind = string.find
+
+-- Check a character by digit.
+-- Проверка символа на цифру.
+function unit.isdigit (c) --< (char) --> (bool)
+  return sfind(digits, c, 1, true)
+end ---- isdigit
+
+-- Convert a character to digit.
+-- Преобразование символа в цифру.
+function unit.todigit (c) --< (char) --> (digit|-1)
+  return (sfind(digits, c, 1, true) or 0) - 1
+end ---- todigit
+
+end -- do
+
 -- Convert a string to boolean.
 -- Преобразование строки к логическому типу.
 function unit.s2b (s, default) --< (string) --> (bool)
@@ -222,6 +250,17 @@ end ----
 -- Преобразование UTF-8 символа в кодовую точку.
 function unit.u8byte (c) --< (char) --> (number)
   return byte16(U8toU16(c))
+end ----
+
+end -- do
+do
+  local upper, gsub = string.upper, string.gsub
+
+-- Make a character codepoint as string.
+-- Формирование кодовой точки символа в виде строки.
+function unit.ucp2s (n, up) --< (number) --> (string)
+  local s = gsub(format("%4x", n), " ", "0") -- Any Plan
+  return up and upper(s) or s
 end ----
 
 end -- do
