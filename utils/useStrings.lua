@@ -64,11 +64,13 @@ unit.spaces = setmetatable({}, Tspaces)
 end -- do
 
 ---------------------------------------- Char
+--[[
 -- Get a char from specified position of string.
 -- Получение символа в заданной позиции строки.
 function unit.at (s, pos) --> (string)
   return s:sub(pos, pos)
 end ----
+--]]
 
 -- Convert first character of string to upper.
 -- Преобразование первого символа строки в верхний регистр.
@@ -92,7 +94,7 @@ end ----
 
 ---------------------------------------- String
 -- Set a replace string to specified position of string.
--- Установка строки-замены в заданную позиции строки.
+-- Установка строки-замены в заданную позицию строки.
 function unit.sat (s, pos, str) --> (string)
   return pos <= 1       and format("%s%s", str, s:sub(2, -1)) or
          pos >= s:len() and format("%s%s", s:sub(1, -2), str) or
