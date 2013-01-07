@@ -138,7 +138,7 @@ unit.KeyToStr = KeyToStr
 --[[
   -- @notes:
      Serialize data of following types: boolean, number, string, table.
-  -- @params (@see unit.serialize).
+  -- @params: @see unit.serialize.
   -- @return:
   isOk   (bool) - operation success flag.
 --]]

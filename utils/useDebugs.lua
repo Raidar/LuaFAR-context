@@ -296,7 +296,7 @@ end ---- TypToText
   -- @params:
   name   (string) - data table name.
   data    (t|nil) - processed data table.
-  kind    (t|nil) - conversion kind (@see serial.prettyize):
+  kind    (t|nil) - conversion kind: @see serial.prettyize and:
     -- @fields additions: none.
     -- @locals in kind:
     filter (string) - @see filter param.
@@ -305,13 +305,13 @@ end ---- TypToText
                     - w - write data as whole table.
                     - d%d+ - max depth (nesting) level to convert.
                     -- fields:
-                    - O|B|N|S|T|U|F|E - exclude some key types
-                                        (@see unit.Types).
-                    - o|b|n|s|t|u|f|e - exclude some value types.
-                                        (@see unit.Types).
+                    - O|B|N|S|T|U|F|E - exclude some key types:
+                                        @see unit.Types.
+                    - o|b|n|s|t|u|f|e - exclude some value types:
+                                        @see unit.Types.
                     - /|\|.|: - exclude fields containing this chars in keys.
-                    - W - exclude some word names in keys (@see unit.Words).
-                    - M - exclude meta-fields names in keys (@see unit.Metas).
+                    - W - exclude some word names in keys: @see unit.Words.
+                    - M - exclude meta-fields names in keys: @see unit.Metas.
                     -- format:
                     - x%d+ | xk%d* | xv%d* - @see kind.keyhex/kind.valhex.
                     - i%d+ | ik%d* | iv%d* - @see kind.keyint/kind.valint.

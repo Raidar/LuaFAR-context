@@ -54,7 +54,7 @@ unit.Dataless = utils.null  -- A field data for undatum field
 -- Add data from user-table to base-table.
 -- Добавление данных из пользовательской таблицы в базовую.
 --[[
-  -- @params (@see tables.add):
+  -- @params: @see tables.add as:
   base  (table) - base table.
   user  (table) - user table.
   kind (string) - kind of addition.
@@ -188,7 +188,7 @@ do
   -- @params:
   name (string) - file name.
   t     (t|nil) - already existing data table.
-  kind (string) - kind of data require (@default 'update'): @see unit.add.
+  kind (string) - kind of data require (@default = 'update'): @see unit.add.
   reload (bool) - flag for reload on repeated data load.
   -- @return:
   data  (table) - data table.

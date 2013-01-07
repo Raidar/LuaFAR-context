@@ -611,7 +611,7 @@ end ---- sortpairs
   -- @params:
   k         (any) - table key (k == nil --> call for init).
   v         (any) - table value (v == t --> call for init).
-  kind    (table) - additional parameters (@see unit.statpairs.kind).
+  kind    (table) - additional parameters: @see unit.statpairs.kind.
   -- @return:
     -- @return in kind:
     stats (table) - required statistics.
@@ -660,7 +660,7 @@ end ---- gatherstat
     gathered (bool) - gathered statistics (@default = false).
   ...           - parameters to call kind.pairs(t, ...).
   -- @return:
-    -- @return in kind (@see unit.gatherstat.kind).
+    -- @return in kind: @see unit.gatherstat.kind.
 --]]
 function unit.statpairs (t, kind, ...) --| kind --> (func)
   if not t then return end
