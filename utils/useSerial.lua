@@ -730,7 +730,7 @@ local luaNameToIdent = lua.NameToIdent
   name (string) - data name.
   data  (table) - saved data.
   kind  (table) - serializion kind (@see kind in pairs and *ToStr):
-    saved     (table) - tables already saved with its names.
+    saved     (table) - tables already saved (with its names).
     indent   (string) - initial indent value to write.
     shift    (string) - indent shift to pretty write fields.
     pairs      (func) - pairs function to get fields.
