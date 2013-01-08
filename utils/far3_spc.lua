@@ -110,7 +110,7 @@ end ---- RepairInput
 function far.ParseInput (Input) --> (VirKey, FarKey)
 
   if LFVer >= 3 then
-    logShow(Input)
+    --logShow(Input)
     local c = Input.UnicodeChar
     if type(c) == 'number' then
       Input.UnicodeChar = c ~= 0 and ("").char(c) or ""
