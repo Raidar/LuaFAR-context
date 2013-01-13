@@ -32,7 +32,7 @@ local logShow = log.Show
 
 --------------------------------------------------------------------------------
 do
-  local keyUt --= require "Rh_Scripts.Utils.keyUtils"
+  local keyUt --= require "Rh_Scripts.Utils.Keys"
   local VKEY_Keys --= keyUt.VKEY_Keys
 
 -- WARN: Call far.RepairInput(Input) before using Input in ProcessInput.
@@ -47,7 +47,7 @@ function far.RepairInput (Input) --|> (Input)
   end
 
   if keyUt == nil then
-    keyUt = require "Rh_Scripts.Utils.keyUtils"
+    keyUt = require "Rh_Scripts.Utils.Keys"
     VKEY_Keys = keyUt.VKEY_Keys
   end
 
