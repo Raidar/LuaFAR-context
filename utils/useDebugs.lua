@@ -523,9 +523,10 @@ unit.BKeys = {
     ShowMenu (func) - function to show menu with tabulized data.
     ShowLineNumber (bool) - show line numbers (@default = true).
     ChosenToClip   (bool) - copy chosen text to clipboard (@default = false).
-  -- @return: @see kind.Show.
+  -- @return:
+  Item    (t|nil) - an item of data menu.
 --]]
-function unit.ShowData (data, name, kind) --| (menu)
+function unit.ShowData (data, name, kind) --| (item)
   if type(data) ~= 'table' then
     return far.Message(tostring(data), name or unit.Nameless)
   end
