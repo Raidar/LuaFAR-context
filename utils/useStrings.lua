@@ -140,6 +140,43 @@ end ---- gsubcount
 
 end -- do
 
+-- Count of lines in specified string.
+-- Количество линий в указанной строке.
+--[[
+  -- @params:
+  s  (string) - analyzed string.
+  sep (s|nil) - line separator: @default = "\n".
+  -- @return:
+  count (number) - count of lines.
+--]]
+function unit.linecount (s, sep) --> (number)
+  return unit.gsubcount(s, sep or "\n") + 1
+end ----
+
+-- Maximal length (and line) in specified string.
+-- Максимальная длина (и линия) в указанной строке.
+--[[
+  -- @params:
+  s  (string) - analyzed string.
+  sep (s|nil) - line pattern: @default = "([^\n]+)".
+  -- @return:
+  max  (number) - maximal length.
+  line (string) - line with max length.
+--]]
+function unit.linemax (s, pat) --> (number, string | 0, nil)
+  local max, x = 0
+
+  -- Цикл по линиям строки:
+  for line in s:gmatch(pat or "([^\n]+)") do
+    local len = line:len()
+    if len > max then
+      max, x = len, line
+    end
+  end
+
+  return max, x
+end ---- linemax
+
 ---------------------------------------- Convert
 do
   local digits = '0123456789'
