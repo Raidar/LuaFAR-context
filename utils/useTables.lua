@@ -121,7 +121,7 @@ do
 function unit.fitfind (t, v, comp) --> (index: 1..#t+1)
   local min, max = 1, #t + 1
   while max - min > 0 do
-    local m = modf((max + min) / 2) -- TODO: optimize
+    local m = modf((max + min) / 2) -- MAYBE: optimize
     if comp(t[m], v) then
       min = m + 1
     else
@@ -140,7 +140,6 @@ function unit.bfind (t, v, comp) --> (index | nil)
 end ---- bfind
 
 end -- do
-
 ---------------------------------------- copy
 
 -- Simple copy of table without links to one and the same table.
@@ -390,7 +389,6 @@ function unit.add (t, u, kind, tpairs, ...) --> (table)
 end ---- add
 
 end -- do
-
 ---------------------------------------- pairs
 -- 'pairs' function for non-hole arrays.
 -- Функция 'pairs' для массивов без "дыр".
@@ -453,7 +451,6 @@ function unit.hpairs (t) --> (func)
 end ---- hpairs
 
 end -- do
-
 ---------------------------------------- allpairs
 -- Make list of all tables.
 -- Формирование списка из всех таблиц.
@@ -527,7 +524,6 @@ function unit.allpairs (t, make, ...) --> (func)
 end ---- allpairs
 
 end -- do
-
 ---------------------------------------- sortpairs
 -- Compare values for table sort.
 -- Сравнение значений для сортировки таблицы.
@@ -603,8 +599,6 @@ function unit.sortpairs (t, kind, ...) --> (func)
   return _next
 end ---- sortpairs
 
-  local lua -- useLua unit
-
 -- Gather simple statistics.
 -- Сбор элементарной статистики.
 --[[
@@ -623,7 +617,7 @@ function unit.gatherstat (k, v, kind) --| kind.stats
     if v ~= nil then
       -- Init --
       local gathered = kind.gathered
-      if not lua then lua = require 'context.utils.useLua' end
+      local lua = require 'context.utils.useLua'
 
       for k, _ in pairs(lua.types) do
         if gathered then
@@ -698,7 +692,6 @@ function unit.statpairs (t, kind, ...) --| kind --> (func)
 end ---- statpairs
 
 end -- do
-
 ---------------------------------------- fill
 
 -- Fill values in array with value.

@@ -158,7 +158,7 @@ end ----
 --[[
   -- @params:
   s  (string) - analyzed string.
-  sep (s|nil) - line pattern: @default = "([^\n]+)".
+  pat (s|nil) - line pattern: @default = "([^\n]+)".
   -- @return:
   max  (number) - maximal length.
   line (string) - line with max length.
