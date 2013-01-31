@@ -131,7 +131,7 @@ function far.ParseInput (Input) --> (VirKey, FarKey)
       MousePositionX
       MousePositionY
       --]]
-      return
+      return Input
     end
 
     local c = Input.UnicodeChar

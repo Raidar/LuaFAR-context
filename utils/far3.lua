@@ -158,7 +158,7 @@ do
   F.DN_CONTROLINPUT = O.DN_KEY
 
   O.DN_MOUSECLICK = F.DN_MOUSECLICK
-  F.DN_MOUSECLICK = nil -- == F.DN_CONTROLINPUT
+  --F.DN_MOUSECLICK = nil -- == F.DN_CONTROLINPUT
 end -- do
 
 -- ACTL_ (Advanced control) (build 1860, 1864, 1906):
@@ -617,12 +617,9 @@ do
   end
 end -- do
 
---[[ TODO: build > 2896, excluding:
+--[[ TODO: build > 3064, excluding:
            -- Макросы:
            2851 (Lua-макросы !!!),
-           2856 (Plugin.Exist),
-           2859 (Panel.Item, panel.setpath, fexist, beep, Window.Scroll),
-           2869 (Plugin.Menu, Plugin.Config, Plugin.Command),
 ---- TODO: -- Скрипты:
            2435 (EEREDRAW_), 2438 (EE_CHANGE),
            2478—2479, 2541 (переход на FSSF_…),
@@ -643,6 +640,6 @@ end -- do
            2802 (OPEN_COMMANDLINE),
            2870 (sqlite 3.7.14.1).
 … ]]--
---[[ TODO: Checking FAR builds: 2246; 2516; 2574(?), 2686(?) ]]--
+--[[ TODO: Checking FAR builds: 2246; 2516; 2574(?), 2686(?), 3064 ]]--
 
 --------------------------------------------------------------------------------
