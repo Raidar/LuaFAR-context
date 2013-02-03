@@ -36,7 +36,7 @@ local useprofiler = false
 if useprofiler then require "profiler" end -- Lua Profiler
 
 ----------------------------------------
--- [[
+--[[
 local dbg = require "context.utils.useDebugs"
 local logShow = dbg.Show
 --]]
@@ -319,9 +319,9 @@ local PathNamePattern = '^(.-)([^\\/]+)$'
 -- Detect a type of file in active panel.
 function areaFileType.panels (f)
   local f = f or {}
+  local Info = panel.GetPanelInfo(nil, 1)
 
   if not f.filename then
-    local Info = panel.GetPanelInfo(nil, 1)
     if Info.ItemNumbers == 0 then return 'empty' end
     local Item = panel.GetCurrentPanelItem(nil, 1)
     f.path, f.name = panel.GetPanelDirectory(nil, 1).Name, Item.FileName
@@ -363,14 +363,14 @@ end -- editor
 -- Detect a type of viewed file.
 function areaFileType.viewer (f)
   local f = f or {}
+  local fullname = viewer.GetInfo().FileName
 
   if not f.filename then
-    local fullname = viewer.GetInfo().FileName
     f.path, f.name = fullname:match(PathNamePattern)
   end
 
   if f.firstline == true then
-    f.firstline, f.assumed = detect.readFileFirstLine(fullname)
+    f.firstline, f.assumed = unit.readFileFirstLine(fullname)
   end
 
   return detectType(f)
@@ -575,6 +575,8 @@ local function superType (ctype, v, cfg, field) --> (string | nil)
 end -- superType
 checkType.superType = superType
 
+local tconcat = table.concat
+
 -- Check inheritance for config type.
 local function checkInherit (ctype, v, cfg, field)
   if v._checked_ then return end
@@ -596,11 +598,11 @@ local function checkInherit (ctype, v, cfg, field)
         local message = {
           L:t1('SInheritIndirect', ctype, field),
           L:t'SInheritChainBegin',
-          table_concat(chain, L:t'SInheritChainSep'),
+          tconcat(chain, L:t'SInheritChainSep'),
           L:t'SInheritChainEnd',
           L:t1('SInheritReset', last, super),
         }
-        L:w(L:t'CInheritError', table.concat(message, '\n'))
+        L:w(L:t'CInheritError', tconcat(message, '\n'))
       end
       cfg[last][field] = nil
       break

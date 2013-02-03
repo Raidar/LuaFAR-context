@@ -326,7 +326,7 @@ local MHistory = { __index = THistory }
 function unit.history (path, name, kind) --> (object)
 
   local self = {
-    path = path or PluginPath,
+    path = path or utils.PluginPath,
     name = name or "unknown",
     kind = kind or {},
   } --- self

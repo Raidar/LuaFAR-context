@@ -38,7 +38,7 @@ far.Show("types", unpack(types))
 --]]
 
 ----------------------------------------
--- [[
+--[[
 local dbg = require "context.utils.useDebugs"
 local logShow = dbg.Show
 --]]

@@ -35,7 +35,7 @@ local logShow = log.Show
 --bit64 = bit
 local band, bor  = bit.band, bit.bor
 --local bnot, bxor = bit.bnot, bit.bxor
---local bshl, bshr = bit.lshift, bit.rshift
+local bshl, bshr = bit.lshift, bit.rshift
 
 --------------------------------------------------------------------------------
 

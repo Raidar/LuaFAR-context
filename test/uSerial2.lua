@@ -18,8 +18,8 @@ local serial = require 'context.utils.useSerial'
 --------------------------------------------------------------------------------
 
 ---------------------------------------- main
-local sortcompare = tables.sortcompare
-local sortpairs = tables.sortpairs
+--local sortcompare = tables.sortcompare
+--local sortpairs = tables.sortpairs
 
 local function Execute ()
 
@@ -28,6 +28,7 @@ local function Execute ()
 
   local data = datas.load(SourceFile, nil, 'change')
 
+  --[[
   local sortkind = {
     --compare = sortcompare,
     --pairs = ipairs, -- Test: array fields
@@ -35,6 +36,7 @@ local function Execute ()
     pairs = pairs, -- Test: array + hash fields
     --pairs = allpairs, -- Test: all fields including from metas
   } ---
+  --]]
 
   local kind = {
     localret = true, -- Test: local + return instead of global

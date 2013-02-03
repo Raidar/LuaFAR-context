@@ -237,8 +237,8 @@ end ---- s2v
 end -- do
 
 do
-  local tostring = tostring
-  local sbyte = string.byte
+  --local tostring = tostring
+  --local sbyte = string.byte
 
 -- Quote a string.
 -- Заключение строки в кавычки.

@@ -135,7 +135,7 @@ end ---- fitfind
 -- Binary find in sorted array.
 -- Двоичный поиск в отсортированном массиве.
 function unit.bfind (t, v, comp) --> (index | nil)
-  local i = fitfind(t, v, comp)
+  local i = unit.fitfind(t, v, comp)
   return v == t[i] and i or nil
 end ---- bfind
 

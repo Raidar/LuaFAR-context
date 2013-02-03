@@ -10,7 +10,7 @@
 ----------------------------------------
 --local context = context
 
-local tables = require 'context.utils.useTables'
+--local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
 --local locale = require 'context.utils.useLocale'
 local serial = require 'context.utils.useSerial'
@@ -19,7 +19,7 @@ local serial = require 'context.utils.useSerial'
 --local addNewData = tables.extend
 
 ----------------------------------------
--- [[
+--[[
 local log = require "context.samples.logging"
 local logShow = log.Show
 --]]
@@ -103,13 +103,14 @@ function TTest:Load ()
 end ---- GenerateFormo
 
 do
-  local sortcompare = tables.sortcompare
-  local sortpairs = tables.sortpairs
+  --local sortcompare = tables.sortcompare
+  --local sortpairs = tables.sortpairs
 
 -- Сохранение.
 function TTest:Save ()
   local Data = self.Data
 
+  --[[
   local sortkind = {
     --compare = sortcompare,
     --pairs = ipairs, -- Test: array fields
@@ -117,6 +118,7 @@ function TTest:Save ()
     pairs = pairs, -- Test: array + hash fields
     --pairs = allpairs, -- Test: all fields including from metas
   } ---
+  --]]
 
   local kind = {
     localret = true, -- Test: local + return instead of global
