@@ -18,7 +18,7 @@ Using in 'LuaFAR for Editor' plugin:
 1. Open main _usermenu.lua file in plugin directory.
 2. Insert to BEGIN of this file following lines:
 require "context.initiate"
-MakeResident(require "context.resident")
+MakeResident("context.resident")
 *. It may be used a prepared template file
 context/samples/lf4ed/_usermenu.lua
    Just copy it to plugin directory.
