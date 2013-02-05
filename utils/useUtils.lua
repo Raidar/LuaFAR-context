@@ -175,7 +175,7 @@ unit.PluginPath = unit.pluginPath() -- Current plugin path
 
 -- Profile path.
 function unit.profilePath ()
-  return win.GetEnv("FARPORFILE") or
+  return win.GetEnv("FARPROFILE") or
          win.GetEnv("FARHOME").."\\Profile\\"
 end --
 
