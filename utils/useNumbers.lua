@@ -185,21 +185,24 @@ end ----
 -- Integer division (like ceil).
 -- Целочисленное деление (с запасом).
 function unit.divc (x, y) --> (number)
-  local m = x%y; local z = (x - m) / y
-  if m == 0 then return z else return z + 1 end
+  local m = x%y
+  local z = (x - m) / y
+  return m == 0 and z or z + 1
 end ----
 
 -- Integer division (rounded).
 -- Целочисленное деление (с округлением).
 function unit.divr (x, y) --> (number)
-  local m = x%y; local z = (x - m) / y
-  if m < y / 2 then return z else return z + 1 end
+  local m = x%y
+  local z = (x - m) / y
+  return m < y / 2 and z or z + 1
 end ----
 
 -- Integer division (with remainder).
 -- Целочисленное деление (с остатком).
 function unit.divm (x, y) --> (number)
-  local m = x%y; return (x - m) / y, m
+  local m = x%y
+  return (x - m) / y, m
 end ----
 
 ---------------------------------------- Operation
