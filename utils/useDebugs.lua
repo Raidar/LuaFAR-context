@@ -12,11 +12,9 @@
 --]]
 --------------------------------------------------------------------------------
 
-local type, unpack = type, unpack
+local type = type
 local ipairs = ipairs
---local pairs, ipairs = pairs, ipairs
 local tonumber, tostring = tonumber, tostring
-local setmetatable = setmetatable
 
 local string = string
 local format = string.format
@@ -29,16 +27,9 @@ local tconcat = table.concat
 ----------------------------------------
 local far = far
 --local F = far.Flags
---local far_Message, far_Show = far.Message, far.Show
 
 ----------------------------------------
---local context = context
-
---local numbers = require 'context.utils.useNumbers'
-local strings = require 'context.utils.useStrings'
 local serial = require 'context.utils.useSerial'
-
-local spaces = strings.spaces -- for ShowData
 
 ----------------------------------------
 --[[
@@ -148,6 +139,11 @@ local function sfind (s, pat) --> (bool)
   return s:find(pat, 1, true)
 end --
 unit.sfind = sfind
+
+-- Default width for: Ox12345678
+function unit.hex8 (n, width) --> (string)
+  return format(format("%%#0%dx", (width or 8) + 2), n or 0)
+end ----
 
 -- Check field type to exclude.
 local function isUnfitValType (tp, filter) --> (bool)
@@ -499,6 +495,7 @@ end ---- tabulize
 
 ---------------------------------------- Show
 do
+
 unit.Separ = "│"
 unit.TextFmt = "%s%s%s%s"
 --unit.TextFmt = "%s%s %s %s"
@@ -510,10 +507,13 @@ unit.BKeys = {
   { BreakKey = 'X', Action = "CopyEx" },  -- text with numbers
   { BreakKey = 'Z', Action = "CopyAs" },  -- text without numbers
   { BreakKey = 'V', Action = "Value" },   -- text of selected item
-} ---
+} --- BKeys
 
   local slen  = string.len
   local sfind = string.find
+
+  local strings = require 'context.utils.useStrings'
+  local spaces = strings.spaces
 
 -- Show data as menu.
 -- Показ данных как меню.
@@ -615,6 +615,8 @@ function unit.ShowData (data, name, kind) --| (item)
   return Item
 end ---- ShowData
 
+  local unpack = unpack
+
 -- Show data based on far.Show.
 -- Показ данных, основанный на far.Show.
 function unit.farShow (data) --| (menu)
@@ -687,6 +689,7 @@ function TLogging:close (s) --< (file table)
 end ---- close
 
 local io_open = io.open
+local setmetatable = setmetatable
 
 function unit.open (filename, mode, s) --> (file table)
    local self = {
