@@ -584,7 +584,7 @@ local function TabToText (name, data, kind, write) --| (write)
     local cnt, len, indlen = 1, 0, new_indent:len()
 
     for k, v in sortnext do
-      if not skip[k] then
+      if skip[k] == nil then
         local s, c = KeyToStr(k, kind)
         c = nestless and c or s -- Check using dot
         --logShow({ nestless, s, c, kind }, name, 2)
