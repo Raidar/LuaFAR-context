@@ -28,8 +28,6 @@ require 'context.scripts.detectType'
 
 local context, ctxdata = context, ctxdata
 
-local utils = require 'context.utils.useUtils'
-
 local detect = context.detect
 local cfgDat = ctxdata.config
 --[[
@@ -47,13 +45,11 @@ local logShow = dbg.Show
 local unit = {}
 
 ----------------------------------------
-local farWarning = utils.warning
-
 -- Messages
 local Msgs = {
   CHandlerError = "Handler error",
   SHandlerError = "Error running handler %d.\n%s\nHandler is removed.",
-} ---
+} --- Msgs
 
 ---------------------------------------- Events
 local events = ctxdata.events or {}
@@ -66,8 +62,9 @@ function unit.add (event, handler) --> (true|nil)
 
   local handlers = events[event]
   handlers[#handlers+1] = handler
+
   return true
-end ----
+end ---- add
 
 -- Delete handler for event.
 function unit.del (event, handler) --> (true|nil)
@@ -87,9 +84,11 @@ function unit.del (event, handler) --> (true|nil)
       return true
     end
   end
-end ----
+end ---- del
 
-local pcall = pcall
+  local pcall = pcall
+
+  local farMsg = far.Message
 
 -- Handle event calling all handlers for this event.
 local function handleEvent (event, ...) --> (true|nil)
@@ -101,13 +100,14 @@ local function handleEvent (event, ...) --> (true|nil)
     --handlers[k](...)
     local st, res = pcall(handlers[k], ...) -- MAYBE: Use xpcall with traceback?!
     if not st then
-      farWarning(Msgs.CHandlerError,
-                 Msgs.SHandlerError:format(k, res or ''), 'l')
+      farMsg(Msgs.CHandlerError,
+             Msgs.SHandlerError:format(k, res or ''), nil, 'lw')
       unit.del(event, k)
     end
   end
+
   return true
-end --
+end -- handleEvent
 unit.event = handleEvent
 
 ---------------------------------------- Metamethods

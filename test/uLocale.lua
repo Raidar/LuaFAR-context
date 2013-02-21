@@ -24,7 +24,6 @@ local scriptPath = "context\\test\\"
 --local Custom = {
 --} ---
 
-
 local DefCustom = {
   name = "uLocale",
   path = scriptPath,

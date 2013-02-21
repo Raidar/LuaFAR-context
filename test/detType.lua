@@ -22,7 +22,7 @@ local readCfg = context.config.read
 
 if not readCfg then
   farMsg("No types for detect\n\n"..
-              "'LuaFAR context' pack is required\n", "test_detType")
+         "'LuaFAR context' pack is required\n", "test_detType")
   return
 end
 

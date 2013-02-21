@@ -17,18 +17,18 @@ local abstract_type_descs = {
       -- They usually haven't masks field!
 
   -- default
-  --default = 'Default type',
+  --default = "Default type",
 
   -- -- 0. special
-  --special = 'Special type',
-    none    = 'Unknown/undefined type',
-    common  = 'Common predefined data (for any type)',
-    ignore  = 'Private store for ignored data',
+  --special = "Special type",
+    none    = "Unknown/undefined type",
+    common  = "Common predefined data (for any type)",
+    ignore  = "Private store for ignored data",
 } --- abstract_type_descs
 
 ---------------------------------------- Available type descs
 local type_descs = {
-  _meta_ = { basis = 'base', merge = 'update' },
+  _meta_ = { basis = 'base', merge = 'update', },
 
   -- 0. special
 
@@ -58,105 +58,112 @@ local type_descs = {
               -- Script data:
                   -- FAR Manager & plugins:
                   -- rare
-  edif = 'Electronic Design Interchange Format',
-  bor_tem = 'Turbo Editor Macro language',
+  edif = "Electronic Design Interchange Format",
+  bor_tem = "Turbo Editor Macro language",
               -- Network data:
-  css  = 'Cascading Style Sheets',
-  sass = 'Syntactically Awesome Style Sheets',
+  css  = "Cascading Style Sheets",
+  sass = "Syntactically Awesome Style Sheets",
+  less = "Leaner Style Sheets",
 
           -- 1.2.3. markup text
-  rtf  = 'Rich Text Format',
-  --tex = '',
-  --latex = '',
+  rtf  = "Rich Text Format",
+  --tex = "",
+  --latex = "",
+
+  haml = "XHTML Abstraction Markup Language",
+  yaml = "YAML Ain't Markup Language", -- Yet Another Markup Language
+  json = "JavaScript Object Notation",
+
               -- rare
               -- FAR Manager & plugins:
-  far  = 'FAR: File and ARchive Manager',
+  far  = "FAR: File and ARchive Manager",
                   -- rare
               -- SGML subsets:
-  sgml = 'Standard Generalized Markup Language',
-  html = 'HyperText Markup Language',
-  --xhtml = '',
+  sgml = "Standard Generalized Markup Language",
+  html = "HyperText Markup Language",
+  --xhtml = "",
                   -- rare
               -- XML main:
-  xml  = 'Extensible Markup Language',
-  --dtd = '',
-  --xmlschema = '',
-  --xslfo = '',
-  --xslt = '',
-  xquery  = 'XML Query language',
+  xml  = "eXtensible Markup Language",
+  dtd  = "Document Type Definition",
+  --xmlschema = "XML Schema",
+  xslfo = "eXtensible Stylesheet Language Formatting Objects",
+  xslt = "eXtensible Stylesheet Language Transformations",
+  xquery  = "XML Query language",
               -- XML book:
               -- XML others: -- MAYBE: somes are SGML subsets (MathML?)!
-  --rdf = '',
+  --rdf = "",
+  relaxng = "REgular LAnguage for XML Next Generation",
                   -- rare
 
               -- SGML others:
                   -- rare
-  --mathml = '',
-  svg  = 'Scalable Vector Graphics',
-  vrml = 'Virtual Reality Modelling Language',
-  --wml = '',
-  wsc  = 'Windows Script Components',
-  --wsdl = '',
-  wsf  = 'Windows Script Host',
+  --mathml = "",
+  svg  = "Scalable Vector Graphics",
+  vrml = "Virtual Reality Modelling Language",
+  --wml = "",
+  wsc  = "Windows Script Components",
+  --wsdl = "",
+  wsf  = "Windows Script Host",
 
               -- Colorer-take5:
-  colorer = 'Colorer-take5',
+  colorer = "Colorer-take5",
 
       -- 1.3. source
 
           -- 1.3.1. language source
 
               -- 1.3.1.1. frequently used language
-  fortran = 'FORmula TRANslation language',
-  gpss = 'General Purpose Systems Simulator',
-  idl  = 'Interface Definition Language',
-  perl = 'Practical Extraction and Report Language',
+  fortran = "FORmula TRANslation language",
+  gpss = "General Purpose Systems Simulator",
+  idl  = "Interface Definition Language",
+  perl = "Practical Extraction and Report Language",
                   -- rare
-  lisp = 'List Processing',
+  lisp = "List Processing",
                   -- Assembler other:
                   -- HDL:
-  hdl  = 'Hardware Description Language',
-  vhdl = 'Very high speed integrated circuit HDL',
+  hdl  = "Hardware Description Language",
+  vhdl = "Very high speed integrated circuit HDL",
                   -- ML:
-  sml  = 'Standard Meta-Language',
+  sml  = "Standard Meta-Language",
                   -- Prolog:
                   -- Lexers:
-  yacc = 'Yet Another Compiler - Compiler',
+  yacc = "Yet Another Compiler - Compiler",
                   -- Java somes:
 
               -- 1.3.1.2. database language --
-  sql  = 'Structured Query Language',
+  sql  = "Structured Query Language",
                   -- rare
 
               -- 1.3.1.-. .NET support language
 
               -- 1.3.1.3. network language
-  php  = 'PHP: Hypertext Preprocessor',
+  php  = "PHP: Hypertext Preprocessor",
                   -- 1.3.1.3.-. network script
                   -- 1.3.1.3.-. server pages
 
           -- 1.3.2. script language --
                   -- Lua:
-  lua  = 'Lua',
+  lua  = "Lua",
 
               -- 1.3.2.1. batch/shell --
-  shell  = 'SHell (Bourne shell)',
-  ash    = 'Almquist SHell',
-  csh    = 'C SHell',
-  ksh    = 'Korn SHell',
-  psh    = 'Perl SHell',
-  zsh    = 'Z SHell',
-  bash   = 'Bourne Again SHell',
-  dash   = 'Debian Almquist SHell',
-  fish   = 'Friendly Interactive SHell',
-  tcsh   = 'Tenex C SHell',
+  shell  = "SHell (Bourne shell)",
+  ash    = "Almquist SHell",
+  csh    = "C SHell",
+  ksh    = "Korn SHell",
+  psh    = "Perl SHell",
+  zsh    = "Z SHell",
+  bash   = "Bourne Again SHell",
+  dash   = "Debian Almquist SHell",
+  fish   = "Friendly Interactive SHell",
+  tcsh   = "Tenex C SHell",
                   -- rare
-  jcl  = 'Job Control Language',
+  jcl  = "Job Control Language",
 
               -- 1.3.2.-. makefile
-  scons = 'Software Construction tool',
+  scons = "Software Construction tool",
                   -- rare
-  awk  = 'Al Aho, Peter Weinberger, Brian Kernighan',
+  awk  = "Al Aho, Peter Weinberger, Brian Kernighan",
 
               -- 1.3.2.-. install script
 
@@ -175,21 +182,21 @@ local type_descs = {
           -- 2.3.1. image --
 
           -- 2.3.2. audio --
-  midi = 'Musical Instrument Digital Interface',
+  midi = "Musical Instrument Digital Interface",
 
           -- 2.3.3. video --
 
   -- 3. mixed
 
       -- 3.1. doc
-  dvi = 'Device Independendent File',
-  pdf = 'Portable Document Format',
+  dvi = "Device Independendent File",
+  pdf = "Portable Document Format",
               -- Composed help:
-  hlp_rtf = 'Rich Text Format',
-  hlp_chm = 'Compiled HTML help file',
+  hlp_rtf = "Rich Text Format",
+  hlp_chm = "Compiled HTML help file",
 
       -- 3.2. font --
-  tfm = 'TeX Font Metric',
+  tfm = "TeX Font Metric",
 
       -- 3.3. others
 } --- type_descs

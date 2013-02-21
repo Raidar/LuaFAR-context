@@ -22,11 +22,6 @@ local F = far.Flags
 ----------------------------------------
 local context, ctxdata = context, ctxdata
 
---local utils = require 'context.utils.useUtils'
-local datas = require 'context.utils.useDatas'
-
-local cfgpairs = datas.cfgpairs
-
 local types = ctxdata.config.types
 local abstypes = ctxdata.abstypes or {}
 
@@ -37,7 +32,7 @@ local unit = {}
 do
    -- Sort abstract types.
    local absorted = {}
-   for k, _ in pairs(abstypes) do
+   for k in pairs(abstypes) do
      absorted[#absorted] = k
    end
    table.sort(absorted)
@@ -51,24 +46,29 @@ do
    local getAbstractType = context.detect.use.nomaskType
 
    local itemFormat = '%3i %s %20.20s'
-   local menuFlags = { FMENU_AUTOHIGHLIGHT = 1, FMENU_WRAPMODE = 1 }
-   local menuProps = { Flags = menuFlags, Title = "Categories" }
-   local catMenuProps = { Flags = menuFlags, Title = "Types", Bottom = "BackSpace" }
+   local menuFlags = { FMENU_AUTOHIGHLIGHT = 1, FMENU_WRAPMODE = 1, }
+   local menuProps = { Flags = menuFlags, Title = "Categories", }
+   local catMenuProps = { Flags = menuFlags, Title = "Types", Bottom = "BackSpace", }
 
 -- Types menu-manager.
 function unit.showTypes (selected)
     local categories = {}
+
+    local datas = require 'context.utils.useDatas'
+    local cfgpairs = datas.cfgpairs
+
     -- Find categories and owned types.
     for k, v in cfgpairs(types) do
       if not abstypes[k] then
       --if v.masks then
         local cat = v.inherit and getAbstractType(v.inherit) or 'none'
         if not categories[cat] then -- new category:
-            categories[cat] = { type = cat, desc = types[cat].desc or cat}
+            categories[cat] = { type = cat, desc = types[cat].desc or cat, }
             table.insert(categories, categories[cat])
         end
         -- new type in category:
-        table.insert(categories[cat], { type = k, inherit = cat, desc = v.desc or k })
+        table.insert(categories[cat],
+                     { type = k, inherit = cat, desc = v.desc or k, })
       end
     end
 
@@ -95,7 +95,7 @@ function unit.showTypes (selected)
     end
 
     -- Menu for choice of type.
-    local bkey = { BreakKey = 'BACK' }
+    local bkey = { BreakKey = 'BACK', }
     local bkeys = { bkey }
     catMenuProps.Title = selcat and selcat.desc or 'Types:'
     local result = selcat and far.Menu(catMenuProps, selcat, bkeys) or bkey
