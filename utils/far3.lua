@@ -520,7 +520,7 @@ function far.Text (X, Y, Color, Str)
 end ----
 
 function editor.AddColor (EditorId, StringNumber,
-                          StartPos, EndPos, Flags, Color, Priority)
+                          StartPos, EndPos, Flags, Color, Priority, Owner)
   --far.Show(EditorId, StringNumber, StartPos, EndPos, Flags, Color, Priority)
   if type(Color) == 'table' then
     return _EditorAddColor(EditorId, StringNumber,
@@ -531,9 +531,13 @@ function editor.AddColor (EditorId, StringNumber,
   end
 end ----
 
-function editor.DelColor (EditorId, StringNumber, StartPos)
+function editor.DelColor (EditorId, StringNumber, StartPos, Owner)
   --far.Show(EditorId, StringNumber, StartPos)
-  return editor.AddColor(EditorId, StringNumber, StartPos, StartPos, 0)
+  if Owner or StartPos then
+    return editor.AddColor(EditorId, StringNumber, StartPos or -1, StartPos or -1, 0, Owner)
+  else
+    return true -- Исключение сброса всей раскраски в FAR2 !
+  end
 end ----
 
 function editor.GetColor (EditorId, StringNumber,
