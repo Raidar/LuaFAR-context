@@ -24,6 +24,14 @@ ctxdata.reg     = ctxdata.reg or {}     -- register of configs
 ctxdata.checked = ctxdata.checked or {} -- type checked configs
 ctxdata.descriptors = ctxdata.descriptors or {} -- config descriptors
 
+---------------------------------------- Debug
+-- Show required information.
+function context.ShowInfo (...)
+  context.dbg = context.dbg or require "context.utils.useDebugs"
+
+  return context.dbg.Show(...)
+end ---- ShowInfo
+
 ---------------------------------------- -- FAR23 begin
 --[[
   Блок кода работы скриптов для LuaFAR3 под LuaFAR2.
