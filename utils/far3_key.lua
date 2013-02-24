@@ -27,23 +27,16 @@ local far = far
 local F = far.Flags
 
 ----------------------------------------
-local context = context
+--local context = context
+--local logShow = context.ShowInfo
+local far23 = context.use.far23
 
---local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 --local numbers = require 'context.utils.useNumbers'
 
 local tconcat, tfind = table.concat, tables.find
 
 --local hex = numbers.hex8 -- for far.Message
-
-local far23 = context.use.far23
-
-----------------------------------------
---[[
-local dbg = require "context.utils.useDebugs"
-local logShow = dbg.Show
---]]
 
 --------------------------------------------------------------------------------
 local unit = {}

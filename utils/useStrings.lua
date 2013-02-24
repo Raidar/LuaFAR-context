@@ -23,10 +23,7 @@ local band, bor  = bit.band, bit.bor
 local bshl, bshr = bit.lshift, bit.rshift
 
 ----------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
+--local logShow = context.Show
 
 --------------------------------------------------------------------------------
 local unit = {}

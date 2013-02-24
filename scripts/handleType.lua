@@ -27,18 +27,13 @@ local F = far.Flags
 require 'context.scripts.detectType'
 
 local context, ctxdata = context, ctxdata
+local logShow = context.ShowInfo
 
 local detect = context.detect
 local cfgDat = ctxdata.config
 --[[
 local types = cfgDat.types
 far.Show("types", unpack(types))
---]]
-
-----------------------------------------
---[[
-local dbg = require "context.utils.useDebugs"
-local logShow = dbg.Show
 --]]
 
 --------------------------------------------------------------------------------

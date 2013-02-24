@@ -19,6 +19,7 @@ local pairs = pairs
 
 ----------------------------------------
 local context, ctxdata = context, ctxdata
+local logShow = context.ShowInfo
 local types = ctxdata.config.types
 
 local utils = require 'context.utils.useUtils'
@@ -34,12 +35,6 @@ local useprofiler = false
 --local useprofiler = true
 
 if useprofiler then require "profiler" end -- Lua Profiler
-
-----------------------------------------
---[[
-local dbg = require "context.utils.useDebugs"
-local logShow = dbg.Show
---]]
 
 --------------------------------------------------------------------------------
 local unit = {}

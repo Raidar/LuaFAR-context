@@ -23,16 +23,10 @@ local pairs = pairs
 local getmetatable, setmetatable = getmetatable, setmetatable
 
 ----------------------------------------
-local context = context
+--local logShow = context.Show
 
 local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
-
-----------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -334,6 +328,9 @@ function unit.history (path, name, kind) --> (object)
   return setmetatable(self, MHistory)
 end -- history
 
+do
+  local context = context
+
 -- Create history object.
 function unit.newHistory (data, check) --> (object)
 
@@ -362,6 +359,7 @@ else -- FAR23
 end
 end -- history
 
+end -- do
 ---------------------------------------- custom
 do
   local f_fpath = '%s%s%s'      -- Relative path

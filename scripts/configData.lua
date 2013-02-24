@@ -20,8 +20,8 @@ local getmetatable, setmetatable = getmetatable, setmetatable
 
 ----------------------------------------
 local context, ctxdata = context, ctxdata
+local logShow = context.ShowInfo
 
---local utils = require 'context.utils.useUtils'
 local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
 local locale = require 'context.utils.useLocale'
@@ -30,12 +30,6 @@ local cfgDat, cfgReg = ctxdata.config, ctxdata.reg
 local descriptors = ctxdata.descriptors
 
 local cfgpairs = datas.cfgpairs
-
-----------------------------------------
---[[
-local dbg = require "context.utils.useDebugs"
-local logShow = dbg.Show
---]]
 
 --------------------------------------------------------------------------------
 local unit = {}

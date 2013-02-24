@@ -18,6 +18,7 @@ local setmetatable = setmetatable
 
 ----------------------------------------
 --local context, ctxdata = context, ctxdata
+--local logShow = context.Show
 
 local strings = require 'context.utils.useStrings'
 local utils = require 'context.utils.useUtils'
@@ -26,12 +27,6 @@ local datas = require 'context.utils.useDatas'
 
 local languages = require "context.data.languages" -- languages and codes
 local lCodes = languages.alpha_3
-
-----------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
 
 --------------------------------------------------------------------------------
 local unit = {}

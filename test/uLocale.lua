@@ -9,14 +9,9 @@
 
 ----------------------------------------
 --local context = context
+local ShowInfo = context.ShowInfo
 
 local locale = require 'context.utils.useLocale'
-
-----------------------------------------
--- [[
-local dbg = require "context.utils.useDebugs"
-local logShow = dbg.Show
---]]
 
 --------------------------------------------------------------------------------
 local scriptPath = "context\\test\\"
@@ -39,7 +34,7 @@ local loc, error1, error2 = locale.create(DefCustom)
 loc.b = loc.button
 
 if loc == nil then
-  logShow({ error1, error2 }, 'Error')
+  ShowInfo({ error1, error2 }, 'Error')
   return
 end
 

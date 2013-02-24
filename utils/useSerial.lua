@@ -34,6 +34,7 @@ local format = string.format
 
 ----------------------------------------
 --local context = context
+--local logShow = context.Show
 
 local lua = require "context.utils.useLua"
 local numbers = require 'context.utils.useNumbers'
@@ -48,12 +49,6 @@ local MaxNumberInt = numbers.MaxNumberInt
 
 local spaces = strings.spaces -- for ...ToText
 local squote = strings.quote -- for quoting string
-
-----------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
 
 --------------------------------------------------------------------------------
 local unit = {}

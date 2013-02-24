@@ -9,6 +9,7 @@
 
 ----------------------------------------
 --local context = context
+local logShow = context.ShowInfo
 
 --local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
@@ -22,11 +23,6 @@ local serial = require 'context.utils.useSerial'
 --[[
 local log = require "context.samples.logging"
 local logShow = log.Show
---]]
--- [[
-local dbg = require "context.utils.useDebugs"
-local dbgShow = dbg.Show
---local logShow = dbgShow
 --]]
 
 --------------------------------------------------------------------------------
@@ -225,7 +221,7 @@ function unit.Execute (Data) --> (bool | nil)
   filter = "wi20r5" -- Integer and real number
 
   --logShow(_Test.test, "test", "w") -- Test samples/logging
-  dbgShow(_Test.test, "test", filter) -- Test utils/useDebugs
+  logShow(_Test.test, "test", filter) -- Test utils/useDebugs
   --[[
   -- Test "logging-to-file" object:
   local l = dbg.open("uSerialFile.log")

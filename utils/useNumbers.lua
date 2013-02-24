@@ -25,10 +25,7 @@ local floor, ceil = math.floor, math.ceil
 --local win, far = win, far
 
 ----------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
+--local logShow = context.Show
 
 --------------------------------------------------------------------------------
 local unit = {}

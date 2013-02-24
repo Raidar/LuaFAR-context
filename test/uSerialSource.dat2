@@ -1,10 +1,7 @@
 --[[ uSerial2: Source ]]--
 
 --------------------------------------------------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
+local logShow = context.ShowInfo
 
 local b = {text="ha'ns", ['co\nl or']='bl"ue', str="\"\n'\\\000"}
 local c = function() return 1 end

@@ -29,13 +29,9 @@ local far = far
 --local F = far.Flags
 
 ----------------------------------------
-local serial = require 'context.utils.useSerial'
+--local logShow = context.Show
 
-----------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
+local serial = require 'context.utils.useSerial'
 
 --------------------------------------------------------------------------------
 local unit = {}

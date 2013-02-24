@@ -15,16 +15,27 @@ local _G = _G
 
 --------------------------------------------------------------------------------
 context = rawget(_G, 'context') or {}
+
+local context = context
 context.use = context.use or {} -- for non-context utils
 
 ---------------------------------------- Data
 ctxdata = rawget(_G, 'ctxdata') or {}
+
+local ctxdata = ctxdata
 ctxdata.config  = ctxdata.config or {}  -- access to configs
 ctxdata.reg     = ctxdata.reg or {}     -- register of configs
 ctxdata.checked = ctxdata.checked or {} -- type checked configs
 ctxdata.descriptors = ctxdata.descriptors or {} -- config descriptors
 
 ---------------------------------------- Debug
+-- Show simple information.
+function context.Show (...)
+  context.log = context.log or require "context.samples.logging"
+
+  return context.log.Show(...)
+end ---- Show
+
 -- Show required information.
 function context.ShowInfo (...)
   context.dbg = context.dbg or require "context.utils.useDebugs"

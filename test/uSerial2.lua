@@ -9,6 +9,7 @@
 
 ----------------------------------------
 --local context = context
+local logShow = context.ShowInfo
 
 local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'

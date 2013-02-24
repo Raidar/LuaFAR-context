@@ -17,6 +17,7 @@ if not context then
   return
 end
 
+local logShow = context.ShowInfo
 --local cfgReg = ctxdata.reg
 local readCfg = context.config.read
 
@@ -29,10 +30,6 @@ end
 local utils = require 'context.utils.useUtils'
 
 ----------------------------------------
---[[
-local dbg = require "context.utils.useDebugs"
-local logShow = dbg.Show
---]]
 
 --readCfg(cfgReg.types) -- Reading types_config -- don't work!
 

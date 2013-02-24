@@ -14,12 +14,7 @@
 
 ----------------------------------------
 --local context = context
-
-----------------------------------------
---[[
-local log = require "context.samples.logging"
-local logShow = log.Show
---]]
+--local logShow = context.Show
 
 --------------------------------------------------------------------------------
 local unit = {}
