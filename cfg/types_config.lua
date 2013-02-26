@@ -156,8 +156,8 @@ local types = {
           -- 1.2.1. config text --
   ini       = { inherit = 'config', desc = 'INI config',
                 masks = {'%.ini$','%.cfg$'}, },
-  --ini_ini   = { inherit = 'config', desc = 'Main config',
-  --              masks = {'%.ini$','%.cfg$'}, firstline = {lines.ini}, },
+    --ini_ini   = { inherit = 'config', desc = 'Main config',
+    --              masks = {'%.ini$','%.cfg$'}, firstline = {lines.ini}, },
     ini_cfg   = { inherit = 'ini', desc = 'Other config',
                   masks = {'%.ctl$','%.tpl$','%.srg$','%.lng$',
                            --'%.conf$', -- xml-based config
@@ -194,11 +194,6 @@ local types = {
 
           -- 1.2.2. data define --
               -- Resources:
-  --[[ -- MAYBE:
-  res_def   = { inherit = 'define', desc = 'Resource define', },
-    res_src   = { inherit = 'res_def', desc = 'Resource source', masks = {'%.rc$','%.dlg$'}, },
-    frm_dlf   = { inherit = 'res_def', desc = 'Delphi form', masks = {'%.dfm$'}, },
-  --]]
   frm_dlf   = { inherit = 'define', desc = 'Delphi form', masks = {'%.dfm$'}, },
   res_src   = { inherit = 'define', desc = 'Resource source', masks = {'%.rc$','%.dlg$'}, },
   vmodeler  = { inherit = 'define', desc = 'Visual Modeler', masks = {'%.mdl$'}, },
@@ -242,6 +237,7 @@ local types = {
 
               -- Script data:
   scriptdata= { inherit = 'define', desc = 'Script data', group = 'script', },
+    cue       = { inherit = 'scriptdata', desc = 'Cue sheet', masks = {'%.cue$'}, },
     diff      = { inherit = 'scriptdata', desc = 'Diff/Patch',
                   masks = {'%.diff?.*$','%.pat$','%.patch$','%.rej$','%.reject$'},
                   firstline = {'^diff','^Index','^%-%-%-','^%+%+%+','^%*%*%*',
@@ -256,7 +252,7 @@ local types = {
   edif      = { inherit = 'define', desc = 'EDIF', masks = {'%.edi?f$','%.ed[no]$'}, },
   step_rc   = { inherit = 'define', desc = 'Litestep step_rc', masks = {'step%.rc$'}, },
 
-  bor_tem   = { inherit = 'scriptdata', desc = 'TEM language', masks = {'%.tem$'}, },
+  --bor_tem   = { inherit = 'scriptdata', desc = 'TEM language', masks = {'%.tem$'}, },
   m4        = { inherit = 'scriptdata', desc = 'M4 macro processor', masks = {'%.m4$'}, },
   mntrack   = { inherit = 'scriptdata', desc = 'MNTrack script', masks = {'%.scn$'}, },
   --]]
@@ -268,8 +264,9 @@ local types = {
   less      = { inherit = 'css', desc = 'LESS', group = 'haml', masks = {'%.less$'}, },
 
           -- 1.2.3. markup text --
-  markdown  = { inherit = 'markup', desc = 'Markdown', masks = {'%.md$'}, },
-  
+  markdown  = { inherit = 'markup', desc = 'Markdown',
+                group = 'define', masks = {'%.md$','%.markdown$','%.text$'}, },
+
   rtf       = { inherit = 'markup', desc = 'RTF', masks = {'%.rtf$'}, },
   tex       = { inherit = 'markup', desc = 'TeX',
                 masks = {'%.tex$','%.sty$','%.cls$'},
@@ -279,15 +276,19 @@ local types = {
   postscript= { inherit = 'markup', desc = 'PostScript',
                 masks = {'%.ps[1-3f]?$','%.eps[if]?$','%.gsf$'},
                 strongline = {'^%%!PS'}, firstline = {'^%%!'}, },
-  ps_font   = { inherit = 'postscript', desc = 'Postscript Font', group = 'font',
-                masks = {'%.pf[ab]$'}, firstline = {'^%%!','^%%!PS'}, },
-
-  haml      = { inherit = 'markup', desc = 'HAML', masks = {'%.haml$'}, },
+  ps_font   = { inherit = 'postscript', desc = 'Postscript Font',
+                group = 'font', masks = {'%.pf[ab]$'},
+                firstline = {'^%%!','^%%!PS'}, },
+                
   yaml      = { inherit = 'markup', desc = 'YAML', masks = {'%.yaml$'}, },
   json      = { inherit = 'yaml', desc = 'JSON', masks = {'%.json$'}, },
 
-  relaxnc   = { inherit = 'markup', desc = 'Relax NG Compact Syntax', group = "RELAX",
-                masks = {'%.rnc$'}, },
+  haml      = { inherit = 'markup', desc = 'HAML', masks = {'%.haml$'}, },
+  shpaml    = { inherit = 'haml', desc = 'SHPAML', group = 'html',
+                masks = {'%.shpaml$'}, },
+
+  relaxnc   = { inherit = 'markup', desc = 'Relax NG Compact Syntax',
+                group = 'relaxng', masks = {'%.rnc$'}, },
               -- rare
   --[[
   admtempl  = { inherit = 'main', desc = 'ADM - Policy Template', masks = {'%.adm$'}, },
@@ -328,7 +329,6 @@ local types = {
                 masks = {'%.html?$','%.p$'}, firstline = {'^[@%^]%w+'}, },
                   -- rare
   -- [[
-  mason     = { inherit = 'html', desc = 'Mason', group = 'perl', masks = {'%.mc$'}, },
   ppwizard  = { inherit = 'html', desc = 'ppWizard', masks = {'%.i[th]$'}, },
   --]]
               -- XML main:
@@ -343,11 +343,11 @@ local types = {
   xslfo     = { inherit = 'xml', desc = 'XSL-FO',
                 masks = {'%.xsltfo?$','%.fo$'}, }, -- 1.0
   xslt      = { inherit = 'xml', desc = 'XSLT', masks = {'%.xslt?2?$'},
-                firstline = {'stylesheet%s+',
-                             '[tT]ransform%s+'}, }, -- 1.0 & 2.0
-              -- use colorer' proto.hrc for XSLT 1.0 and XSLT 2.0 separation
+                firstline = {'stylesheet%s+', '[tT]ransform%s+'}, }, -- 1.0 & 2.0
+              -- use colorer' proto.hrc to separate XSLT 1.0 and XSLT 2.0
   xquery    = { inherit = 'xml', desc = 'XQuery',
                 masks = {'%.xq$'}, firstline = {'^%s*xquery%s+'}, },
+  schematron= { inherit = 'xml', desc = 'Schematron', masks = {'%.sch$'}, },
               -- XML book:
   xmlbook   = { inherit = 'xml', desc = 'XML Book', },
   docbook   = { inherit = 'xmlbook', desc = 'DocBook',
@@ -360,10 +360,13 @@ local types = {
   calcset   = { inherit = 'xml', desc = 'FAR calcset',
                 masks = {'calcset%.csr$'}, },
   htc       = { inherit = 'xml', desc = 'HTC', masks = {'%.htc$'}, },
+  qrc       = { inherit = 'xml', desc = 'Qt Resource Collection',
+                masks = {'%.qrc$'}, },
   rdf       = { inherit = 'xml', desc = 'RDF', masks = {'%.rdf$'}, },
-  relaxng   = { inherit = 'xml', desc = 'Relax NG', group = "RELAX", masks = {'%.rng$'}, },
+  relaxng   = { inherit = 'xml', desc = 'Relax NG', masks = {'%.rng$'}, },
   rss       = { inherit = 'xml', desc = 'RSS', -- 0.91 & 1.0
-                masks = {'^rss','%.rss$','%.rdf$','%.xml$'},
+                masks = {'^rss','%.rss$','%.rdf$'},
+                --masks = {'^rss','%.rss$','%.rdf$','%.xml$'},
                 firstline = {'xmlns="http://purl%.org/rss/1%.0/"',
                              '<rss version="0%.91">'}, },
   svg       = { inherit = 'xml', desc = 'SVG', masks = {'%.svg$'}, }, -- 1.0
@@ -371,19 +374,17 @@ local types = {
   web_app   = { inherit = 'xml', desc = 'web-app', masks = {'web%.xml$'}, },
   wsc       = { inherit = 'xml', desc = 'WSC', masks = {'%.wsc$'}, },
   wsdl      = { inherit = 'xml', desc = 'WSDL', masks = {'%.wsdl$'}, },
-  wsf       = { inherit = 'xml', desc = 'WSF', masks = {'%.wsf$'}, },
+  wsf       = { inherit = 'xml', desc = 'WSH', masks = {'%.wsf$'}, }, -- wsf ~= wsh
+  --xaml      = { inherit = 'xml', desc = 'XAML', masks = {'%.xaml$'}, },
   xbl       = { inherit = 'xml', desc = 'Mozilla XBL', masks = {'%.xml$'},
                 firstline = {'xmlns%s*=%s*["\']http://www%.mozilla%.org/xbl["\']'}, },
+  xul       = { inherit = 'xml', desc = 'Mozilla XUL', masks = {'%.xul$'}, },
+                --firstline = {'xmlns%s*=%s*["\']http://www%.mozilla%.org/xul["\']'}, },
   xsieve    = { inherit = 'xslt', desc = 'XSieve XSLT', masks = {'%.xsl$'},
                 firstline = {'xmlns%s*=%s*["\']http://www%.sourceforge%.net["\']'}, },
                   -- rare
-  --[[
-  ant       = { inherit = 'xml', desc = 'Ant\'s build',
-                masks = {'build%.xml$'}, firstline = {'<project'}, },
-  --]]
               -- SGML others:
   vrml      = { inherit = 'sgml', desc = 'VRML', masks = {'%.wrl$'}, },
-  wml       = { inherit = 'sgml', desc = 'WML', masks = {'%.wml$'}, },
                   -- rare
   -- [[
   mathml    = { inherit = 'sgml', desc = 'MathML',
@@ -392,6 +393,7 @@ local types = {
   micqlog   = { inherit = 'sgml', desc = 'mICQ log', group = 'text',
                 masks = {'^[%._]log$'}, firstline = {'^<$'}, },
   sdml      = { inherit = 'sgml', desc = 'SDML', masks = {'%.sdml$'}, },
+  wml       = { inherit = 'sgml', desc = 'WML', masks = {'%.wml$'}, },
   --]]
               -- Colorer-take5:
   colorer   = { inherit = 'xml', desc = 'Colorer', },
@@ -421,10 +423,6 @@ local types = {
   vb        = { inherit = 'basic', desc = 'Visual Basic',
                 masks = {'%.bas$','%.vbp$','%.frm$','%.cls$'},
                 firstline = {'^VERSION %d+%.%d+', '^VBWIZARD %d+%.%d+'}, },
-  --[[ -- MAYBE:
-  c         = { inherit = 'main', desc = 'C',
-                masks = {'%.[ch]$','%.[ch]pp$','%.cc$','%.hh$','%.cxx$'}, },
-  --]]
   c         = { inherit = 'main', desc = 'C', masks = {'%.[ch]$'}, },
   cpp       = { inherit = 'c', desc = 'C++',
                 masks = {'%.[ch]pp$','%.cc$','%.hh$','%.cxx$'},
@@ -466,13 +464,22 @@ local types = {
                 masks = {'%.ob2?$','%.odf$'}, firstline = msets.modula, },
                     -- rare
   ada       = { inherit = 'main', desc = 'Ada', masks = {'%.ad[sbc]$'}, },
+  --cup       = { inherit = 'main', desc = 'Cup', masks = {'%.cup$'}, },
   eiffel    = { inherit = 'main', desc = 'Eiffel', masks = {'%.e$'}, },
   erlang    = { inherit = 'main', desc = 'Erlang', masks = {'%.[eh]rl$'}, },
   gpss      = { inherit = 'main', desc = 'GPSS', masks = {'%.gps$'}, },
   icon      = { inherit = 'main', desc = 'Icon', masks = {'%.icn$'}, },
   lisp      = { inherit = 'main', desc = 'Lisp',
                 masks = {'%.li?sp$','%.scm$','%.elc?$'}, },
+  --llvm      = { inherit = 'main', desc = 'LLVM IR', masks = {'%.ll$'}, },
   matlab    = { inherit = 'main', desc = 'MatLab', masks = {'%.m$'}, },
+  --nesc      = { inherit = 'c', desc = 'nesC', masks = {'%.nc$'}, },
+  --pl1       = { inherit = 'main', desc = 'PL/I', masks = {'%.pl[1i]$'}, },
+  --stata     = { inherit = 'main', desc = 'Stata', masks = {'%.a?do$'}, },
+  --ubasic    = { inherit = 'basic', desc = 'UniVision Basic',
+  --              masks = {'%.uvbasic$'},
+  --              firstline = {'^PROGRAM%s+%w+$',
+  --                           '^SUBROUTINE%s+%w+', '^EXTERNALFUNCTION%s+%w+'}, },
   -- [[
                   -- Others:
   abap4     = { inherit = 'main', desc = 'ABAP/4', group = 'rare',
@@ -522,6 +529,7 @@ local types = {
                   -- Lexers:
   lex       = { inherit = 'main', desc = 'Lex/flex', masks = {'%.f?lex$','%.l+$'}, },
   yacc      = { inherit = 'lex', desc = 'YACC/Bison', masks = {'%.yacc$','%.y+$'}, },
+  --lemon     = { inherit = 'lex', desc = 'Lemon', masks = {'%.y$'}, },
                   -- Java somes:
   j_pnuts   = { inherit = 'java', desc = 'Java Pnuts', masks = {'%.pnut$'}, },
   j_jcc     = { inherit = 'java', desc = 'Java Compiler Compiler', masks = {'%.jjt?$'}, },
@@ -561,7 +569,7 @@ local types = {
   vb_net    = { inherit = 'dotnet', desc = 'VB.NET', masks = {'%.vb$'}, },
 
               -- 1.3.1.3. network language
-  erb       = { inherit = 'net', desc = 'ERB - Rails HTML',
+  erb       = { inherit = 'net', desc = 'Embedded Ruby',
                 masks = {'%.erb$','%.r?html$','html%.erb$'}, },
   php       = { inherit = 'net', desc = 'PHP',
                 masks = {'%.php%d?$','%.[pt]html$'},
@@ -579,16 +587,24 @@ local types = {
   asp       = { inherit = 'net', desc = 'Active Server Pages',
                 masks = {masks.asp_as,masks.asp_ht}, },
   asp_vbs   = { inherit = 'asp', desc = 'ASP: VBScript',
-                masks = msets.asp, firstline = {lines.lang..'vbscript', '<%%'}, },
+                group = 'basic', masks = msets.asp,
+                firstline = {lines.lang..'vbscript', '<%%'}, },
   asp_js    = { inherit = 'asp', desc = 'ASP: JavaScript',
-                masks = msets.asp,
+                group = 'jscript', masks = msets.asp,
                 firstline = {lines.lang..'jscript',lines.lang..'javascript'}, },
   asp_ps    = { inherit = 'asp', desc = 'ASP: PerlScript',
-                masks = msets.asp, firstline = {lines.lang..'perlscript'}, },
+                group = 'perl', masks = msets.asp,
+                firstline = {lines.lang..'perlscript'}, },
   adp       = { inherit = 'net', desc = 'AOLserver Dynamic Pages',
                 masks = {'%.adp$'}, firstline = {lines.lang..'tcltk', '<%%'}, },
   jsp       = { inherit = 'net', desc = 'Java Server Pages',
-                masks = {'%.jspf?$'}, },
+                group = 'java', masks = {'%.jspf?$','%.tag$'}, },
+  mako      = { inherit = 'net', desc = 'Mako',
+                group = 'python', masks = {'%.mako$'}, },
+  mason     = { inherit = 'net', desc = 'Mason',
+                group = 'perl', masks = {'%.mc$'}, },
+  psp       = { inherit = 'net', desc = 'Pascal Server Pages',
+                group = 'pascal', masks = {'%.psp$'}, },
 
           -- 1.3.2. Script language --
   --acapella= { inherit = 'script', desc = 'Acapella', -- It is required firstline!
@@ -596,8 +612,11 @@ local types = {
   avisynth  = { inherit = 'script', desc = 'AviSynth', masks = {'%.avsi?$'}, },
   farmacro  = { inherit = 'script', desc = 'FAR macros', masks = {'%.macro$'}, },
   farmail   = { inherit = 'script', desc = 'FARMail Script', masks = {'%.fms$'}, },
+  r         = { inherit = 'script', desc = 'R',
+                masks = {'%.r$','%.rhistory$','%.rprofile$'}, },
+  squirrel  = { inherit = 'script', desc = 'Squirrel', masks = {'%.nut$'}, },
   tcl_tk    = { inherit = 'script', desc = 'Tcl/Tk', masks = {'%.tcl$','%.tk$'},
-               strongline = {'^#!%s-%S*tcl','^#!%s-%S*wish'}, },
+                strongline = {'^#!%s-%S*tcl','^#!%s-%S*wish'}, },
                   -- Lua:
   lua       = { inherit = 'script', desc = 'Lua', masks = {'%.lua$','%.wlua$'},
                 strongline = {'^#!%s-%S*lua'}, firstline = {lines.lua_rem}, },
@@ -610,7 +629,8 @@ local types = {
   batch     = { inherit = 'shell', desc = 'Batch', group = 'script',
                 masks = {'%.cmd$','%.bat$','%.nt$','%.btm$','%.sys$'}, },
   sh        = { inherit = 'shell', desc = 'Shell', group = 'script',
-                masks = {'%.sh$','^pkgbuild$'}, strongline = {'^#!%s-%S*sh'}, },
+                masks = {'%.sh$','%.spec$','^pkgbuild$'},
+                strongline = {'^#!%s-%S*sh'}, },
   csh       = { inherit = 'shell', desc = 'CSH script', group = 'script',
                 masks = {'%.csh$'}, strongline = {'^#!%s-%S*csh'}, },
   bash      = { inherit = 'shell', desc = 'BASH script', group = 'script',
@@ -620,6 +640,8 @@ local types = {
   apache    = { inherit = 'shell', desc = 'Apache httpd.conf', group = 'script',
                 masks = {'httpd%.conf$','srm%.conf$','access%.conf$',
                          '%.htaccess$','apache%.conf$'}, },
+  powershell= { inherit = 'shell', desc = 'PowerShell script',
+                group = 'script', masks = {'%.ps[dm]?1$','%.psfconsole$'}, },
                   -- rare
   --[[
   shell_r   = { inherit = 'shell', desc = 'Batch/Shell rare', group = 'rare', },
@@ -636,17 +658,22 @@ local types = {
               -- 1.3.2.-. makefile
   makefile  = { inherit = 'script', desc = 'MakeFile script', },
   make      = { inherit = 'makefile', desc = 'MakeFile',
-                masks = {'gnumakefile','^makefile','%.make?$','%.gmk$'}, },
+                masks = {'^makefile','gnumakefile','%.make?$','%.g?mk$'}, },
+  make_ap   = { inherit = 'makefile', desc = 'MakeFile: AirPlay SDK',
+                masks = {'%.mk[bf]$'}, }, -- .. project/package/group
+  make_bor  = { inherit = 'makefile', desc = 'MakeFile: Borland',
+                masks = {'%.bp[krg]$'}, }, -- .. project/package/group
   make_ms   = { inherit = 'makefile', desc = 'MakeFile: MS DS',
                 masks = {'%.ds[pw]$'}, -- .. project/workspace
                 firstline = {'Microsoft Developer Studio'}, },
-  make_bor  = { inherit = 'makefile', desc = 'MakeFile: Borland',
-                masks = {'%.bp[krg]$'}, }, -- .. project/package/group
-  make_ap   = { inherit = 'makefile', desc = 'MakeFile: AirPlay SDK',
-                masks = {'%.mk[bf]$'}, }, -- .. project/package/group
+  make_qt   = { inherit = 'makefile', desc = 'MakeFile: Qt qmake',
+                masks = {'%.pr[oif]$'}, }, -- .. project/package/group
   make_sc   = { inherit = 'makefile', desc = 'SCons tool', group = 'script',
                 masks = {'sconstruct$','sconscript$'}, }, -- Software Construction tool
                   -- rare
+  --ant       = { inherit = 'makefile', desc = 'Ant\'s build',
+  --              group = 'xml', masks = {'build%.xml$'},
+  --              firstline = {'<project'}, },
   autoit    = { inherit = 'script', desc = 'AutoIt', masks = {'%.aut$'}, }, -- 2.x
   ahk       = { inherit = 'script', desc = 'AutoHotkey',
                 masks = {'%.ahk$'}, firstline = {'^;'}, },
@@ -674,6 +701,8 @@ local types = {
   inst_iss  = { inherit = 'install', desc = 'InnoSetup script', masks = {'%.iss$'}, },
   inst_nsi  = { inherit = 'install', desc = 'Nullsoft script', masks = {'%.ns[ih]$'}, },
   inst_rar  = { inherit = 'install', desc = 'RAR script', masks = {'%.s$'}, },
+  inst_wxs  = { inherit = 'install', desc = 'WiX script',
+                group = 'xml', masks = {'%.wxs$'}, },
 
   -- 2. packed
 
