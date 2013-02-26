@@ -440,6 +440,7 @@ function unit.customize (Custom, defCustom) --> (table)
 
   -- History:
   u = t.history or {}; t.history = u
+  u.f_fpath = f_fpath
   u.field = u.field or name
   u.dir   = u.dir  or ''
   u.ext   = u.ext  or '.cfg'
@@ -451,6 +452,7 @@ function unit.customize (Custom, defCustom) --> (table)
 
   -- Help:
   u = t.help or {}; t.help = u
+  u.f_tlink = f_tlink
   u.ext   = u.ext  or '.hlf'
   u.file  = u.file or t.file or name
   u.path  = u.path or path
@@ -459,6 +461,7 @@ function unit.customize (Custom, defCustom) --> (table)
 
   -- Locale:
   u = t.locale or {}; t.locale = u
+  u.f_fpath = f_fpath
   u.kind  = u.kind or 'both'
   u.dir   = u.dir or 'locales\\'
   u.ext   = u.ext  or '.lua'
