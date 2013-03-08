@@ -295,6 +295,7 @@ end ---- TypToText
   filter (string) - filter some fields; filter characters:
                     -- common:
                     - w - write data as whole table.
+                    - A - pairs all fields.
                     - d%d+ - max depth (nesting) level to convert.
                     -- fields:
                     - O|B|N|S|T|U|F|E - exclude some key types:
@@ -441,6 +442,10 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   -- Common:
   kind.localret = false
   if sfind(filter, 'w') then kind.astable = true end
+  if sfind(filter, 'A') then
+    local tables = require 'context.utils.useTables'
+    kind.pairs = tables.allpairs
+  end
   local depth = filter:match("d(%d+)") -- Nesting:
   if depth then kind.nesting = tonumber(depth) end
 
