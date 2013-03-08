@@ -2,8 +2,8 @@
 
 ----------------------------------------
 --[[ description:
-  -- Information about Lua language.
-  -- Информация о языке Lua.
+  -- Information about Lua language.
+  -- Информация о языке Lua.
 --]]
 ----------------------------------------
 --[[ uses:
