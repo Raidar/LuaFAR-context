@@ -447,7 +447,7 @@ local types = {
   pas_inc   = { inherit = 'pascal',
                 masks = {masks.inc,'%.i16$','%.i32$','%.int$'}, },
   perl      = { inherit = 'main', desc = 'Perl',
-                masks = {'%.pl[sx]?$','%.pm$','%.pod$','%.t$','%.cgi$'},
+                masks = {'%.pl[sx]?$','%.p[hm]$','%.pod$','%.t$','%.cgi$'},
                 strongline = {'^#!%s-%S*perl'}, firstline = {'perl'}, },
   python    = { inherit = 'main', desc = 'Python',
                 masks = {'%.py[ws]?$'},
