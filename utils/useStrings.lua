@@ -142,7 +142,7 @@ end -- do
 --[[
   -- @params:
   s  (string) - analyzed string.
-  sep (s|nil) - line separator: @default = "\n".
+  sep (s|nil) - line separator (@default = "\n").
   -- @return:
   count (number) - count of lines.
 --]]
@@ -155,7 +155,7 @@ end ----
 --[[
   -- @params:
   s  (string) - analyzed string.
-  pat (s|nil) - line pattern: @default = "([^\n]+)".
+  pat (s|nil) - line pattern (@default = "([^\n]+)").
   -- @return:
   max  (number) - maximal length.
   line (string) - line with max length.

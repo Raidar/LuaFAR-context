@@ -232,7 +232,7 @@ local Locale_MT = { __index = TLocale }
   Custom   (table) - установки скрипта.
   Data     (table) - данные локализации.
   useError  (bool) - показ сообщения об ошибке вместо его возврата.
-  show      (func) - функция вывода сообщения (@default = far.Message)
+  show      (func) - функция вывода сообщения (@default = far.Message).
                      @params: (текст, [заголовок], [флаги]).
   -- @return:
   object   (table) - объект с методами локализации.
