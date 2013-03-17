@@ -72,7 +72,7 @@ end ----
 -- Convert first character of string to upper.
 -- Преобразование первого символа строки в верхний регистр.
 function unit.upfirst (s) --> (string)
-  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1))
+  return s:sub(1, 1):upper()..s:sub(2, -1)
 end --
 
 -- Capitalize first character of string
@@ -80,13 +80,18 @@ end --
 -- Преобразование первого символа строки в заглавный
 -- (первый - в верхний регистр, а остальные - в нижний).
 function unit.capfirst (s) --> (string)
-  return format("%s%s", s:sub(1, 1):upper(), s:sub(2, -1):lower())
+  return s:sub(1, 1):upper()..s:sub(2, -1):lower()
 end ----
+
+local function cap (head, tail) --> (string)
+  return head:upper()..(tail and tail:lower() or "")
+end --
 
 -- Capitalize words in string.
 -- Преобразование первого символа слов в заглавный.
 function unit.capital (s) --> (string)
-  return s:gsub("%w+", unit.capfirst)
+  return s:gsub("(%w)(%w*)", cap)
+  --return s:gsub("%w+", unit.capfirst)
 end ----
 
 ---------------------------------------- String
