@@ -435,8 +435,8 @@ function unit.customize (Custom, defCustom) --> (table)
   t.label = t.label or name
   t.file  = t.file  or name
   t.base  = t.base  or utils.PluginPath
-  --t.profile = t.profile or utils.PluginPath
-  t.profile = t.profile or utils.ProfilePath
+  --t.profile = t.profile or utils.ProfilePath
+  t.profile = t.profile or utils.PluginDataPath
 
   -- History:
   u = t.history or {}; t.history = u

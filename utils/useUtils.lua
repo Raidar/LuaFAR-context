@@ -163,6 +163,7 @@ end -- do
 
 ---------------------------------------- FAR
 -- Plugin path.
+-- Путь к плагину.
 function unit.pluginPath ()
   return far.PluginStartupInfo().ModuleDir or
          far.PluginStartupInfo().ModuleName:match("(.*[/\\])") -- FAR23
@@ -170,13 +171,24 @@ end --
 
 unit.PluginPath = unit.pluginPath() -- Current plugin path
 
+-- Plugin directory name.
+-- Название каталога плагина.
+unit.PluginDirName = unit.PluginPath:match("[/\\]([^/\\]*)[/\\]$")
+
+--far.Message(unit.PluginPath, unit.PluginDirName)
+
 -- Profile path.
+-- Путь к профилю.
 function unit.profilePath ()
   return (win.GetEnv("FARPROFILE") or
           win.GetEnv("FARHOME").."\\Profile").."\\"
 end --
 
 unit.ProfilePath = unit.profilePath() -- Current profile path
+
+unit.PluginDataDir = "data\\"
+
+unit.PluginDataPath = unit.ProfilePath..unit.PluginDataDir
 
 -- Used interface and help language.
 -- Используемый язык интерфейса и справки.
