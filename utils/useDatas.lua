@@ -339,6 +339,7 @@ function unit.newHistory (data, check) --> (object)
   local name, path
   if tp == 'table' then
     name, path = data.full, data.work
+
   elseif tp == 'string' then
     name = data
     path = data:match("(.*[/\\])")
@@ -347,16 +348,9 @@ function unit.newHistory (data, check) --> (object)
 
   utils.makedir(path)
   
-if context.use.LFVer >= 3 then
   local history = require "far2.history"
 
   return history.newfile(name)
-
-else -- FAR23
-  local history = require "history"
-
-  return history.new(name)
-end
 end -- history
 
 end -- do

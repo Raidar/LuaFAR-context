@@ -43,24 +43,6 @@ function context.ShowInfo (...)
   return context.dbg.Show(...)
 end ---- ShowInfo
 
----------------------------------------- -- FAR23 begin
---[[
-  Блок кода работы скриптов для LuaFAR3 под LuaFAR2.
-  Внимание: не гарантируется работа всех скриптов,
-  только для LF context, Rh_Scripts, fl_scripts и LF area config.
---]]
--- [==[
-context.use.LFVer = far.LuafarVersion(true)
-if context.use.LFVer < 3 then bit64 = bit end
-
-require "context.utils.far3_spc"
-
---]==]
--- [[
-  require "context.utils.far3" -- FAR23
---]]
----------------------------------------- -- FAR23 end
-
 ---------------------------------------- Config
 local registerConfig
 

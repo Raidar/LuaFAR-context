@@ -30,14 +30,13 @@ ctxdata.isResident = true
 function ProcessEditorEvent (id, event, param)
   --logShow({ id, event, param })
   --logShow(editor.GetInfo())
-  local id, event, param = far.ParseEditorEvent(id, event, param)
   handle.editorEvent(id, event, param)
 
   return 0
 end --
 
 function ProcessViewerEvent (id, event, param)
-  local id, event, param = far.ParseViewerEvent(id, event, param)
+
   handle.viewerEvent(id, event, param)
 
   return 0

@@ -22,8 +22,10 @@ local bnot, bxor = bit.bnot, bit.bxor
 ----------------------------------------
 local win, far = win, far
 
+local F = far.Flags
+
 ----------------------------------------
---local logShow = context.Show
+local logShow = context.Show
 
 --------------------------------------------------------------------------------
 local unit = {}
@@ -50,8 +52,6 @@ end -- do
 --local null = unit.null -- null value instead of nil
 
 ---------------------------------------- Flags
-local F = far.Flags
-
 do
 --[[
   -- @params (for flag handling):
@@ -128,7 +128,6 @@ do
 
   -- Number used flags
   local numFlags = {
-    DIF_SETCOLOR = true, -- FAR23: Exclude!
     MIF_CHECKED  = true,
     WHEEL_DELTA  = true,
   } --- numFlags
@@ -164,12 +163,11 @@ end -- do
 ---------------------------------------- FAR
 -- Plugin path.
 -- Путь к плагину.
-function unit.pluginPath ()
-  return far.PluginStartupInfo().ModuleDir or
-         far.PluginStartupInfo().ModuleName:match("(.*[/\\])") -- FAR23
+function unit.getPluginPath ()
+  return far.PluginStartupInfo().ModuleDir
 end --
 
-unit.PluginPath = unit.pluginPath() -- Current plugin path
+unit.PluginPath = unit.getPluginPath() -- Current plugin path
 
 -- Plugin directory name.
 -- Название каталога плагина.
@@ -179,12 +177,12 @@ unit.PluginDirName = unit.PluginPath:match("[/\\]([^/\\]*)[/\\]$")
 
 -- Profile path.
 -- Путь к профилю.
-function unit.profilePath ()
+function unit.getProfilePath ()
   return (win.GetEnv("FARPROFILE") or
           win.GetEnv("FARHOME").."\\Profile").."\\"
 end --
 
-unit.ProfilePath = unit.profilePath() -- Current profile path
+unit.ProfilePath = unit.getProfilePath() -- Current profile path
 
 unit.PluginDataDir = "data\\"
 
@@ -199,11 +197,34 @@ unit.PluginDataPath = unit.ProfilePath..unit.PluginDataDir
     Help (string) - help language.
 --]]
 function unit.language () --> (table)
+  --[[
+  far.FreeSettings()
+  local lngMain, lngHelp
+
+  local obj = far.CreateSettings("far", F.PSL_LOCAL)
+  if obj then
+    --far.Message(obj, "far")
+    local key = obj:OpenSubkey(0, "Language")
+    --far.Message(F.FST_STRING, key)
+    --far.Message(obj:Get(0, "Main", F.FST_STRING), key)
+    far.Message(obj:Get(key, "Main", F.FST_STRING), key)
+    lngMain = obj:Get(key, "Main", F.FST_STRING)
+    lngHelp = obj:Get(key, "Help", F.FST_STRING)
+    obj:Free()
+  end
+
+  return {
+    Main = lngMain or "Default", -- Interface
+    Help = lngHelp or "Default", -- Help
+  } ----
+  --]]
+  -- [[
   local key = "Software\\Far Manager\\Language"
   return {
     Main = win.GetEnv("FARLANG") or "Default",  -- Interface
     Help = win.GetRegKey("HKCU", key, "Help") or "Default", -- Help -- FAR23
   } ----
+  --]]
 end ----
 
 do
