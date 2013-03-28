@@ -1,0 +1,11 @@
+.svn
+context.bat
+context.exc
+Filex.lnk
+*.WinMerge
+testing/*
+usrcfg/inh_config.lua
+usrcfg/types_config.lua
+testing/FAR3_changelog
+testing/LuaFAR3_flags.c
+testing/FAR2_plugin.hpp
