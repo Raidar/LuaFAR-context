@@ -388,7 +388,7 @@ for k, v in pairs(areas) do
 end
 
 function areaFileType.current (f)
-  local area = far.AdvControl(F.ACTL_GETWINDOWINFO, -1).Type
+  local area = far.AdvControl(F.ACTL_GETWINDOWINFO, 0).Type
   if areaFileType[area] then
     return areaFileType[area](f)
   else

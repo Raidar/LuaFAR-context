@@ -127,7 +127,7 @@ do
 
 -- Choose type for current FAR area.
 function unit.chooseCurrentType ()
-  local area = areas[far.AdvControl(F.ACTL_GETWINDOWINFO, -1).Type or '']
+  local area = areas[far.AdvControl(F.ACTL_GETWINDOWINFO, 0).Type or '']
   if not area then return end
 
   local areaCfg = ctxdata[area]
