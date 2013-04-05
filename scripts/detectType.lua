@@ -113,7 +113,7 @@ do
 -- Read a first line from file in editor.
 -- Чтение первой линии из файла в редакторе.
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
-  local k, line, assumed = 0
+  local k, line, assumed = 1
 
   -- FAR API SetPosition bug workaround (by Shmuel):
   repeat
