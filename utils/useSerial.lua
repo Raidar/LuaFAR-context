@@ -369,6 +369,7 @@ local statpairs = tables.statpairs
     hlimit      (n|f) - length limit for line.
     hcount      (n|f) - max field count in line.
     hwidth      (n|f) - min field width in line.
+    zeroln     (bool) - zero indexed field on separate line.
     -- @locals in kind:
     nestless  (table) - nestless flags for nesting levels.
     isarray   (table) - flag of array-part of prior/current level table.
@@ -567,8 +568,9 @@ local function TabToText (name, data, kind, write) --| (write)
 
     -- Settings to write fields of hash in one line:
     local islining = kind.lining == "all" or kind.lining == "hash"
-    local hlimit, hcount, hwidth
+    local zeroln, hlimit, hcount, hwidth
     if islining then
+      zeroln = kind.zeroln
       hlimit, hcount, hwidth = kind.hlimit, kind.hcount, kind.hwidth
       if type(hlimit) == 'function' then hlimit = hlimit(name, data) end
       if type(hcount) == 'function' then hcount = hcount(name, data) end
@@ -630,6 +632,8 @@ local function TabToText (name, data, kind, write) --| (write)
                   len = indlen + culen + 4 -- for ' = ' + ','
                   write(l > 1 and "\n" or "",
                         new_indent, format("%s = %s,%s", c, u, sp))
+
+                  if zeroln and k == 0 then len = hlimit end
                 else      -- Other fields in same line:
                   write(format(" %s = %s,%s", c, u, sp))
                 end
