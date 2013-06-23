@@ -365,11 +365,18 @@ local statpairs = tables.statpairs
     alimit      (n|f) - length limit for line.
     acount      (n|f) - max field count in line.
     awidth      (n|f) - min field width in line.
+    avalth      (n|f) - min field value width in line.
+    avarth      (n|f) - min field value width (from right) in line.
                         ~ to write hash:
     hlimit      (n|f) - length limit for line.
     hcount      (n|f) - max field count in line.
     hwidth      (n|f) - min field width in line.
+    hkeyth      (n|f) - min field key width in line.
+    hvalth      (n|f) - min field value width in line.
+    hvarth      (n|f) - min field value width (from right) in line.
+
     zeroln     (bool) - zero indexed field on separate line.
+    hstrln     (bool) - field with string value on separate line.
     -- @locals in kind:
     nestless  (table) - nestless flags for nesting levels.
     isarray   (table) - flag of array-part of prior/current level table.
@@ -471,12 +478,17 @@ local function TabToText (name, data, kind, write) --| (write)
 
     -- Settings to write fields of array in one line:
     local islining = kind.lining == "all" or kind.lining == "array"
-    local alimit, acount, awidth
+    local alimit, acount
+    local awidth, avalth, avarth
     if islining then
-      alimit, acount, awidth = kind.alimit, kind.acount, kind.awidth
+      alimit, acount = kind.alimit, kind.acount
+      awidth = kind.awidth
+      avalth, avarth = kind.avalth, kind.avarth
       if type(alimit) == 'function' then alimit = alimit(name, data) end
       if type(acount) == 'function' then acount = acount(name, data) end
       if type(awidth) == 'function' then awidth = awidth(name, data) end
+      if type(avalth) == 'function' then avalth = avalth(name, data) end
+      if type(avarth) == 'function' then asepth = avarth(name, data) end
     end
 
     local l = 0 -- New line count-flag
@@ -503,14 +515,26 @@ local function TabToText (name, data, kind, write) --| (write)
         if islining then
           l = l + 1
           cnt = cnt + 1
+
           local ulen = u:len()
+          local lw, lsp = (avalth or 0) - ulen, ""
+          if lw > 0 then
+            ulen = ulen + lw
+            lsp = spaces[lw]
+          end
+          local rw, rsp = (avarth or 0) - ulen, ""
+          if rw > 0 then
+            ulen = ulen + rw
+            rsp = spaces[rw]
+          end
+
           len = len + ulen + 2 -- for ' ' + ','
-          -- Settings to align fields:
-          local w, sp = (awidth or 0) - ulen, ""
+          local w, wsp = (awidth or 0) - ulen, ""
           if w > 0 then
             len = len + w
-            sp = spaces[w]
+            wsp = spaces[w]
           end
+
           -- Write field:
           if l == 1 or
              acount and cnt > acount or
@@ -518,9 +542,10 @@ local function TabToText (name, data, kind, write) --| (write)
             cnt = 1 -- First field in new line:
             len = indlen + ulen + 1 -- for ','
             write(l > 1 and "\n" or "",
-                  new_indent, format("%s,%s", u, sp))
+                  new_indent,
+                  format("%s%s%s,%s", lsp, u, rsp, wsp))
           else      -- Other fields in same line:
-            write(format(" %s,%s", u, sp))
+            write(format(" %s%s%s,%s", lsp, u, rsp, wsp))
           end
         else
           write(new_indent, u, ",\n")
@@ -568,13 +593,20 @@ local function TabToText (name, data, kind, write) --| (write)
 
     -- Settings to write fields of hash in one line:
     local islining = kind.lining == "all" or kind.lining == "hash"
-    local zeroln, hlimit, hcount, hwidth
+    local zeroln, hstrln
+    local hlimit, hcount
+    local hwidth, hkeyth, hvalth, hvarth
     if islining then
-      zeroln = kind.zeroln
-      hlimit, hcount, hwidth = kind.hlimit, kind.hcount, kind.hwidth
+      zeroln, hstrln = kind.zeroln, kind.hstrln
+      hlimit, hcount = kind.hlimit, kind.hcount
+      hwidth = kind.hwidth
+      hkeyth, hvalth, hvarth = kind.hkeyth, kind.hvalth, kind.hvarth
       if type(hlimit) == 'function' then hlimit = hlimit(name, data) end
       if type(hcount) == 'function' then hcount = hcount(name, data) end
       if type(hwidth) == 'function' then hwidth = hwidth(name, data) end
+      if type(hkeyth) == 'function' then hkeyth = hkeyth(name, data) end
+      if type(hvalth) == 'function' then hvalth = hvalth(name, data) end
+      if type(hvarth) == 'function' then hvalth = hvarth(name, data) end
     end
 
     local l = 0 -- New line count-flag
@@ -616,14 +648,34 @@ local function TabToText (name, data, kind, write) --| (write)
               if islining then
                 l = l + 1
                 cnt = cnt + 1
-                local culen = c:len() + u:len()
+
+                local clen = c:len()
+                local kw, ksp = (hkeyth or 0) - clen, ""
+                if kw > 0 then
+                  clen = clen + kw
+                  ksp = spaces[kw]
+                end
+
+                local ulen = u:len()
+                local lw, lsp = (hvalth or 0) - ulen, ""
+                if lw > 0 then
+                  ulen = ulen + lw
+                  lsp = spaces[lw]
+                end
+                local rw, rsp = (hvarth or 0) - ulen, ""
+                if rw > 0 then
+                  ulen = ulen + rw
+                  rsp = spaces[rw]
+                end
+
+                local culen = clen + ulen
                 len = len + culen + 5 -- for ' ' + ' = ' + ','
-                -- Settings to align fields:
-                local w, sp = (hwidth or 0) - culen, ""
+                local w, wsp = (hwidth or 0) - culen, ""
                 if w > 0 then
                   len = len + w
-                  sp = spaces[w]
+                  wsp = spaces[w]
                 end
+
                 -- Write field:
                 if l == 1 or
                    hcount and cnt > hcount or
@@ -631,12 +683,18 @@ local function TabToText (name, data, kind, write) --| (write)
                   cnt = 1 -- First field in new line:
                   len = indlen + culen + 4 -- for ' = ' + ','
                   write(l > 1 and "\n" or "",
-                        new_indent, format("%s = %s,%s", c, u, sp))
+                        new_indent,
+                        format("%s%s = %s%s%s,%s", c, ksp, lsp, u, rsp, wsp))
 
-                  if zeroln and k == 0 then len = hlimit end
                 else      -- Other fields in same line:
-                  write(format(" %s = %s,%s", c, u, sp))
+                  write(format(" %s%s = %s%s%s,%s", c, ksp, lsp, u, rsp, wsp))
                 end
+                
+                if (zeroln and k == 0) or
+                   (hstrln and type(v) == 'string') then
+                  len = hlimit + 1
+                end
+
               else
                 write(new_indent, format("%s = %s,\n", c, u))
               end
