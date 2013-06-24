@@ -286,10 +286,11 @@ local function ValToText (value, kind) --> (string | nil, type)
   -- string:
   if tp == 'string' then
     -- using long brackets for values:
-    if kind.strlong and kind.iskey and
+    if kind.strlong and
+    --if kind.strlong and kind.iskey and
        value:len() > kind.strlong and
        value:find("\n", 1, true) and
-       not value:find("%s\n") and
+       --not value:find("%s\n") and
        --not value:find("%[%[.-%]%]") and
        not value:find("[[", 1, true) and
        not value:find("]]", 1, true) then
