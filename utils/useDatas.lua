@@ -418,6 +418,7 @@ local defCustom = {
 --]]
 function unit.customize (Custom, defCustom) --> (table)
   local t, u = addData(Custom or {}, defCustom, 'extend', pairs, true)
+  --logShow(t, "data")
   local name, path = t.name, t.path:gsub('/', '\\'):gsub('%.', '\\')
   t.path = path
   --logShow(t, "data")

@@ -164,13 +164,13 @@ local types = {
                            '%.gitconfig$',
                            '%.types$','%.tab$'},
                   firstline = {lines.ini_ext}, },
-              -- Lua somes:
-  cfg_lua   = { inherit = 'config', desc = 'Lua-ini config',
-                masks = {'%.ltx$'}, firstline = {lines.ini}, },
-
     ini_dlf   = { inherit = 'ini', desc = 'Delphi ini', -- Delphi config:
                   masks = {'%.dof$','%.dsk$','%.dro$','%.dci$'},
                   firstline = {lines.ini}, },
+
+              -- Lua somes:
+  cfg_lua   = { inherit = 'config', desc = 'Lua-ini config',
+                masks = {'%.ltx$'}, firstline = {lines.ini}, },
 
               -- FAR Manager & plugins:
   lng_far   = { inherit = 'config', desc = 'FAR lng',
