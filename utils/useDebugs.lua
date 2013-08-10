@@ -542,11 +542,11 @@ function unit.ShowData (data, name, kind) --| (item)
   local items, n = {}, #data
   local nlen = slen(tostring(n))
 
-  for k, v in ipairs(data) do
+  for k = 1, #data do
     local m, sp = tostring(k)
     local isnum = true
 
-    for s in v:gmatch("[^\n]+") do
+    for s in data[k]:gmatch("[^\n]+") do
       if ShowLineNumber then
         if isnum then
           isnum = false
