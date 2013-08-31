@@ -280,7 +280,7 @@ local types = {
                 group = 'font', masks = {'%.pf[ab]$'},
                 firstline = {'^%%!','^%%!PS'}, },
                 
-  yaml      = { inherit = 'markup', desc = 'YAML', masks = {'%.yaml$'}, },
+  yaml      = { inherit = 'markup', desc = 'YAML', masks = {'%.ya?ml$'}, },
   json      = { inherit = 'yaml', desc = 'JSON', masks = {'%.json$'}, },
 
   haml      = { inherit = 'markup', desc = 'HAML', masks = {'%.haml$'}, },
@@ -330,6 +330,7 @@ local types = {
                   -- rare
   -- [[
   ppwizard  = { inherit = 'html', desc = 'ppWizard', masks = {'%.i[th]$'}, },
+  mediawiki = { inherit = 'html', desc = 'MediaWiki', masks = {'%.mediawiki$','%.mw$'}, },
   --]]
               -- XML main:
   xml       = { inherit = 'sgml', desc = 'XML', masks = {'%.xml$'}, },
@@ -383,6 +384,9 @@ local types = {
   xsieve    = { inherit = 'xslt', desc = 'XSieve XSLT', masks = {'%.xsl$'},
                 firstline = {'xmlns%s*=%s*["\']http://www%.sourceforge%.net["\']'}, },
                   -- rare
+  --[[
+  digidoc   =  { inherit = 'xml', desc = 'DigiDoc', masks = {'%.ddoc$','%.dd$'}, },
+  --]]
               -- SGML others:
   vrml      = { inherit = 'sgml', desc = 'VRML', masks = {'%.wrl$'}, },
                   -- rare
@@ -428,7 +432,8 @@ local types = {
                 masks = {'%.[ch]pp$','%.cc$','%.hh$','%.cxx$'},
                 strongline = {lines.c_rem, lines.s_inc, lines.s_def, lines.s_if},
               }, -- use firstline -^ (from colorer) for fine choice
-  d         = { inherit = 'main', desc = 'D', masks = {'%.di?$'}, },
+  d         = { inherit = 'main', desc = 'D', masks = {'%.di?$'},
+                firstline = {'^%s*modula','^%s*import'} },
   forth     = { inherit = 'main', desc = 'Forth',
                 masks = {'%.[4f]th$','%.f32$','%.spf$'}, }, -- ,'%.f$'
   fortran   = { inherit = 'main', desc = 'Fortran',
@@ -447,7 +452,8 @@ local types = {
   pas_inc   = { inherit = 'pascal',
                 masks = {masks.inc,'%.i16$','%.i32$','%.int$'}, },
   perl      = { inherit = 'main', desc = 'Perl',
-                masks = {'%.pl[sx]?$','%.p[hm]$','%.pod$','%.t$','%.cgi$'},
+                masks = {'%.pl[sx]?$','%.p[hm]$','%.pod$','%.t$'},
+                --masks = {'%.pl[sx]?$','%.p[hm]$','%.pod$','%.t$','%.cgi$'},
                 strongline = {'^#!%s-%S*perl'}, firstline = {'perl'}, },
   python    = { inherit = 'main', desc = 'Python',
                 masks = {'%.py[ws]?$'},
@@ -471,7 +477,7 @@ local types = {
   icon      = { inherit = 'main', desc = 'Icon', masks = {'%.icn$'}, },
   lisp      = { inherit = 'main', desc = 'Lisp',
                 masks = {'%.li?sp$','%.scm$','%.elc?$'}, },
-  --llvm      = { inherit = 'main', desc = 'LLVM IR', masks = {'%.ll$'}, },
+  llvm      = { inherit = 'main', desc = 'LLVM IR', masks = {'%.ll$'}, },
   matlab    = { inherit = 'main', desc = 'MatLab', masks = {'%.m$'}, },
   --nesc      = { inherit = 'c', desc = 'nesC', masks = {'%.nc$'}, },
   --pl1       = { inherit = 'main', desc = 'PL/I', masks = {'%.pl[1i]$'}, },
@@ -500,6 +506,7 @@ local types = {
   assem     = { inherit = 'asm', desc = 'Special asm', group = 'rare', },
   adsp      = { inherit = 'assem', desc = 'ADSP-21xx asm',
                 masks = {'%.dsp$'}, }, -- ,'%.sys$' -- unknown
+  asasm     = { inherit = 'assem', desc = 'AsAsm', masks = {'%.asasm$'}, },
   asm8051   = { inherit = 'assem', desc = '8051 MCU asm', masks = {'%.a5[12]$'}, },
   avrasm    = { inherit = 'assem', desc = 'AVR MCU asm',
                 masks = {'%.asm$','%.avr$','%.inc$'}, firstline = {'^%s*;'}, },
@@ -575,10 +582,12 @@ local types = {
                 masks = {'%.php%d?$','%.[pt]html$'},
                 strongline = {'^#%s-%S*php'}, },
   php_inc   = { inherit = 'php', masks = {'%.inc$'}, firstline = {'^<%?php'}, },
+  smarty    = { inherit = 'php', desc = 'Smarty PHP Templates', masks = {'%.smarty$'}, },
+  twig      = { inherit = 'php', desc = 'Twig PHP Templates', masks = {'%.twig$'}, },
 
               -- 1.3.1.3.-. network script
   netscript = { inherit = 'net', desc = 'Network script', group = 'script', },
-  ascript   = { inherit = 'netscript', desc = 'ActionScript', masks = {'%.as$'}, },
+  ascript   = { inherit = 'netscript', desc = 'ActionScript', masks = {'%.as$','%.jsfl$'}, },
   coldfusion= { inherit = 'netscript', desc = 'ColdFusion', masks = {'%.cf[mc]$'}, },
   jscript   = { inherit = 'netscript', desc = 'JavaScript', masks = {'%.js$','%.mocha$'}, },
   vbscript  = { inherit = 'netscript', desc = 'VBScript', masks = {'%.vbs$'}, },
@@ -666,6 +675,8 @@ local types = {
   make_ms   = { inherit = 'makefile', desc = 'MakeFile: MS DS',
                 masks = {'%.ds[pw]$'}, -- .. project/workspace
                 firstline = {'Microsoft Developer Studio'}, },
+  make_sln  = { inherit = 'makefile', desc = 'MS VS solution file',
+                masks = {'%.sln$'}, }, -- solution
   make_qt   = { inherit = 'makefile', desc = 'MakeFile: Qt qmake',
                 masks = {'%.pr[oif]$'}, }, -- .. project/package/group
   make_sc   = { inherit = 'makefile', desc = 'SCons tool', group = 'script',
