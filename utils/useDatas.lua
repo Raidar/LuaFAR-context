@@ -237,18 +237,19 @@ end -- make
 
 ---------------------------------------- save/tostring
 do
-  local io_open = io.open
-
-  local serial -- useSerial unit
+  --local serial -- useSerial unit
 
 -- Get serialize function.
 local function getSerialize (serialize) --> (serialize)
   if serialize then return serialize end
 
-  serial = serial or require 'context.utils.useSerial'
+  local serial = require 'context.utils.useSerial'
+  --serial = serial or require 'context.utils.useSerial'
 
   return serial and serial.serialize
 end -- getSerialize
+
+  local io_open = io.open
 
 -- Save data to file.
 -- Сохранение данных в файл.

@@ -501,8 +501,9 @@ local function TabToText (name, data, kind, write) --| (write)
       local u, tp = ValToStr(v, kind)
 
       -- Set '{' of array/table to line:
-      if isnull and (u or tp == 'table' or
-                     TypToStr and tp ~= nil) then
+      if isnull and
+         (u or tp == 'table' or
+          TypToStr and tp ~= nil) then
         isnull = false
         if isarray then
           write(cur_indent, "{\n") -- {
@@ -538,12 +539,12 @@ local function TabToText (name, data, kind, write) --| (write)
 
           -- Write field:
           if l == 1 or
-             acount and cnt > acount or
-             alimit and len >= alimit then
+             (acount and cnt > acount) or
+             (alimit and len >= alimit) then
             cnt = 1 -- First field in new line:
             len = indlen + ulen + 1 -- for ','
-            write(l > 1 and "\n" or "",
-                  new_indent,
+            if l > 1 then write("\n") end
+            write(new_indent,
                   format("%s%s%s,%s", lsp, u, rsp, wsp))
           else      -- Other fields in same line:
             write(format(" %s%s%s,%s", lsp, u, rsp, wsp))
@@ -557,8 +558,9 @@ local function TabToText (name, data, kind, write) --| (write)
 
         -- New line before:
         if islining then
-          write("\n")
+          if l > 1 then write("\n") end
           l = 0
+          --l = -1
         end
 
         local s = KeyToStr(k, kind)
@@ -623,8 +625,9 @@ local function TabToText (name, data, kind, write) --| (write)
           local u, tp = ValToStr(v, kind)
 
           -- Set '{' of hash/table to line:
-          if isnull and (u or tp == 'table' or
-                         TypToStr and tp ~= nil) then
+          if isnull and
+             (u or tp == 'table' or
+              TypToStr and tp ~= nil) then
             isnull = false
             --logShow({ nestless, kind }, name, 2)
             if nestless then
@@ -679,20 +682,21 @@ local function TabToText (name, data, kind, write) --| (write)
 
                 -- Write field:
                 if l == 1 or
-                   hcount and cnt > hcount or
-                   hlimit and len >= hlimit then
+                   (hcount and cnt > hcount) or
+                   (hlimit and len >= hlimit) then
                   cnt = 1 -- First field in new line:
                   len = indlen + culen + 4 -- for ' = ' + ','
-                  write(l > 1 and "\n" or "",
-                        new_indent,
+                  if l > 1 then write("\n") end
+                  write(new_indent,
                         format("%s%s = %s%s%s,%s", c, ksp, lsp, u, rsp, wsp))
 
                 else      -- Other fields in same line:
                   write(format(" %s%s = %s%s%s,%s", c, ksp, lsp, u, rsp, wsp))
                 end
                 
-                if (zeroln and k == 0) or
-                   (hstrln and type(v) == 'string') then
+                if hlimit and
+                   ( (zeroln and k == 0) or
+                     (hstrln and type(v) == 'string') ) then
                   len = hlimit + 1
                 end
 
