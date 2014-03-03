@@ -309,6 +309,8 @@ end -- type_oldindex
 
 -- Inheritance mechanism for whole config data table.
 local function type_index (cfg, ctype)
+  --jit.off(true, true) -- RAI: 2013-11-26 00:01 — 2014-03-03 18:30
+
   local v = type_oldindex(cfg, ctype)
   if v ~= nil then return v end
 
