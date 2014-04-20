@@ -108,16 +108,15 @@ function unit.readFileFirstLine (filename) --> (string, string|nil | nil)
 end -- readFileFirstLine
 
 do
-  local EditorGetStr = editor.GetString
+  local EditorGetLine = editor.GetString
 
 -- Read a first line from file in editor.
 -- Чтение первой линии из файла в редакторе.
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
   local k, line, assumed = 1
 
-  -- FAR API SetPosition bug workaround (by Shmuel):
   repeat
-    line = EditorGetStr(nil, k)
+    line = EditorGetLine(nil, k, 0)
     if not line then break end
     local check = checkSkipLines(line.StringText)
     if check and not assumed then assumed = check end
