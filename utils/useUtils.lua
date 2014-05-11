@@ -222,7 +222,8 @@ function unit.language () --> (table)
   local key = "Software\\Far Manager\\Language"
   return {
     Main = win.GetEnv("FARLANG") or "Default",  -- Interface
-    Help = win.GetRegKey("HKCU", key, "Help") or "Default", -- Help -- FAR23
+    Help = win.GetEnv("FARLANG") or "Default",  -- Help -- FAR3 temp
+    --Help = win.GetRegKey("HKCU", key, "Help") or "Default", -- Help -- FAR23
   } ----
   --]]
 end ----
