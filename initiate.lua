@@ -17,12 +17,16 @@ local _G = _G
 context = rawget(_G, 'context') or {}
 
 local context = context
+context.guid = "c0afe3a3-ff78-4904-b100-1c366d04ea96"
+
 context.use = context.use or {} -- for non-context utils
 
 ---------------------------------------- Data
 ctxdata = rawget(_G, 'ctxdata') or {}
 
 local ctxdata = ctxdata
+ctxdata.guid = "c05e4187-192b-4c37-8821-06cf75e7b4d1"
+
 ctxdata.config  = ctxdata.config or {}  -- access to configs
 ctxdata.reg     = ctxdata.reg or {}     -- register of configs
 ctxdata.checked = ctxdata.checked or {} -- type checked configs

@@ -32,6 +32,8 @@ local modf, frexp = math.modf, math.frexp
 local string = string
 local format = string.format
 
+--local uuid = (rawget(_G, 'win') or {}).Uuid 
+
 ----------------------------------------
 --local context = context
 --local logShow = context.Show
