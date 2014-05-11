@@ -632,7 +632,8 @@ local types = {
   lua_inc   = { inherit = 'lua', desc = 'Lua include',
                 masks = {'%.script$'}, firstline = {lines.lua_rem}, },
   lua_dat   = { inherit = 'lua', desc = 'Lua data', group = 'config',
-                masks = {'%.cfg$','history%.data$'}, firstline = {'^do local'}, },
+                masks = {'%.cfg$','history%.data$'},
+                firstline = {'^do local', '^'..('%-'):rep(40)}, },
 
               -- 1.3.2.1. batch/shell --
   batch     = { inherit = 'shell', desc = 'Batch', group = 'script',
