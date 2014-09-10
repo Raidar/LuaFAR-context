@@ -117,10 +117,11 @@ do
 -- An __index for subtables-configs.
 local function evt_index (t, key)
   if key == 'type' then return rawget(t, 'type') end
+
   local keycfg = cfgDat[key] -- may be nil or no table?
   if type(keycfg) ~= 'table' then return keycfg end
   return keycfg[rawget(t, 'type')]
-end --
+end -- evt_index
 
   local evt_mt = { __index = evt_index }
 
@@ -130,7 +131,7 @@ local function ev_newindex (t, key, value)
   if type(value) == 'table' then
     setmetatable(value, evt_mt)
   end
-end --
+end -- ev_newindex
 
   local detEditorType = detect.area.editor
   local detViewerType = detect.area.viewer
@@ -138,41 +139,57 @@ end --
 -- Detect and return config with type for 'current'.
 local function e_index (t, key) --| for editor
   if key == 'current' then
-    return { type = detEditorType() }
+    local tp = detEditorType()
+    if tp then return { type = tp } end
   end
-end --
+end -- e_index
 
 local function v_index (t, key) --| for viewer
   if key == 'current' then
-    return { type = detViewerType() }
+    local tp = detViewerType()
+    if tp then return { type = tp } end
   end
-end --
+end -- v_index
 
   setmetatable(editors, { __newindex = ev_newindex, __index = e_index })
   setmetatable(viewers, { __newindex = ev_newindex, __index = v_index })
 end -- do
 
-local function reloadEditorConfig (id) --| editors
+local function reloadEditorConfig (id, kind) --| editors
   --logShow({ "reset", editor.GetInfo() })
-  editors.current = nil           -- reset
-  local current = editors.current -- new config via mt
+
+  local current = editors[id]
+  if not current or current.kind ~= 'focus' then
+    editors.current = nil     -- reset
+    current = editors.current -- new config via mt
+  end
+  if current then current.kind = kind end
   editors.current = current
+
   -- Alternative code using indexes directly
   --local current = e_index(editors, 'current')
   --ev_newindex(editors, 'current', current)
+
   editors[id] = current
   handleEvent('reloadEditor', current)
 
   --far.Message(editors.current.type, "Editor")
 end -- reloadEditorConfig
 
-local function reloadViewerConfig (id) --| viewers
-  viewers.current = nil           -- reset
-  local current = viewers.current -- new config via mt
+local function reloadViewerConfig (id, kind) --| viewers
+
+  local current = viewers[id]
+  if not current or current.kind ~= 'focus' then
+    viewers.current = nil     -- reset
+    current = viewers.current -- new config via mt
+  end
+  if current then current.kind = kind end
   viewers.current = current
+
   -- Alternative code using indexes directly
   --local current = e_index(viewers, 'current')
   --ev_newindex(viewers, 'current', current)
+
   viewers[id] = current
   handleEvent('reloadViewer', current)
 
@@ -206,23 +223,34 @@ function unit.editorEvent (id, event, param)
   local eid = id
   if event == EE_READ then
     --logShow(eid, "EE_READ")
-    --logShow(editor.GetInfo())
-    eid = editor.GetInfo().EditorID -- TEST and DELETE
-    reloadEditorConfig(eid)
+    local Info = editor.GetInfo()
+    --logShow(Info)
+    eid = Info.EditorID -- TEST and DELETE
+    if not Info then return end
+
+    reloadEditorConfig(eid, 'load')
     --far.Message(('%i %s'):format(eid, editors.current.type))
-  elseif event == EE_SAVE then
-    eid = editor.GetInfo().EditorID -- TEST and DELETE
-    if editors.current.type == 'none' then
-      reloadEditorConfig(eid)
-    end
+
   elseif event == EE_GOTFOCUS then
-    if not editors[eid] then
-      reloadEditorConfig(eid)
-    else
-      editors.current = editors[eid]
+    --if not editors[eid] then
+      reloadEditorConfig(eid, 'focus')
+    --else
+    --  editors.current = editors[eid]
+    --end
+
+  elseif event == EE_SAVE then
+    local Info = editor.GetInfo()
+    if not Info then return end
+  
+    eid = Info.EditorID -- TEST and DELETE
+    if not editors.current or
+       editors.current.type == 'none' then
+      reloadEditorConfig(eid, 'save')
     end
+
   elseif event == EE_CLOSE then
     editors.current, editors[eid] = nil, nil
+
   end
 end ---- editorEvent
 
@@ -237,17 +265,23 @@ do
 function unit.viewerEvent (id, event, param)
   local vid = id
   if event == VE_READ then
-    vid = viewer.GetInfo().ViewerID
-    reloadViewerConfig(vid)
+    local Info = viewer.GetInfo()
+    if not Info then return end
+  
+    vid = Info.ViewerID
+    reloadViewerConfig(vid, 'load')
     --far.Message( ('%i %s'):format(vid, viewers.current.type) )
+
   elseif event == VE_GOTFOCUS then
-    if not viewers[vid] then
-      reloadViewerConfig(vid)
-    else
-      viewers.current = viewers[vid]
-    end
+    --if not viewers[vid] then
+      reloadViewerConfig(vid, 'focus')
+    --else
+    --  viewers.current = viewers[vid]
+    --end
+
   elseif event == VE_CLOSE then
     viewers.current, viewers[vid] = nil, nil
+
   end
 end ---- viewerEvent
 

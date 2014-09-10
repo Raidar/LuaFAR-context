@@ -313,10 +313,13 @@ local PathNamePattern = '^(.-)([^\\/]+)$'
 -- Detect a type of file in active panel.
 function areaFileType.panels (f)
   local f = f or {}
-  local Info = panel.GetPanelInfo(nil, 1)
+  local Info
 
   if not f.filename then
+    Info = panel.GetPanelInfo(nil, 1)
+    if not Info then return end
     if Info.ItemNumbers == 0 then return 'empty' end
+
     local Item = panel.GetCurrentPanelItem(nil, 1)
     f.path, f.name = panel.GetPanelDirectory(nil, 1).Name, Item.FileName
     --far.Message(f.name, "Current item name")
@@ -327,10 +330,14 @@ function areaFileType.panels (f)
     f.name = f.filename
   end
 
-  if f.firstline == true and
-     not utils.isPluginPanel(Info) then
-    f.firstline, f.assumed =
-        unit.readFileFirstLine((f.path or '.')..'/'..f.name)
+  if f.firstline == true then
+    if not Info then Info = panel.GetPanelInfo(nil, 1) end
+    if not Info then return end
+
+    if not utils.isPluginPanel(Info) then
+      f.firstline, f.assumed =
+          unit.readFileFirstLine((f.path or '.')..'/'..f.name)
+    end
   end
 
   return detectType(f)
@@ -342,7 +349,9 @@ function areaFileType.editor (f)
 
   --if useprofiler then profiler.start("detectType.log") end
   if not f.filename then
-    local fullname = editor.GetInfo().FileName
+    local Info = editor.GetInfo()
+    if not Info then return end
+    local fullname = Info.FileName
     f.path, f.name = fullname:match(PathNamePattern)
   end
 
@@ -357,7 +366,9 @@ end -- editor
 -- Detect a type of viewed file.
 function areaFileType.viewer (f)
   local f = f or {}
-  local fullname = viewer.GetInfo().FileName
+  local Info = viewer.GetInfo()
+  if not Info then return end
+  local fullname = Info.FileName
 
   if not f.filename then
     f.path, f.name = fullname:match(PathNamePattern)
