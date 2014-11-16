@@ -217,6 +217,7 @@ do
   local EE_CLOSE    = F.EE_CLOSE
   local EE_GOTFOCUS = F.EE_GOTFOCUS
   --local EE_CHANGE   = F.EE_CHANGE
+  --local EE_REDRAW   = F.EE_REDRAW
 
 -- Process type autodetection for editor.
 function unit.editorEvent (id, event, param)
@@ -241,7 +242,7 @@ function unit.editorEvent (id, event, param)
   elseif event == EE_SAVE then
     local Info = editor.GetInfo()
     if not Info then return end
-  
+
     eid = Info.EditorID -- TEST and DELETE
     if not editors.current or
        editors.current.type == 'none' then
@@ -267,7 +268,7 @@ function unit.viewerEvent (id, event, param)
   if event == VE_READ then
     local Info = viewer.GetInfo()
     if not Info then return end
-  
+
     vid = Info.ViewerID
     reloadViewerConfig(vid, 'load')
     --far.Message( ('%i %s'):format(vid, viewers.current.type) )
