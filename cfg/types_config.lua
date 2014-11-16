@@ -129,7 +129,8 @@ local types = {
               -- rare
   --mancolorer= { inherit = 'text', desc = 'man colorer', masks = {'^man%s?colorer$'}, },
               -- test (used in typesTest.lua)
-  tst_def   = { inherit = 'plain', desc = 'Test: Default text', masks = {'%.tst$'}, },
+  tst_def   = { inherit = 'plain', desc = 'Test: Default text',
+                masks = {'%.tst$'}, },
     tst_fl1   = { inherit = 'tst_def', desc = 'Test: fl #1 text',
                   --masks = {'%.tst$'}, firstline = {'line #1'}, },
                   masks = {'%.tst$'}, strongline = {'line #1'}, },
@@ -140,7 +141,8 @@ local types = {
           -- 1.1.-. formed text
               -- Message:
   message   = { inherit = 'plain', desc = 'Message', },
-    msg_fido  = { inherit = 'message', desc = 'FIDO message', masks = {'%.msg$','%.uue$'}, },
+    msg_fido  = { inherit = 'message', desc = 'FIDO message',
+                  masks = {'%.msg$','%.uue$'}, },
     msg_eml   = { inherit = 'message', desc = 'E-mail message',
                   masks = {'%.eml$','%.msg$','%.nws$'}, firstline = {'^FROM'}, },
     msg_pkt   = { inherit = 'message', desc = 'PKTview message', masks = {'%.pms$'}, },
@@ -182,20 +184,24 @@ local types = {
               -- System config:
   cfg_sys   = { inherit = 'config', desc = 'System config', },
     sys_boot  = { inherit = 'cfg_sys', desc = 'Boot.ini',
-                 masks = {'boot%.ini$'}, firstline = {'%[boot%sloader%]'}, },
-    sys_dos   = { inherit = 'cfg_sys', desc = 'MsDos.sys', masks = {'^msdos%.sys'}, },
-    sys_cfg   = { inherit = 'cfg_sys', desc = 'Config.sys', masks = {'^config%.sys'}, },
+                  masks = {'boot%.ini$'},
+                  firstline = {'%[boot%sloader%]'}, },
+    sys_dos   = { inherit = 'cfg_sys', desc = 'MsDos.sys',
+                  masks = {'^msdos%.sys'}, },
+    sys_cfg   = { inherit = 'cfg_sys', desc = 'Config.sys',
+                  masks = {'^config%.sys'}, },
              -- Windows config:
     inf       = { inherit = 'sys_cfg', desc = 'Windows INF',
                   masks = {'%.inf$'}, firstline = {lines.ini}, },
     reg       = { inherit = 'sys_cfg', desc = 'Windows REG', masks = {'%.reg$'},
-                firstline = {'^%s*REGEDIT4%s*$','^%s-FARREG%d%d%s*$',
-                             '^%s*Windows Registry Editor Version %d%.%d%d%s*$'}, },
+                  firstline = {'^%s*REGEDIT4%s*$','^%s-FARREG%d%d%s*$',
+                               '^%s*Windows Registry Editor Version %d%.%d%d%s*$'}, },
 
           -- 1.2.2. data define --
               -- Resources:
   frm_dlf   = { inherit = 'define', desc = 'Delphi form', masks = {'%.dfm$'}, },
-  res_src   = { inherit = 'define', desc = 'Resource source', masks = {'%.rc$','%.dlg$'}, },
+  res_src   = { inherit = 'define', desc = 'Resource source',
+                masks = {'%.rc$','%.dlg$'}, },
   vmodeler  = { inherit = 'define', desc = 'Visual Modeler', masks = {'%.mdl$'}, },
 
               -- Subtitles:
@@ -237,15 +243,21 @@ local types = {
 
               -- Script data:
   scriptdata= { inherit = 'define', desc = 'Script data', group = 'script', },
-    cue       = { inherit = 'scriptdata', desc = 'Cue sheet', masks = {'%.cue$'}, },
+    cue       = { inherit = 'scriptdata', desc = 'Cue sheet',
+                  masks = {'%.cue$'}, },
     diff      = { inherit = 'scriptdata', desc = 'Diff/Patch',
-                  masks = {'%.diff?.*$','%.pat$','%.patch$','%.rej$','%.reject$'},
-                  firstline = {'^diff','^Index','^%-%-%-','^%+%+%+','^%*%*%*',
+                  masks = {'%.diff?.*$',
+                           '%.pat$','%.patch$',
+                           '%.rej$','%.reject$'},
+                  firstline = {'^diff','^Index',
+                               '^%-%-%-','^%+%+%+','^%*%*%*',
                                '^%d+,%d+%w%d ','^ %d+%w%d','^cvs'}, },
                   -- FAR Manager & plugins:
   def_far   = { inherit = 'scriptdata', desc = 'FAR define', },
-  airbrush  = { inherit = 'def_far', desc = 'FAR Airbrush', masks = {'[/\\%.]syntax$'}, },
-  truemac   = { inherit = 'def_far', desc = 'FAR True Macro', masks = {'%truemac%.ctl$'}, },
+  airbrush  = { inherit = 'def_far', desc = 'FAR Airbrush',
+                masks = {'[/\\%.]syntax$'}, },
+  truemac   = { inherit = 'def_far', desc = 'FAR True Macro',
+                masks = {'%truemac%.ctl$'}, },
                   -- rare
   -- [[
   aditor    = { inherit = 'define', desc = 'Aditor highlight', masks = {'%.hgh$'}, },
@@ -330,7 +342,8 @@ local types = {
                   -- rare
   -- [[
   ppwizard  = { inherit = 'html', desc = 'ppWizard', masks = {'%.i[th]$'}, },
-  mediawiki = { inherit = 'html', desc = 'MediaWiki', masks = {'%.mediawiki$','%.mw$'}, },
+  mediawiki = { inherit = 'html', desc = 'MediaWiki',
+                masks = {'%.mediawiki$','%.mw$'}, },
   --]]
               -- XML main:
   xml       = { inherit = 'sgml', desc = 'XML', masks = {'%.xml$'}, },
@@ -371,7 +384,8 @@ local types = {
                 firstline = {'xmlns="http://purl%.org/rss/1%.0/"',
                              '<rss version="0%.91">'}, },
   svg       = { inherit = 'xml', desc = 'SVG', masks = {'%.svg$'}, }, -- 1.0
-  taglib    = { inherit = 'xml', desc = 'JSP taglib', group = 'jsp', masks = {'%.tld$'}, },
+  taglib    = { inherit = 'xml', desc = 'JSP taglib', group = 'jsp',
+                masks = {'%.tld$'}, },
   web_app   = { inherit = 'xml', desc = 'web-app', masks = {'web%.xml$'}, },
   wsc       = { inherit = 'xml', desc = 'WSC', masks = {'%.wsc$'}, },
   wsdl      = { inherit = 'xml', desc = 'WSDL', masks = {'%.wsdl$'}, },
@@ -433,11 +447,11 @@ local types = {
                 strongline = {lines.c_rem, lines.s_inc, lines.s_def, lines.s_if},
               }, -- use firstline -^ (from colorer) for fine choice
   d         = { inherit = 'main', desc = 'D', masks = {'%.di?$'},
-                firstline = {'^%s*modula','^%s*import'} },
+                firstline = {'^%s*module','^%s*import'} },
   forth     = { inherit = 'main', desc = 'Forth',
                 masks = {'%.[4f]th$','%.f32$','%.spf$'}, }, -- ,'%.f$'
   fortran   = { inherit = 'main', desc = 'Fortran',
-                masks = {'%.for$','%.f$','%.f90$','%.f77$'},
+                masks = {'%.for$','%.f90$','%.f95$','%.f77$','%.f3?$'},
                 firstline = {'^%*', '^C'}, }, -- conflict -^
   go        = { inherit = 'c', desc = 'Go', masks = {'%.go$'}, },
   idl       = { inherit = 'main', desc = 'IDL',
@@ -446,6 +460,8 @@ local types = {
   java      = { inherit = 'main', desc = 'Java',
                 masks = {'%.java$','%.ja[vd]$'},
                 strongline = {'^%// Decompiled by Jad'}, },
+  kotlin    = { inherit = 'main', desc = 'Kotlin', group = 'java',
+                masks = {'%.kt$'}, },
   pascal    = { inherit = 'main', desc = 'Pascal',
                 masks = {'%.~?pas$','%.~?[bdlp]p[rk]$','%.pp$'},
                 firstline = {'program','library','unit','package'}, },
@@ -534,23 +550,32 @@ local types = {
   tprolog   = { inherit = 'prolog', desc = 'Turbo Prolog', masks = {'%.tpl$'}, },
   --]]
                   -- Lexers:
-  lex       = { inherit = 'main', desc = 'Lex/flex', masks = {'%.f?lex$','%.l+$'}, },
-  yacc      = { inherit = 'lex', desc = 'YACC/Bison', masks = {'%.yacc$','%.y+$'}, },
+  lex       = { inherit = 'main', desc = 'Lex/flex',
+                masks = {'%.f?lex$','%.l+$'}, },
+  yacc      = { inherit = 'lex', desc = 'YACC/Bison',
+                masks = {'%.yacc$','%.y+$'}, },
   --lemon     = { inherit = 'lex', desc = 'Lemon', masks = {'%.y$'}, },
                   -- Java somes:
-  j_pnuts   = { inherit = 'java', desc = 'Java Pnuts', masks = {'%.pnut$'}, },
-  j_jcc     = { inherit = 'java', desc = 'Java Compiler Compiler', masks = {'%.jjt?$'}, },
+  j_pnuts   = { inherit = 'java', desc = 'Java Pnuts',
+                masks = {'%.pnut$'}, },
+  j_jcc     = { inherit = 'java', desc = 'Java Compiler Compiler',
+                masks = {'%.jjt?$'}, },
   j_props   = { inherit = 'java', desc = 'Java properties',
                 masks = {'%.prop?$','%.properties$'}, },
-  j_policy  = { inherit = 'java', desc = 'Java policy', masks = {'%.policy$'}, },
+  j_policy  = { inherit = 'java', desc = 'Java policy',
+                masks = {'%.policy$'}, },
 
               -- 1.3.1.2. database language --
   clarion   = { inherit = 'dbl', desc = 'Clarion', masks = {'%.cl[aw]$'}, },
-  clipper   = { inherit = 'dbl', desc = 'Clipper', masks = {'%.ch$','%.prg$'}, -- prg
-                firstline = {lines.s_inc, lines.s_def, lines.s_if}, }, -- conflict -^
-  foxpro    = { inherit = 'dbl', desc = 'FoxPro', masks = {'%.prg$','%.[sm]pr$'}, },
+  clipper   = { inherit = 'dbl', desc = 'Clipper',
+                masks = {'%.ch$','%.prg$'}, -- prg
+                firstline = {lines.s_inc, lines.s_def, lines.s_if},
+              }, -- conflict -^
+  foxpro    = { inherit = 'dbl', desc = 'FoxPro',
+                masks = {'%.prg$','%.[sm]pr$'}, },
   paradox   = { inherit = 'dbl', desc = 'Paradox', masks = {'%.sc$'}, },
-  sql       = { inherit = 'dbl', desc = 'SQL', masks = {'%.sql$'}, }, -- SQL, PL/SQL, MySQL
+  sql       = { inherit = 'dbl', desc = 'SQL',
+                masks = {'%.sql$'}, }, -- SQL, PL/SQL, MySQL
               -- SQL package, specification, type:
     sqluf   = { inherit = 'sql', desc = 'SQL-used files',
                 masks = {'%.pck$','%.spc$','%.tps$'},
@@ -558,16 +583,21 @@ local types = {
   sqlj      = { inherit = 'dbl', desc = 'SQLJ', masks = {'%.sqlj$'}, },
                   -- rare
   -- [[
-  s1c       = { inherit = 'dbl', desc = '1C', group = 'rare', masks = {'%.1c$'}, },
-  baan      = { inherit = 'dbl', desc = 'Baan 4GL', group = 'rare', masks = {'%.cln$'}, },
+  s1c       = { inherit = 'dbl', desc = '1C', group = 'rare',
+                masks = {'%.1c$'}, },
+  baan      = { inherit = 'dbl', desc = 'Baan 4GL', group = 'rare',
+                masks = {'%.cln$'}, },
   rsmac     = { inherit = 'dbl', desc = 'R-Style macro', group = 'rare',
                 masks = {'%.rsl$','%.mac$'}, },
   --]]
   -- [[
   sql_emb   = { inherit = 'sql', desc = 'EmbeddedSQL', group = 'rare', },
-  sql_c     = { inherit = 'sql_emb', desc = 'EmbeddedSQL for C', masks = {'%.sc$'}, },
-  sql_cpp   = { inherit = 'sql_emb', desc = 'EmbeddedSQL for C++', masks = {'%.scpp$'}, },
-  sql_cbl   = { inherit = 'sql_emb', desc = 'EmbeddedSQL for Cobol', masks = {'%.sco$'}, },
+  sql_c     = { inherit = 'sql_emb', desc = 'EmbeddedSQL for C',
+                masks = {'%.sc$'}, },
+  sql_cpp   = { inherit = 'sql_emb', desc = 'EmbeddedSQL for C++',
+                masks = {'%.scpp$'}, },
+  sql_cbl   = { inherit = 'sql_emb', desc = 'EmbeddedSQL for Cobol',
+                masks = {'%.sco$'}, },
   --]]
               -- 1.3.1.-. .NET support language
   dotnet    = { inherit = 'main', desc = '.NET language', },
@@ -581,16 +611,23 @@ local types = {
   php       = { inherit = 'net', desc = 'PHP',
                 masks = {'%.php%d?$','%.[pt]html$'},
                 strongline = {'^#%s-%S*php'}, },
-  php_inc   = { inherit = 'php', masks = {'%.inc$'}, firstline = {'^<%?php'}, },
-  smarty    = { inherit = 'php', desc = 'Smarty PHP Templates', masks = {'%.smarty$'}, },
-  twig      = { inherit = 'php', desc = 'Twig PHP Templates', masks = {'%.twig$'}, },
+  php_inc   = { inherit = 'php', masks = {'%.inc$'},
+                firstline = {'^<%?php'}, },
+  smarty    = { inherit = 'php', desc = 'Smarty PHP Templates',
+                masks = {'%.smarty$'}, },
+  twig      = { inherit = 'php', desc = 'Twig PHP Templates',
+                masks = {'%.twig$'}, },
 
               -- 1.3.1.3.-. network script
   netscript = { inherit = 'net', desc = 'Network script', group = 'script', },
-  ascript   = { inherit = 'netscript', desc = 'ActionScript', masks = {'%.as$','%.jsfl$'}, },
-  coldfusion= { inherit = 'netscript', desc = 'ColdFusion', masks = {'%.cf[mc]$'}, },
-  jscript   = { inherit = 'netscript', desc = 'JavaScript', masks = {'%.js$','%.mocha$'}, },
-  vbscript  = { inherit = 'netscript', desc = 'VBScript', masks = {'%.vbs$'}, },
+  ascript   = { inherit = 'netscript', desc = 'ActionScript',
+                masks = {'%.as$','%.jsfl$'}, },
+  coldfusion= { inherit = 'netscript', desc = 'ColdFusion',
+                masks = {'%.cf[mc]$'}, },
+  jscript   = { inherit = 'netscript', desc = 'JavaScript',
+                masks = {'%.js$','%.mocha$'}, },
+  vbscript  = { inherit = 'netscript', desc = 'VBScript',
+                masks = {'%.vbs$'}, },
 
               -- 1.3.1.3.-. server pages
   asp       = { inherit = 'net', desc = 'Active Server Pages',
@@ -745,15 +782,17 @@ local types = {
       -- 2.3. media
 
           -- 2.3.1. image --
-  ico       = { inherit = 'image', desc = 'Icon image',   masks = {'%.icon?$'}, },
+  ico       = { inherit = 'image', desc = 'Icon image', masks = {'%.icon?$'}, },
   cursor    = { inherit = 'image', desc = 'Cursor image', masks = {'%.ani$','%.cur$'}, },
   bitmap    = { inherit = 'image', desc = 'Bitmap graphics',
                 masks = {'%.bmp$','%.dib$','%.[dp]cx$'}, },
   vector    = { inherit = 'image', desc = 'Vector graphics', masks = {'%.[ew]mf$'}, },
   wavelet   = { inherit = 'image', desc = 'Wavelet graphics', masks = {'%.wvl$'}, },
   graphic   = { inherit = 'image', desc = 'Picture graphics',
-                masks = {'%.png$','%.tga$','%.targa$','%.[grt]iff?$','%.gif87$',
-                         '%.jp[2eg]$','%.jpeg$','%.j[fi]f$','%.jfif?$','%.p[bnp]m$',
+                masks = {'%.png$','%.tga$','%.targa$',
+                         '%.[grt]iff?$','%.gif87$',
+                         '%.jp[2eg]$','%.jpeg$',
+                         '%.j[fi]f$','%.jfif?$','%.p[bnp]m$',
                          '%.iff$','%.kd[ck]$','%.psd$'}, },
               -- rare
   --[[
@@ -828,7 +867,8 @@ local types = {
 
       -- 3.1. doc --
   mso       = { inherit = 'doc', desc = 'MS Office document',
-                masks = {'%.do[ct]$','%.xl[sta]$','%.pp[tsa]$','%.pot$','%.vs[dsa]$',
+                masks = {'%.do[ct]$','%.xl[sta]$','%.pp[tsa]$',
+                         '%.pot$','%.vs[dsa]$',
                          '%.mcw$','%.pwd$','%.psw$','%.wri$'}, },
   mso_xml   = { inherit = 'doc', desc = 'MS Office XML document', group = 'xml_zip',
                 masks = {'%.do[ct][xm]$','%.xl[sta][xm]$',
@@ -853,8 +893,10 @@ local types = {
 
       -- 3.2. font --
   fontmetric  = { inherit = 'font', desc = 'Font metric', },
-  fm_tex    = { inherit = 'fontmetric', desc = 'TeX font metric', masks = {'%.tfm$'}, },
-  fm_ps     = { inherit = 'fontmetric', desc = 'PS font metric', masks = {'%.[ap]fm$'}, },
+  fm_tex    = { inherit = 'fontmetric', desc = 'TeX font metric',
+                masks = {'%.tfm$'}, },
+  fm_ps     = { inherit = 'fontmetric', desc = 'PS font metric',
+                masks = {'%.[ap]fm$'}, },
 
       -- 3.3. others --
   link      = { inherit = 'mixed', desc = 'Link', },
