@@ -142,6 +142,8 @@ end ---- gsubcount
 
 end -- do
 
+---------------------------------------- Lines
+
 -- Count of lines in specified string.
 -- Количество линий в указанной строке.
 --[[

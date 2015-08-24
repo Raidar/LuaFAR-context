@@ -720,6 +720,44 @@ function unit.fillargs (value, ...)
   return unit.fillnils({ ... }, select('#', ...), value)
 end ----
 
+---------------------------------------- Lines
+
+-- Count of lines in specified table.
+-- Количество линий в указанной таблице.
+--[[
+  -- @params:
+  t      (table) - analyzed table.
+  -- @return:
+  count (number) - count of lines.
+--]]
+function unit.linecount (t) --> (number)
+  return #t
+end ----
+
+-- Maximal length (and line) in specified table.
+-- Максимальная длина (и линия) в указанной таблице.
+--[[
+  -- @params:
+  t     (table) - analyzed table.
+  count (n|nil) - analyzed line count (@default = #t).
+  -- @return:
+  max  (number) - maximal length.
+  line (string) - line with max length.
+--]]
+function unit.linemax (t, count) --> (number, string | 0, nil)
+  local max, x = 0
+
+  -- Цикл по линиям таблицы:
+  for line = 1, count or #t do
+    local len = line:len()
+    if len > max then
+      max, x = len, line
+    end
+  end
+
+  return max, x
+end ---- linemax
+
 ---------------------------------------- others
 
 -- Get value t[k] checking field of metatable.
