@@ -652,7 +652,7 @@ local TLogging = {} -- Logging-to-file class
 local MLogging = { __index = TLogging }
 
 function TLogging:log (...)
-  self.file:write(...)
+  return self.file:write(...)
 end ----
 
 local nowDT = os.date
@@ -667,16 +667,17 @@ function TLogging:logln (...)
 end ----
 
 function TLogging:logtab (t, name) --< array
-  self:logln(name or "")
+  local name = name or ""
+  self:logln(name..":")
   for _, v in ipairs(t) do
     self:log(v)
     self:log('\n')
   end --
-  self:logln(name or "")
+  self:logln("~"..name)
 end ---- logtab
 
 function TLogging:data (data, filter, name, kind)
-  self:logtab(unit.tabulize(name, data, kind, filter), name or "data")
+  return self:logtab(unit.tabulize(name, data, kind, filter), name or "data")
 end ----
 
 function TLogging:close (s) --< (file table)
