@@ -452,6 +452,8 @@ local types = {
       d         = { inherit = 'cpp', desc = 'D', masks = {'%.di?$'},
                     firstline = {'^%s*module','^%s*import'} },
 
+      csharp    = { inherit = 'cpp', desc = 'C#', masks = {'%.cs$'}, },
+
       java      = { inherit = 'cpp', desc = 'Java',
                     masks = {'%.java$','%.ja[vd]$'},
                     strongline = {'^%// Decompiled by Jad'}, },
