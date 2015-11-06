@@ -2,7 +2,7 @@
 
 ----------------------------------------
 --[[ description:
-  -- Information about Lua language.
+  -- Information about Lua language.
   -- Информация о языке Lua.
 --]]
 ----------------------------------------

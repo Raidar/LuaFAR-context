@@ -2,8 +2,8 @@
 
 ----------------------------------------
 --[[ description:
-  -- Macros for LF context check.
-  -- Макросы для проверки LF context.
+  -- Macros for LF context check.
+  -- Макросы для проверки LF context.
 --]]
 ----------------------------------------
 --[[ uses:

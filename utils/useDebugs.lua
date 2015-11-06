@@ -2,7 +2,7 @@
 
 ----------------------------------------
 --[[ description:
-  -- Debugging and logging of scripts.
+  -- Debugging and logging of scripts.
   -- Отладка и протоколирование скриптов.
 --]]
 ----------------------------------------
