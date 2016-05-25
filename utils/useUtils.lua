@@ -226,7 +226,7 @@ function unit.language () --> (table)
     --Help = win.GetRegKey("HKCU", key, "Help") or "Default", -- Help -- FAR23
   } ----
   --]]
-end ----
+end ---- language
 
 do
   local GetPanelInfo = panel.GetPanelInfo
@@ -257,9 +257,17 @@ end --
 
 end -- do
 ---------------------------------------- System
+
+-- Преобразование разделителей в разделители пути.
+-- Convert separators (in path) to path separators.
+function unit.to_path (path) --> (string)
+  return path and path:gsub('/', '\\'):gsub('%.', '\\')
+end ----
+
 do
   local format = string.format
 
+-- Полное имя
 -- Full name.
 function unit.fullname (path, name, ext) --> (string)
   return format('%s%s%s', path or '', name or '', ext or '')

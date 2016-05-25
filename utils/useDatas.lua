@@ -330,7 +330,7 @@ function unit.history (path, name, kind) --> (object)
 end -- history
 
 do
-  local context = context
+  --local context = context
 
 -- Create history object.
 function unit.newHistory (data, check) --> (object)
@@ -344,6 +344,7 @@ function unit.newHistory (data, check) --> (object)
   elseif tp == 'string' then
     name = data
     path = data:match("(.*[/\\])")
+
     --logShow(path..'\n'..name)
   end
 
@@ -359,6 +360,8 @@ end -- do
 do
   local f_fpath = '%s%s%s'      -- Relative path
   local f_tlink = '<%s%s>%s'    -- Help topic link
+
+  local to_path = utils.to_path
 
 -- defCustom sample.
 -- Warning: Fields with '*' are required, others are optional.
@@ -420,7 +423,7 @@ local defCustom = {
 function unit.customize (Custom, defCustom) --> (table)
   local t, u = addData(Custom or {}, defCustom, 'extend', pairs, true)
   --logShow(t, "data")
-  local name, path = t.name, t.path:gsub('/', '\\'):gsub('%.', '\\')
+  local name, path = t.name, to_path(t.path)
   t.path = path
   --logShow(t, "data")
 
@@ -442,7 +445,7 @@ function unit.customize (Custom, defCustom) --> (table)
   u.ext   = u.ext  or '.cfg'
   u.name  = u.name or name
   u.file  = u.file or u.name..u.ext
-  u.path  = u.path or path
+  u.path  = u.path and to_path(u.path) or path
   u.work  = f_fpath:format(t.profile, u.path, u.dir)
   u.full  = u.work..u.file
 
@@ -451,7 +454,7 @@ function unit.customize (Custom, defCustom) --> (table)
   u.f_tlink = f_tlink
   u.ext   = u.ext  or '.hlf'
   u.file  = u.file or t.file or name
-  u.path  = u.path or path
+  u.path  = u.path and to_path(u.path) or path
   u.topic = u.topic or u.file
   u.tlink = u.tlink or f_tlink:format(t.base, u.path, u.topic)
 
@@ -462,7 +465,7 @@ function unit.customize (Custom, defCustom) --> (table)
   u.dir   = u.dir or 'locales\\'
   u.ext   = u.ext  or '.lua'
   u.file  = u.file or t.file or name
-  u.path  = u.path or path
+  u.path  = u.path and to_path(u.path) or path
   u.work  = f_fpath:format(u.path, u.dir, '')
   --u.work = t.base..u.path
   --logShow(t, "data")
