@@ -33,7 +33,7 @@ local utils = require 'context.utils.useUtils'
 
 --readCfg(cfgReg.types) -- Reading types_config -- don't work!
 
-local PluginPath = utils.PluginPath
+local PluginWorkPath = utils.PluginWorkPath
 
 --[[
 -- Protected require.
@@ -130,7 +130,7 @@ to 'context\test\detType' on plugin path!
 ]] -- SNoTestFiles
 
 local function testTypesCfg (...)
-  local TestFilesDir = PluginPath.."context\\test\\detType\\"
+  local TestFilesDir = PluginWorkPath.."context\\test\\detType\\"
   local DirList = far.GetDirList(TestFilesDir)
   if #DirList == 0 then
     farMsg(SNoTestFiles, CNoTestFiles, nil, 'l')

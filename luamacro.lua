@@ -16,8 +16,9 @@
 --
 require "context.initiate"
 resident = require "context.resident"
-local MakeResident = require "context.luamacro"
-MakeResident(resident, Event)
+
+local MakeLFcResident = require "context.luamacro"
+MakeLFcResident(resident, Event)
 --
 --]]
 ----------------------------------------
@@ -26,12 +27,14 @@ MakeResident(resident, Event)
 --------------------------------------------------------------------------------
 
 ----------------------------------------
-function MakeResident (resident, Event)
+function MakeResident (resident, Event, Priority)
+
+  local Priority = Priority or 100
 
   Event {
     group       = "EditorEvent",
-    description = "LFc ProcessEditorEvent",
-    priority    = 100,
+    description = "LuaFAR context ProcessEditorEvent",
+    priority    = Priority,
     action      = function (id, event, param)
       return resident.ProcessEditorEvent(id, event, param)
     end,
@@ -39,8 +42,8 @@ function MakeResident (resident, Event)
 
   Event {
     group       = "ViewerEvent",
-    description = "LFc ProcessViewerEvent",
-    priority    = 100,
+    description = "LuaFAR context ProcessViewerEvent",
+    priority    = Priority,
     action      = function (id, event, param)
       return resident.ProcessViewerEvent(id, event, param)
     end,
@@ -48,8 +51,8 @@ function MakeResident (resident, Event)
 
   Event {
     group       = "ExitFAR",
-    description = "LFc ExitScript",
-    priority    = 100,
+    description = "LuaFAR context ExitScript",
+    priority    = Priority,
     action      = function ()
       return resident.ExitScript()
     end,

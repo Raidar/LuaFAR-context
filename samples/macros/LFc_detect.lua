@@ -1,9 +1,9 @@
---[[ LF context check macros ]]--
+--[[ LuaFAR context check macros ]]--
 
 ----------------------------------------
 --[[ description:
-  -- Macros for LF context check.
-  -- Макросы для проверки LF context.
+  -- Macros for 'LuaFAR context' check.
+  -- Макросы для проверки 'LuaFAR context'.
 --]]
 ----------------------------------------
 --[[ uses:
@@ -17,18 +17,18 @@ local context, ctxdata = context, ctxdata
 
 ----------------------------------------
 --[[
-local dbg = require "context.utils.useDebugs"
-local logShow = dbg.Show
+local debugs = require "context.utils.useDebugs"
+local logShow = debugs.Show
 --]]
 
 --------------------------------------------------------------------------------
 --local unit = {}
 
-local dbgs
+local debugs
 
 local function doShow (...)
-  dbgs = dbgs or require "context.utils.useDebugs"
-  return dbgs.Show(...)
+  debugs = debugs or require "context.utils.useDebugs"
+  return debugs.Show(...)
 end -- doShow
 
 ----------------------------------------

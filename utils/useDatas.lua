@@ -321,7 +321,7 @@ local MHistory = { __index = THistory }
 function unit.history (path, name, kind) --> (object)
 
   local self = {
-    path = path or utils.PluginPath,
+    path = path or utils.PluginWorkPath,
     name = name or "unknown",
     kind = kind or {},
   } --- self
@@ -349,7 +349,7 @@ function unit.newHistory (data, check) --> (object)
   end
 
   utils.makedir(path)
-  
+
   local history = require "far2.history"
 
   return history.newfile(name)
@@ -367,46 +367,47 @@ do
 -- Warning: Fields with '*' are required, others are optional.
 --[[
 local defCustom = {
- *name = ScriptName,    -- имя скрипта (для формирования имён файлов).
- *path = ScriptPath,    -- относительный путь к файлам скрипта.
-  base = PluginPath,    -- базовая часть пути для файлов скрипта.
+ *name      = ScriptName,       -- имя скрипта (для формирования имён файлов).
+ *path      = ScriptPath,       -- относительный путь к файлам скрипта.
+  base      = PluginWorkPath,   -- базовая часть пути для файлов скрипта.
+  profile   = PluginDataPath,   -- базовая часть пути для конфигурации.
 
   -- Options: -- Опции скрипта.
-  options = {},         -- таблица параметров, настраиваемых скриптом.
+  options   = {},               -- таблица параметров, настраиваемых скриптом.
 
   -- Common:  -- Общие параметры:
-  label = '',           -- обозначение скрипта (обычно сокращённое).
-  file  = '',           -- общая часть имени (без расширения)
-                           для файлов справки и локализации.
+  label     = '',               -- обозначение скрипта (обычно сокращённое).
+  file      = '',               -- общая часть имени (без расширения)
+                                   для файлов справки и локализации.
 
   -- History:
-  history = { -- История (обработка настроек скрипта):
-    field = name,       -- поле настроек скрипта в таблице файла.
-    dir   = '',         -- каталог файла.
-    ext   = '.cfg',     -- расширение файла.
-    name  = '',         -- имя файла (без расширения).
-    file  = '',         -- полное имя файла (с расширением).
-    path  = '',         -- относительный путь к файлу.
-    work  = '',         -- полный путь к файлу.
-    full  = '',         -- полный путь с именем файла.
+  history   = { -- История (обработка настроек скрипта):
+    field       = name,         -- поле настроек скрипта в таблице файла.
+    dir         = '',           -- каталог файла.
+    ext         = '.cfg',       -- расширение файла.
+    name        = '',           -- имя файла (без расширения).
+    file        = '',           -- полное имя файла (с расширением).
+    path        = '',           -- относительный путь к файлу.
+    work        = '',           -- полный путь к файлу.
+    full        = '',           -- полный путь с именем файла.
   },
 
   -- Help:
-  help = {    -- Справка по скрипту:
-    ext   = '.hlf',     -- расширение файла.
-    file  = '',         -- имя файла.
-    path  = '',         -- относительный путь к файлу.
-    topic = '',         -- название темы.
-    tlink = '',         -- ссылка на тему.
+  help      = {    -- Справка по скрипту:
+    ext         = '.hlf',       -- расширение файла.
+    file        = '',           -- имя файла.
+    path        = '',           -- относительный путь к файлу.
+    topic       = '',           -- название темы.
+    tlink       = '',           -- ссылка на тему.
   },
 
   -- Locale:
-  locale = {  -- Файлы локализации скрипта:
-    kind  = 'both',     -- способ обработки файлов.
-    dir   = "locales\\",-- каталог файлов.
-    ext   = '.lua',     -- расширение файлов.
-    file  = '',         -- общее имя файлов.
-    path  = '',         -- относительный путь к файлам.
+  locale    = {  -- Файлы локализации скрипта:
+    kind        = 'both',       -- способ обработки файлов.
+    dir         = "locales\\",  -- каталог файлов.
+    ext         = '.lua',       -- расширение файлов.
+    file        = '',           -- общее имя файлов.
+    path        = '',           -- относительный путь к файлам.
   }
 } --- defCustom
 --]]
@@ -431,10 +432,9 @@ function unit.customize (Custom, defCustom) --> (table)
   t.options = t.options or {}
 
   -- Common:
-  t.label = t.label or name
-  t.file  = t.file  or name
-  t.base  = t.base  or utils.PluginPath
-  --t.profile = t.profile or utils.ProfilePath
+  t.label   = t.label   or name
+  t.file    = t.file    or name
+  t.base    = t.base    or utils.PluginWorkPath
   t.profile = t.profile or utils.PluginDataPath
 
   -- History:

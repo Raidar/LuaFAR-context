@@ -171,18 +171,44 @@ unit.PluginPath = unit.getPluginPath() -- Current plugin path
 
 -- Plugin directory name.
 -- Название каталога плагина.
-unit.PluginDirName = unit.PluginPath:match("[/\\]([^/\\]*)[/\\]$")
+--unit.PluginDirName = unit.PluginPath:match("[/\\]([^/\\]*)[/\\]$")
 
 --far.Message(unit.PluginPath, unit.PluginDirName)
+
+do
+  local GetSysEnv = win.GetEnv
 
 -- Profile path.
 -- Путь к профилю.
 function unit.getProfilePath ()
-  return (win.GetEnv("FARPROFILE") or
-          win.GetEnv("FARHOME").."\\Profile").."\\"
+  return (GetSysEnv("FARPROFILE") or
+          GetSysEnv("FARHOME").."\\Profile").."\\"
+end -- getProfilePath
+
 end --
 
 unit.ProfilePath = unit.getProfilePath() -- Current profile path
+
+--do
+--  local supper = string.upper
+
+-- Work directory path.
+-- Путь к рабочему каталогу.
+function unit.getWorkPath ()
+  local Info = far.PluginStartupInfo()
+  local Guid = string.upper(win.Uuid(Info.PluginGuid) or "")
+  --far.Show(Guid)
+  if Guid == "4EBBEFC8-2084-4B7F-94C0-692CE136894D" then
+    return unit.ProfilePath.."Macros\\modules\\"
+  end
+
+  return Info.ModuleDir
+end -- getWorkPath
+
+--end
+
+unit.PluginWorkPath = unit.getWorkPath()
+--far.Show(unit.PluginWorkPath)
 
 unit.PluginDataDir = "data\\"
 

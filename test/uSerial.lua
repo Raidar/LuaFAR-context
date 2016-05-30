@@ -224,7 +224,7 @@ function unit.Execute (Data) --> (bool | nil)
   logShow(_Test.test, "test", filter) -- Test utils/useDebugs
   --[[
   -- Test "logging-to-file" object:
-  local l = dbg.open("uSerialFile.log")
+  local l = debugs.open("uSerialFile.log")
   l:data(_Test.test, "test", "w")
   l:close()
   --]]
