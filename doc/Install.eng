@@ -15,13 +15,15 @@ Install:
 4. Clear plugins cache and reload FAR Manager.
 
 Using in 'LuaFAR for Editor' plugin:
-1. Open main _usermenu.lua file in plugin directory.
+1. Open main "_usermenu.lua" file in plugin directory.
 2. Insert to BEGIN of this file following lines:
 require "context.initiate"
 MakeResident("context.resident")
-*. It may be used a prepared template file
-context/samples/lf4ed/_usermenu.lua
-   Just copy it to plugin directory.
+
+Warning:
+  It may be used a prepared template file
+"context/samples/lf4ed/_usermenu.lua"
+Just copy it to plugin directory.
 
 ―――――――
 P.S. It's also recommended view a history of changes
