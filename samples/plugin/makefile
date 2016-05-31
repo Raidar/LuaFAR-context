@@ -6,7 +6,7 @@
 PATH_LUAFAR = ..\..\luafar_unicode
 
 # Name of LuaFAR plugin
-TARGET      = lf_plugin.dll
+TARGET      = lfplugin.dll
 
 # Supported export functions
 EXPORTS = \

@@ -185,12 +185,15 @@ function unit.getProfilePath ()
           GetSysEnv("FARHOME").."\\Profile").."\\"
 end -- getProfilePath
 
+function unit.getUserWorkDir ()
+  return (GetSysEnv("FARUSERWORKDIR") or "modules").."\\"
+end -- getUserWorkDir
+
 end --
 
-unit.ProfilePath = unit.getProfilePath() -- Current profile path
-
---do
---  local supper = string.upper
+unit.ProfilePath    = unit.getProfilePath() -- Current profile path
+unit.UserWorkDir    = unit.getUserWorkDir() -- Current user work directory
+                                            -- (relative to profile path)
 
 -- Work directory path.
 -- Путь к рабочему каталогу.
@@ -199,13 +202,11 @@ function unit.getWorkPath ()
   local Guid = string.upper(win.Uuid(Info.PluginGuid) or "")
   --far.Show(Guid)
   if Guid == "4EBBEFC8-2084-4B7F-94C0-692CE136894D" then
-    return unit.ProfilePath.."Macros\\modules\\"
+    return unit.ProfilePath..unit.UserWorkDir
   end
 
   return Info.ModuleDir
 end -- getWorkPath
-
---end
 
 unit.PluginWorkPath = unit.getWorkPath()
 --far.Show(unit.PluginWorkPath)

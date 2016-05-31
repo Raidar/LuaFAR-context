@@ -35,7 +35,6 @@ end -- doShow
 local Macro = Macro or function () end
 
 ---------------------------------------- check
-
 local detArea = context.detect.area
 local curFileType = detArea.current
 

@@ -21,11 +21,11 @@
   FAR plugins\  - common directory of FAR plugins source
     luafar_unicode\ - LuaFARw source
     luafar_plugins\ - LuaFAR plugins source
-        lf_plugin\  - specific LuaFAR plugin source
+        lfplugin\   - specific LuaFAR plugin source
             makefile    - makefile for this plugin
             lfp\        - maked version of this plugin
-                lf_plugin.dll   - luaplug.dll for plugin
-                lf_plugin.lua   - base lua-script of plugin
+                lfplugin.dll    - luaplug.dll for plugin
+                lfplugin.lua    - base lua-script of plugin
                 others\         - other directories of plugin
 --]]
 --------------------------------------------------------------------------------

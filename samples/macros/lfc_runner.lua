@@ -1,35 +1,38 @@
---[[ LuaFAR context ]]--
+--[[ LuaFAR context runner ]]--
 
 ----------------------------------------
 --[[ description:
-  -- Using in LuaMacro.
-  -- Использование в LuaMacro.
+  -- LuaFAR context package runner.
+  -- Запускатель пакета LuaFAR context.
 --]]
 ----------------------------------------
 --[[ uses:
-  LuaFAR.
-  -- group: LF context.
+  none.
+  -- group: Macros/Plugins.
 --]]
 --------------------------------------------------------------------------------
---[[
-  Insert following code to start of LuaMacro _macroinit.lua file:
---
-require "context.initiate"
-resident = require "context.resident"
+do
+  -- Путь к профилю
+  local GetSysEnv = win.GetEnv
+  local ProfilePath = GetSysEnv("FARPROFILE")
+  if not ProfilePath then
+    ProfilePath = GetSysEnv("FARHOME").."\\Profile"
+  end
 
-local MakeLFcResident = require "context.luamacro"
-MakeLFcResident(resident, Event)
---
---]]
-----------------------------------------
---local logShow = context.Show
+  -- Путь к пакету
+  local package = package
+  local ModulePath = ProfilePath.."\\modules\\?.lua;"
+  local PackPath = package.path
+  if not PackPath:find(ModulePath, 1, true) then
+    package.path = ModulePath..PackPath
+  end
 
---------------------------------------------------------------------------------
+  -- Инициализация пакета
+  require "context.initiate"
 
-----------------------------------------
-function MakeResident (resident, Event, Priority)
-
+  -- Установка обработчиков
   local Priority = Priority or 100
+  local resident = require "context.resident"
 
   Event {
     group       = "EditorEvent",
@@ -58,8 +61,7 @@ function MakeResident (resident, Event, Priority)
     end,
   } ---
 
-end ---- MakeResident
-
+end
 --------------------------------------------------------------------------------
-return MakeResident
+--return unit
 --------------------------------------------------------------------------------
