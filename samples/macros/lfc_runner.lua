@@ -21,7 +21,7 @@ do
 
   -- Путь к пакету
   local package = package
-  local ModulePath = ProfilePath.."\\modules\\?.lua;"
+  local ModulePath = ProfilePath.."\\work\\?.lua;"
   local PackPath = package.path
   if not PackPath:find(ModulePath, 1, true) then
     package.path = ModulePath..PackPath

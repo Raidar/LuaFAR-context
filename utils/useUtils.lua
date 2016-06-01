@@ -185,34 +185,39 @@ function unit.getProfilePath ()
           GetSysEnv("FARHOME").."\\Profile").."\\"
 end -- getProfilePath
 
+-- Work directory.
+-- Рабочий каталог.
 function unit.getUserWorkDir ()
-  return (GetSysEnv("FARUSERWORKDIR") or "modules").."\\"
+  return (GetSysEnv("FARUSERWORKDIR") or "work").."\\"
 end -- getUserWorkDir
+
+-- Data directory.
+-- Каталог данных.
+function unit.getUserDataDir ()
+  return (GetSysEnv("FARUSERDATADIR") or "data").."\\"
+end -- getUserDataDir
 
 end --
 
 unit.ProfilePath    = unit.getProfilePath() -- Current profile path
-unit.UserWorkDir    = unit.getUserWorkDir() -- Current user work directory
+unit.PluginWorkDir  = unit.getUserWorkDir() -- Current user work directory
                                             -- (relative to profile path)
-
+unit.PluginDataDir  = unit.getUserDataDir() -- Current user data directory
+                                            -- (relative to profile path)
 -- Work directory path.
 -- Путь к рабочему каталогу.
-function unit.getWorkPath ()
+function unit.getUserWorkPath ()
   local Info = far.PluginStartupInfo()
   local Guid = string.upper(win.Uuid(Info.PluginGuid) or "")
   --far.Show(Guid)
   if Guid == "4EBBEFC8-2084-4B7F-94C0-692CE136894D" then
-    return unit.ProfilePath..unit.UserWorkDir
+    return unit.ProfilePath..unit.PluginWorkDir
   end
 
   return Info.ModuleDir
-end -- getWorkPath
+end -- getUserWorkPath
 
-unit.PluginWorkPath = unit.getWorkPath()
---far.Show(unit.PluginWorkPath)
-
-unit.PluginDataDir = "data\\"
-
+unit.PluginWorkPath = unit.getUserWorkPath()
 unit.PluginDataPath = unit.ProfilePath..unit.PluginDataDir
 
 -- Used interface and help language.
