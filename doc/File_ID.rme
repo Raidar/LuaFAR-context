@@ -1,12 +1,12 @@
 LuaFAR context pack
 
 [Info]
-Ver. : 3.3.0.2
+Ver. : 3.3.0.3
 Date : 2016-05-31
 Ware : Freeware
 Lic. : MIT
 Reqs : FAR + LuaFAR v.3.0.4575,
-       UM Adapter v.3.0.0.4.
+       UM Adapter v.3.0.0.5.
 Type : Plugin for FAR Manager (Script package)
 Desc : LuaFAR context package for LuaFAR plugins and scripts
 
