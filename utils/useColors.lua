@@ -25,25 +25,27 @@ local bshl, bshr = bit.lshift, bit.rshift
 local far = far
 local F = far.Flags
 
+local Flag_FarColor = F.FCF_4BITMASK
+
 ----------------------------------------
 --local logShow = context.Show
 
 --------------------------------------------------------------------------------
 -- Color handling class
 local unit = {
-  Mask  = 0xF,
-  Shift = 0x4,
-  Default = 0xF0,
+  Mask      = 0xF,
+  Shift     = 0x4,
+  Default   = 0xF0,
 
-  FGMask = 0x0F,
-  BGMask = 0xF0,
+  FGMask    = 0x0F,
+  BGMask    = 0xF0,
 
-  DefFG  = 0xF,
-  DefBG  = 0x0,
+  DefFG     = 0xF,
+  DefBG     = 0x0,
 
-  Flags  = 'Flags',
-  FGName = 'ForegroundColor',
-  BGName = 'BackgroundColor',
+  Flags     = 'Flags',
+  FGName    = 'ForegroundColor',
+  BGName    = 'BackgroundColor',
 } ---
 unit.FGMask =      unit.Mask
 unit.BGMask = bshl(unit.Mask, unit.Shift)
@@ -124,21 +126,23 @@ end -- do
 function unit.tonumber (color) --> (number)
   if type(color) ~= 'table' then return color end
   local self = unit
+
   return bor(     band(color[self.FGName], self.FGMask),
              bshl(band(color[self.BGName], self.BGMask), self.Shift))
-end ----
+end ---- tonumber
 
 -- Table value of number-color.
 -- Табличное значение цвета-числа.
 function unit.totable (color) --> (table)
   if type(color) == 'table' then return color end
+
   local self = unit
   return {
+    [self.Flags]  = Flag_FarColor,
     [self.FGName] = band(     color, self.FGMask             ),
     [self.BGName] = band(bshl(color, self.Shift), self.BGMask),
-    [self.Flags]  = F.FCF_4BITMASK,
   }
-end ----
+end ---- totable
 
 -- Required value of color.
 -- Требуемое значение цвета.
@@ -149,93 +153,106 @@ function unit.tocolor (color, kind) --> (table|number)
   elseif tp == 'table' then
     return kind == 'table' and color or self.tonumber(color)
   end
+
   return color
-end ----
+end ---- tocolor
 
 -- Get foreground color for color.
 -- Получение цвета символа для цвета.
 function unit.getFG (color) --> (number)
   if type(color) == 'table' then
     return color[unit.FGName]
-  else
-    return band(color, unit.FGMask)
   end
-end ----
+
+  return band(color, unit.FGMask)
+end ---- getFG
 
 -- Get background color for color.
 -- Получение цвета фона для цвета.
 function unit.getBG (color) --> (number)
   if type(color) == 'table' then
     return color[unit.BGName]
-  else
-    return bshr(color, unit.Shift)
   end
-end ----
+
+  return bshr(color, unit.Shift)
+end ---- getBG
 
 -- Set foreground color for color.
 -- Установка цвета символа для цвета.
 function unit.setFG (color, fg) --> (number)
+  local self = unit
+
   if type(color) == 'table' then
-    color[unit.FGName] = fg
+    color[self.FGName] = fg
+
     return color
-  else
-    return bor(band(color, unit.BGMask), band(fg, unit.Mask))
   end
-end ----
+
+  return bor(band(color, self.BGMask), band(fg, self.Mask))
+end ---- setFG
 
 -- Set background color for color.
 -- Установка цвета фона для цвета.
 function unit.setBG (color, bg) --> (number)
+  local self = unit
+
   if type(color) == 'table' then
-    color[unit.BGName] = bg
+    color[self.BGName] = bg
+
     return color
-  else
-    return bor(band(color, unit.FGMask),
-               bshl(band(bg, unit.Mask), unit.Shift))
   end
-end ----
+
+  return bor(band(color, self.FGMask),
+             bshl(band(bg, self.Mask), self.Shift))
+end ---- setBG
 
 -- Make color (by values).
 -- Формирование цвета (по значениям).
 function unit.make (fg, bg, kind) --> (color)
+  local self = unit
+
   if (kind or 'table') == 'table' then
     return {
-      [unit.FGName] = fg,
-      [unit.BGName] = bg,
-      [unit.Flags]  = F.FCF_4BITMASK,
+      [self.Flags]  = Flag_FarColor,
+      [self.FGName] = fg,
+      [self.BGName] = bg,
     }
-  else
-    return bor(fg, bshl(bg, unit.Shift))
   end
+
+  return bor(fg, bshl(bg, self.Shift))
 end ---- make
 
 -- Make color (by colors).
 -- Формирование цвета (по цветам).
 function unit.cmake (fg, bg, kind) --> (color)
+  local self = unit
+
   if (kind or 'table') == 'table' then
     return {
-      [unit.FGName] = type(fg) == 'table' and fg[unit.FGName] or fg,
-      [unit.BGName] = type(bg) == 'table' and bg[unit.FGName] or bg,
-      [unit.Flags]  = F.FCF_4BITMASK,
+      [self.Flags]  = Flag_FarColor,
+      [self.FGName] = type(fg) == 'table' and fg[self.FGName] or fg,
+      [self.BGName] = type(bg) == 'table' and bg[self.FGName] or bg,
     }
-  else
-    return bor(band(fg, unit.FGMask), band(bg, unit.BGMask))
   end
+
+  return bor(band(fg, self.FGMask), band(bg, self.BGMask))
 end ---- cmake
 
 ---------------------------------------- methods
 -- Make new color (by values).
 -- Формирование нового цвета (по значениям).
 function unit:newColor (fg, bg, kind) --> (color)
+  local self = self
+
   if (kind or 'table') == 'table' then
     return {
+      [self.Flags]  = Flag_FarColor,
       [self.FGName] = fg,
       [self.BGName] = bg,
-      [self.Flags]  = F.FCF_4BITMASK,
     }
-  else
-    return bor(fg, bshl(bg, self.Shift))
   end
+
+  return bor(fg, bshl(bg, self.Shift))
 end ---- newColor
 
 do
@@ -249,6 +266,7 @@ do
   kind   (string) - color format kind: 'table' | 'number'.
 --]]
 function unit:getColor (color, kind) --> (color)
+  local self = self
   -- TODO: Копировать self.Default, если это таблица!
   local color = color or self.Default
 
@@ -275,6 +293,7 @@ end -- do
   kind   (string) - color format kind: 'table' | 'number'.
 --]]
 function unit:dataColor (data, name, prefix, kind) --> (color)
+  --local data, name = data, name
   local prefix = prefix or '_'
   local color = data[prefix..name]
 
@@ -284,6 +303,7 @@ function unit:dataColor (data, name, prefix, kind) --> (color)
 
   color = self:getColor(data[name], kind)
   data[prefix..name] = color
+
   return color
 end ---- dataColor
 
