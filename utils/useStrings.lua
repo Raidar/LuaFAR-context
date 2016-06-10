@@ -28,6 +28,7 @@ local bshl, bshr = bit.lshift, bit.rshift
 --------------------------------------------------------------------------------
 local unit = {}
 
+--[[
 ---------------------------------------- Spaces
 do
   local error = error
@@ -54,12 +55,64 @@ local Tspaces = {
 
     error("Attempt to get spaced string with not number count", 2)
   end,
-} ---
+} --- Tspaces
 
 unit.spaces = setmetatable({}, Tspaces)
 
 end -- do
+--]]
+---------------------------------------- Spaces
+do
+  local error = error
 
+-- Prepared char strings.
+-- Подготовленные строки из символа.
+local Trepchar = {
+  __index = function (t, k)
+    if type(k) == 'number' then
+      if k >= 0 then
+        local v = ""
+        if k > 0 then
+          v = (t.char or " "):rep(k)
+        end
+
+        --if k < 1000000 then
+          rawset(t, k, v)
+        --end
+
+        return v
+
+      else
+        return ""
+
+      end
+    end
+
+    error("Attempt to get char string with not number count", 2)
+  end,
+} --- Trepchar
+
+-- Prepared chars' strings.
+-- Подготовленные строки из символов.
+local Tchars = {
+  __index = function (t, k)
+    if type(k) == 'string' then
+      local v = { char = k }
+      setmetatable(v, Trepchar)
+      rawset(t, k, v)
+      return v
+
+    end
+
+    error("Attempt to get char table with not character", 2)
+  end,
+} --- Tchars
+
+unit.chars = setmetatable({}, Tchars)
+
+unit.spaces = unit.chars[" "]
+
+end -- do
 ---------------------------------------- Char
 --[[
 -- Get a char from specified position of string.
