@@ -211,10 +211,10 @@ function unit.getUserWorkPath ()
   local Guid = string.upper(win.Uuid(Info.PluginGuid) or "")
   --far.Show(Guid)
   if Guid == "4EBBEFC8-2084-4B7F-94C0-692CE136894D" then
-    return unit.ProfilePath..unit.PluginWorkDir
+    return unit.ProfilePath..unit.PluginWorkDir -- LuaMacro plugin
   end
 
-  return Info.ModuleDir
+  return Info.ModuleDir -- LuaFAR plugins
 end -- getUserWorkPath
 
 unit.PluginWorkPath = unit.getUserWorkPath()
@@ -250,14 +250,33 @@ function unit.language () --> (table)
     Help = lngHelp or "Default", -- Help
   } ----
   --]]
-  -- [[
-  local key = "Software\\Far Manager\\Language"
-  return {
-    Main = win.GetEnv("FARLANG") or "Default",  -- Interface
-    Help = win.GetEnv("FARLANG") or "Default",  -- Help -- FAR3 temp
-    --Help = win.GetRegKey("HKCU", key, "Help") or "Default", -- Help -- FAR23
-  } ----
+
+  local Macro_Lang = [[
+    return Far.GetConfig("Language.Main"), Far.GetConfig("Language.Help")
+  ]] -- Macro_Lang
+
+  local Lang = far.MacroExecute(Macro_Lang) or {}
+  local MainLang = Lang[1]
+  local HelpLang = Lang[2]
+  --far.Show(Lang, MainLang, HelpLang)
+
+  --[[
+  -- Language settings are private! -- This code don't work.
+  local FarCfg = far.CreateSettings("far", F.PSL_LOCAL)
+  local Lang = FarCfg and FarCfg:OpenSubkey(0, "Language")
+  local MainLang = Lang and FarCfg:Get(Lang, "Main", F.FST_STRING)
+  local HelpLang = Lang and FarCfg:Get(Lang, "Help", F.FST_STRING)
+  --far.Show(FarCfg, Lang, MainLang, HelpLang)
+  far.FreeSettings()
   --]]
+
+  MainLang = MainLang or win.GetEnv("FARLANG") or "Default"
+  HelpLang = HelpLang or MainLang
+
+  return {
+    Main = MainLang,  -- UI
+    Help = HelpLang,  -- Help
+  } ----
 end ---- language
 
 do
