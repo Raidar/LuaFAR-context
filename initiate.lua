@@ -30,9 +30,9 @@ ctxdata = rawget(_G, 'ctxdata') or {}
 local ctxdata = ctxdata
 ctxdata.guid = "c05e4187-192b-4c37-8821-06cf75e7b4d1"
 
-ctxdata.config  = ctxdata.config or {}  -- access to configs
-ctxdata.reg     = ctxdata.reg or {}     -- register of configs
-ctxdata.checked = ctxdata.checked or {} -- type checked configs
+ctxdata.config      = ctxdata.config      or {} -- access to configs
+ctxdata.reg         = ctxdata.reg         or {} -- register of configs
+ctxdata.checked     = ctxdata.checked     or {} -- type checked configs
 ctxdata.descriptors = ctxdata.descriptors or {} -- config descriptors
 
 ---------------------------------------- Debug
