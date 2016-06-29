@@ -482,7 +482,7 @@ local function TabToText (name, data, kind, write) --| (write)
     -- Settings to write fields of array in one line:
     local islining = kind.lining == "all" or kind.lining == "array"
     local alimit, acount
-    local awidth, avalth, avarth
+    local awidth, avalth, avarth--, asepth
     if islining then
       alimit, acount = kind.alimit, kind.acount
       awidth = kind.awidth
@@ -491,7 +491,7 @@ local function TabToText (name, data, kind, write) --| (write)
       if type(acount) == 'function' then acount = acount(name, data) end
       if type(awidth) == 'function' then awidth = awidth(name, data) end
       if type(avalth) == 'function' then avalth = avalth(name, data) end
-      if type(avarth) == 'function' then asepth = avarth(name, data) end
+      if type(avarth) == 'function' then avarth = avarth(name, data) end
     end
 
     local l = 0 -- New line count-flag

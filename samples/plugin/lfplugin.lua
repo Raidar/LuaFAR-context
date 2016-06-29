@@ -32,7 +32,7 @@
 --[[ LuaFAR plugin ]]--
 
 local _PluginVersion = "1.0.0"
-local _ReqLuafarVer = { 2, 0, 1 }
+--local _ReqLuafarVer = { 2, 0, 1 }
 
 --------------------------------------------------------------------------------
 --[[ Initial processing ]]--[[ Первоначальная обработка ]]--
