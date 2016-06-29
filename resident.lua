@@ -43,8 +43,10 @@ function ProcessViewerEvent (id, event, param)
 end --
 
 function ExitScript ()
-  ctxdata.events = nil -- ?!
-  ctxdata = nil
+  if rawget(_G, 'ctxdata') then
+    ctxdata.events = nil -- ?!
+    ctxdata = nil
+  end
 end --
 
 ----------------------------------------
