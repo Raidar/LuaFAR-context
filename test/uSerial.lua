@@ -33,16 +33,22 @@ local unit = {}
 
 ---------------------------------------- Test class
 local TTest = { -- Информация по умолчанию:
+
 } --- TLang
 local MTest = { __index = TTest }
 
 -- Создание объекта.
 local function CreateTest (Data) --> (object)
+
   local self = {
+
     Data = Data,
     test = false,
+
   } --- self
+
   return setmetatable(self, MTest)
+
 end -- CreateTest
 
 ---------------------------------------- methods
@@ -50,11 +56,13 @@ local tconcat = table.concat
 
 -- Make data in subtable.
 function TTest:makesub (kind) --| test
+
   local t, l = self.test[kind], self.test.Liter
   l[kind] = tconcat(t) -- string with letters
 
   -- Hash-list with positions of array items
   for k, v in ipairs(t) do t[v] = k end
+
 end ---- makesub
 
 -- Fill test using source data.
@@ -66,6 +74,7 @@ function TTest:Fill () --| Language
     local t = l.Konal
     for _, v in ipairs(l.Sonor) do t[#t + 1] = v end
     for _, v in ipairs(l.Sinel) do t[#t + 1] = v end
+
   end -- do
 
   do -- Make data
@@ -74,18 +83,21 @@ function TTest:Fill () --| Language
     self:makesub("Sonor")
     self:makesub("Sinel")
     self:makesub("Hemil")
+
   end -- do
 
   do -- Fill .Yocal
     local t = l.Yocal
     local c = l.Hemal._Yocal_
     for _, v in ipairs(l.Vocal) do t[#t + 1] = c..v end
+
   end -- do
 
   do -- Fill .Yonal
     local t = l.Jonal
     local c = l.Hemal._Jonal_
     for _, v in ipairs(l.Konal) do t[#t + 1] = v..c end
+
   end -- do
 end ---- Fill
 
@@ -93,9 +105,11 @@ end ---- Fill
 ---------------------------------------- Make
 -- Загрузка.
 function TTest:Load ()
+
   local Data = self.Data
 
   self.test = datas.load(Data.SourceFile, nil, 'change')
+
 end ---- GenerateFormo
 
 do
@@ -104,19 +118,23 @@ do
 
 -- Сохранение.
 function TTest:Save ()
+
   local Data = self.Data
 
   --[[
   local sortkind = {
+
     --compare = sortcompare,
     --pairs = ipairs, -- Test: array fields
     --pairs = tables.hpairs, -- Test: hash fields
     pairs = pairs, -- Test: array + hash fields
     --pairs = allpairs, -- Test: all fields including from metas
+
   } ---
   --]]
 
   local kind = {
+
     localret = true, -- Test: local + return instead of global
     tnaming = true, -- Test: temporary name of table to access fields
     astable = true, -- Test: serialize as one table
@@ -183,10 +201,13 @@ function TTest:Save ()
     TabToStr = serial.TabToText,
     --]]
     serialize = serial.prettyize,
+
   } ---
 
   --logShow(self.test, "test")
+
   return datas.save(Data.ResultFile, "Data", self.test, kind)
+
 end ---- GenerateFormo
 
 end -- do
@@ -195,6 +216,7 @@ end -- do
 --local FullNameFmt = "%s%s.%s"
 
 function unit.Execute (Data) --> (bool | nil)
+
 --[[ 1. Analyzing ]]
   local Data = Data or {}
   Data.SourceFile = Data.SourceFile or "uSerialSource.dat"
@@ -222,12 +244,14 @@ function unit.Execute (Data) --> (bool | nil)
 
   --logShow(_Test.test, "test", "w") -- Test samples/logging
   logShow(_Test.test, "test", filter) -- Test utils/useDebugs
+
   --[[
   -- Test "logging-to-file" object:
   local l = debugs.open("uSerialFile.log")
   l:data(_Test.test, "test", "w")
   l:close()
   --]]
+
 end ---- Execute
 
 --------------------------------------------------------------------------------

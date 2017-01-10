@@ -33,6 +33,7 @@ function ProcessEditorEvent (id, event, param)
   handle.editorEvent(id, event, param)
 
   return 0
+
 end --
 
 function ProcessViewerEvent (id, event, param)
@@ -40,20 +41,25 @@ function ProcessViewerEvent (id, event, param)
   handle.viewerEvent(id, event, param)
 
   return 0
+
 end --
 
 function ExitScript ()
   if rawget(_G, 'ctxdata') then
     ctxdata.events = nil -- ?!
     ctxdata = nil
+
   end
 end --
 
 ----------------------------------------
 local resident = {
+
   ProcessEditorEvent = ProcessEditorEvent,
   ProcessViewerEvent = ProcessViewerEvent,
+
   ExitScript = ExitScript,
+
 } --- resident
 
 --------------------------------------------------------------------------------

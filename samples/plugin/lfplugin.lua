@@ -47,6 +47,7 @@ if _FirstRun then -- Check version:
   --local r1, r2 = _ReqLuafarVer[1], _ReqLuafarVer[2]
   --local OK = (v1 > r1) or (v1 == r1 and v2 >= r2)
   --if not OK then error("LuaFAR version "..r1.."."..r2.." is required", 2) end
+
 end --
 
 if _FirstRun then -- Assign unicode:
@@ -57,16 +58,20 @@ if _FirstRun then -- Assign unicode:
   local usub, ssub = unicode.utf8.sub, string.sub
   local ulen, slen = unicode.utf8.len, string.len
   local ufind = unicode.utf8.find
+
   unicode.utf8.cfind = function (s, patt, init, plain)
       init = init and slen(usub(s, 1, init-1)) + 1
       local t = { ufind(s, patt, init, plain) }
       if t[1] == nil then return nil end
       return ulen(ssub(s, 1, t[1]-1)) + 1, ulen(ssub(s, 1, t[2])), unpack(t, 3)
+
   end --
+
   getmetatable("").__index = unicode.utf8
   io = uio
   package.loadlib = far.LoadLib
   require, loadfile = far.Require, far.LoadFile
+
 end --
 
 if _FirstRun then -- LuaFAR context:
@@ -75,6 +80,7 @@ if _FirstRun then -- LuaFAR context:
   -- Configuration files registry
   local registerConfig = context.config.register
   registerConfig{ key = 'plugincfg', name = 'pluginname', inherit = true }
+
 end --
 
 --------------------------------------------------------------------------------
@@ -92,7 +98,9 @@ local F = far.Flags
 lfp = lfp or {}
 
 function lfp.version ()
+
   return _PluginVersion
+
 end
 
 --------------------------------------------------------------------------------
@@ -103,26 +111,36 @@ local handle = context.handle
 -- Action functions
 
 function far.ProcessEditorEvent (id, event, param)
+
   handle.editorEvent(id, event, param)
   -- Do something here --
+
   return 0
+
 end --
 
 function far.ProcessViewerEvent (id, event, param)
+
   handle.viewerEvent(id, event, param)
   -- Do something here --
+
   return 0
+
 end --
 
 --------------------------------------------------------------------------------
 --[[ Plugin functions ]]--[[ Функции плагина ]]--
 
 function far.Config()
+
   far.Message("Configuration")
+
 end
 
 function far.OpenPlugin (From, Item) -- from lf_history.lua
+
   if From == F.OPEN_COMMANDLINE then return end
+
   -----------------------------------------------------------------------------
   local iAnyAction = { text="&Any action",    action=AnyAction }
   local iEdtAction = { text="&Editor action", action=EdtAction }
@@ -132,8 +150,10 @@ function far.OpenPlugin (From, Item) -- from lf_history.lua
   local items = { iAnyAction, iConfig }
   if From == F.OPEN_EDITOR then table.insert(items, 2, iEdtAction) end
   -----------------------------------------------------------------------------
+
   local item = far.Menu(properties, items)
   if item then item.action() end
+
 end ----
 
 --[[ Plugin functions ]]--[[ Функции плагина ]]--

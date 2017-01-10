@@ -3,6 +3,7 @@
 
 --------------------------------------------------------------------------------
 local Data = {
+
   Test = 'Test',
   TestMessage = 'Test of localization',
   Warning = 'Warning',
@@ -13,6 +14,7 @@ local Data = {
   btn_Close  = 'Close',
   btn_Cancel = 'Cancel',
   btn_Apply  = 'Apply',
+
 } --- Data
 
 return Data

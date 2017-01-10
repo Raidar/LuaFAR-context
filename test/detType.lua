@@ -14,6 +14,7 @@ local farMsg = far.Message
 local context = context
 if not context then
   farMsg("No 'LuaFAR context' pack installed\n", "test_detType")
+
   return
 end
 
@@ -38,8 +39,11 @@ local PluginWorkPath = utils.PluginWorkPath
 --[[
 -- Protected require.
 local function prequire (modname)
+
   local st, res = pcall(require, modname)
+
   return st and res or nil
+
 end -- prequire
 --]]
 
@@ -47,11 +51,14 @@ local detect = context.detect
 
 ----------------------------------------
 local DetKindsInfo = { -- Описание видов detect:
+
   bymask = "By mask only without first line", -- Только по маске (без 1-й линии)
   byline = "By mask with first line checked", -- По маске с проверкой 1-й линии
+
 } --- DetKindsInfo
 
 local TestFilesInfo = { -- Ожидаемые результаты detect:
+
   -- Разница между bymask и byline --
   [".t_t"]          = { bymask = "none",  byline = "tst_fl2", },
   ["With_fl2"]      = { bymask = "none",  byline = "tst_fl2", },
@@ -72,18 +79,23 @@ local TestFilesInfo = { -- Ожидаемые результаты detect:
   ["With_fl1.tst"]  = { bymask = "tst_def", byline = "tst_fl1", },
   ["With_fl2.tst"]  = { bymask = "tst_def", byline = "tst_fl2", },
   [".With_fl2.tst"] = { bymask = "tst_def", byline = "tst_fl2", },
+
 } --- TestFilesInfo
 
 local DetFuncsInfo = {
+
   default = { Value = detect.FileType },
   --altered = { Value = <function> },
+
 } --- DetFuncsInfo
 
 ----------------------------------------
 local readFline = detect.readFileFirstLine
 
 local function getFilesType (FileList, detTypeFunc, f) --> (table) or nil
+
   if not detTypeFunc then return nil, 'no detect function' end
+
   local t, tf = {}, f or {}
   local checkFline = f.firstline
   for _, v in ipairs(FileList) do
@@ -92,19 +104,25 @@ local function getFilesType (FileList, detTypeFunc, f) --> (table) or nil
     tf.path = v.path
     if checkFline then
       tf.firstline = readFline and readFline(v.path..v.name) or nil
+
     end
+
     t[v.name] = detTypeFunc(tf)
     --t[v.name] = { detTypeFunc(tf) }
+
   end -- for
   f.firstline = checkFline
 
   return t
+
 end -- getFilesType
 
 local function cmpFilesType (t, FilesType, kind) --> (table | nil, error)
+
   if not FilesType then return nil, 'no file types' end
+
   local t, tp, exp, cmp = t or {}
-  t[#t+1] = "--- "..DetKindsInfo[kind].." ---"
+  t[#t + 1] = "--- "..DetKindsInfo[kind].." ---"
   for k, v in pairs(FilesType) do
     tp = type(v) == "string" and v or type(v) == "table" and v[1] or ""
     exp = TestFilesInfo[k]
@@ -112,12 +130,15 @@ local function cmpFilesType (t, FilesType, kind) --> (table | nil, error)
     if exp then
       exp = exp and TestFilesInfo[k][kind] or ""
       cmp = tp == exp and "ok" or ("error: %s ~= %s"):format(tp, exp)
-      t[#t+1] = ("%14s : %s"):format(k, cmp)
+      t[#t + 1] = ("%14s : %s"):format(k, cmp)
+
     end
   end -- for
-  t[#t+1] = "--- end ---"
+
+  t[#t + 1] = "--- end ---"
 
   return t
+
 end -- cmpFilesType
 
 local PathNamePattern = '^(.-)([^\\/]+)$'
@@ -130,10 +151,12 @@ to 'context\test\detType' on plugin path!
 ]] -- SNoTestFiles
 
 local function testTypesCfg (...)
+
   local TestFilesDir = PluginWorkPath.."context\\test\\detType\\"
   local DirList = far.GetDirList(TestFilesDir)
   if #DirList == 0 then
     farMsg(SNoTestFiles, CNoTestFiles, nil, 'l')
+
     return
   end
   --logShow(DirList, 'test_detType Dir List', 2)
@@ -149,6 +172,7 @@ local function testTypesCfg (...)
     if not v.FileAttributes:find('d', 1, true) then
       Path, Name = v.FileName:match(PathNamePattern)
       FileList[k] = { name = Name, path = Path }
+
     end
   end
   --logShow(FileList, 'test_detType Files List', 2)
@@ -170,6 +194,7 @@ local function testTypesCfg (...)
       t = getFilesType(FileList, detFunc, f)
       res = cmpFilesType(nil, t, 'byline')
       farMsg(table.concat(res, '\n'), Title)
+
     end
   end
 end ---- testTypesCfg
@@ -177,9 +202,12 @@ end ---- testTypesCfg
 ---------------------------------------- main
 local arg = select(1, ...)
 --logShow({ ... }, 'args', 2)
+
 if arg == nil then
   return testTypesCfg()
+
 else
   return testTypesCfg
+
 end
 --------------------------------------------------------------------------------

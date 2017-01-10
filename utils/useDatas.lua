@@ -34,10 +34,12 @@ local unit = {}
 ----------------------------------------
 -- Messages
 local Msgs = {
+
   -- load/save:
   FileNameNotFound = "File name not found",
   FileDataNotFound = "File data not found for:\n%s",
   FileRequireError = "Error require file:\n%s\n%s",
+
 } --- Msgs
 
 ---------------------------------------- base
@@ -56,10 +58,12 @@ unit.Dataless = utils.null  -- A field data for undatum field
   value  (bool) - additional parameter.
 --]]
 function unit.add (base, user, kind, tpairs, deep, ...) --> (table)
+
   if not base then return user end
   if not user then return base end
 
   return tables.add(base, user, kind, tpairs, deep, ...)
+
 end --
 local addData = unit.add
 
@@ -76,11 +80,14 @@ local addData = unit.add
   index  (string) - used __index name.
 --]]
 local function _cfglist (t, list, index) --> (table)
+
   --[[ -- old code
   if not list[t] then
     list[t], list[#list+1] = true, t
+
   end
   --]]
+
   local l = list[t]
 
   -- Check repeating call for t:
@@ -89,6 +96,7 @@ local function _cfglist (t, list, index) --> (table)
   -- Save new found table:
   if not l then
     list[t], list[#list+1] = {}, t
+
   end
   list[t][index or ""] = true -- Save used index
 
@@ -106,19 +114,24 @@ local function _cfglist (t, list, index) --> (table)
   if type(u) == 'table' then _cfglist(u, list, "__index") end
 
   return list
+
 end -- _cfglist
 unit._cfglist = _cfglist
 
 function unit.cfglist (t) --> (table)
+
   local list = {}
   if type(t) ~= 'table' then return list end
 
   return _cfglist(t, list)
+
 end --
 
 -- 'pairs' function with configs support.
 function unit.cfgpairs (t) --> (func)
+
   return tables.allpairs(t, unit.cfglist)
+
 end --
 
 ---------------------------------------- load/require
@@ -136,8 +149,10 @@ do
   data      (t|nil) - data table.
 --]]
 function unit.load (fullname, t, kind) --> (table | nil, error)
+
   if not fullname then
     return nil, Msgs.FileNameNotFound
+
   end
 
   -- Load lua-file with data:
@@ -147,13 +162,16 @@ function unit.load (fullname, t, kind) --> (table | nil, error)
   -- Retrieve data from file:
   local env = { __index = _G }
   setmetatable(env, env)
+
   local u = setfenv(chunk, env)()
   if u == nil then u = env.Data end
   if u == nil and t == nil then
     return nil, Msgs.FileDataNotFound:format(fullname)
+
   end
 
   return addData(t, u, kind or 'update', pairs, false)
+
 end -- load
 
 end -- do
@@ -168,9 +186,11 @@ end -- do
   fullname (string) - full file name.
 --]]
 function unit.find (name, path) --> (string)
+
   path = path or package.path
-  -- TODO: !!!
-  return nil
+
+  return nil -- TODO: !!!
+
 end ---- find
 
 do
@@ -188,20 +208,24 @@ do
   data  (table) - data table.
 --]]
 function unit.require (name, t, kind, reload) --> (table | nil, error)
+
   if not name then
     return nil, Msgs.FileNameNotFound
+
   end
 
   -- Protected require module with Data.
   local st, u = pcall(require, name)
   if not st then
     return nil, Msgs.FileRequireError:format(name, u)
+
   end
 
   -- Exclude module from loaded list.
   if reload then package.loaded[name] = nil end
 
   return addData(t, u, kind or 'update', pairs, false)
+
 end -- require
 
 end -- do
@@ -219,8 +243,10 @@ end -- do
   data  (table) - data table.
 --]]
 function unit.make (path, name, ext, t, kind) --> (table | nil, error)
+
   if not name then
     return nil, Msgs.FileNameNotFound
+
   end
 
   local fullname = utils.fullname(path, name, ext)
@@ -233,6 +259,7 @@ function unit.make (path, name, ext, t, kind) --> (table | nil, error)
   if u ~= nil then return u end
 
   return nil, ('%s\n%s'):format(loadError, reqError)
+
 end -- make
 
 ---------------------------------------- save/tostring
@@ -241,12 +268,14 @@ do
 
 -- Get serialize function.
 local function getSerialize (serialize) --> (serialize)
+
   if serialize then return serialize end
 
   local serial = require 'context.utils.useSerial'
   --serial = serial or require 'context.utils.useSerial'
 
   return serial and serial.serialize
+
 end -- getSerialize
 
   local io_open = io.open
@@ -263,6 +292,7 @@ end -- getSerialize
   isOk       (bool) - operation success flag.
 --]]
 function unit.save (fullname, name, data, kind) --> (bool)
+
   kind = kind or {}
 
   local f, s, res = io_open(fullname, 'w')
@@ -275,7 +305,9 @@ function unit.save (fullname, name, data, kind) --> (bool)
   res, s = getSerialize(kind.serialize)(name, data, kind, write)
 
   f:close()
+
   return res, s
+
 end -- save
 
   local select = select
@@ -292,6 +324,7 @@ end -- save
   isOk (bool) - operation success flag.
 --]]
 function unit.tostring (name, data, kind) --> (bool)
+
   kind = kind or {}
 
   local t, n = {}, 0
@@ -299,8 +332,11 @@ function unit.tostring (name, data, kind) --> (bool)
                   for i = 1, select("#", ...) do
                     n = n + 1
                     t[n] = select(i, ...)
+
                   end
+
                   return true
+
                 end -- write
 
   local res, s = getSerialize(kind.serialize)(name, data, kind, write)
@@ -308,6 +344,7 @@ function unit.tostring (name, data, kind) --> (bool)
   if res == nil then return nil, s end
 
   return tconcat(t), s
+
 end -- tostring
 
 end -- do
@@ -321,12 +358,15 @@ local MHistory = { __index = THistory }
 function unit.history (path, name, kind) --> (object)
 
   local self = {
+
     path = path or utils.PluginWorkPath,
     name = name or "unknown",
     kind = kind or {},
+
   } --- self
 
   return setmetatable(self, MHistory)
+
 end -- history
 
 do
@@ -346,6 +386,7 @@ function unit.newHistory (data, check) --> (object)
     path = data:match("(.*[/\\])")
 
     --logShow(path..'\n'..name)
+
   end
 
   utils.makedir(path)
@@ -353,6 +394,7 @@ function unit.newHistory (data, check) --> (object)
   local history = require "far2.history"
 
   return history.newfile(name)
+
 end -- history
 
 end -- do
@@ -367,6 +409,7 @@ do
 -- Warning: Fields with '*' are required, others are optional.
 --[[
 local defCustom = {
+
  *name      = ScriptName,       -- имя скрипта (для формирования имён файлов).
  *path      = ScriptPath,       -- относительный путь к файлам скрипта.
   base      = PluginWorkPath,   -- базовая часть пути для файлов скрипта.
@@ -390,6 +433,7 @@ local defCustom = {
     path        = '',           -- относительный путь к файлу.
     work        = '',           -- полный путь к файлу.
     full        = '',           -- полный путь с именем файла.
+
   },
 
   -- Help:
@@ -399,6 +443,7 @@ local defCustom = {
     path        = '',           -- относительный путь к файлу.
     topic       = '',           -- название темы.
     tlink       = '',           -- ссылка на тему.
+
   },
 
   -- Locale:
@@ -408,7 +453,9 @@ local defCustom = {
     ext         = '.lua',       -- расширение файлов.
     file        = '',           -- общее имя файлов.
     path        = '',           -- относительный путь к файлам.
+
   }
+
 } --- defCustom
 --]]
 
@@ -422,6 +469,7 @@ local defCustom = {
   Custom    (table) - customized settings table.
 --]]
 function unit.customize (Custom, defCustom) --> (table)
+
   local t, u = addData(Custom or {}, defCustom, 'extend', pairs, true)
   --logShow(t, "data")
   local name, path = t.name, to_path(t.path)
@@ -471,6 +519,7 @@ function unit.customize (Custom, defCustom) --> (table)
   --logShow(t, "data")
 
   return t
+
 end -- customize
 
 end -- do

@@ -42,8 +42,10 @@ local unit = {}
 ----------------------------------------
 -- Messages
 local Msgs = {
+
   CHandlerError = "Handler error",
   SHandlerError = "Error running handler %d.\n%s\nHandler is removed.",
+
 } --- Msgs
 
 ---------------------------------------- Events
@@ -52,31 +54,40 @@ ctxdata.events = events
 
 -- Add new handler for event.
 function unit.add (event, handler) --> (true|nil)
+
   if not event then return end
+
   if not events[event] then events[event] = {} end
 
   local handlers = events[event]
-  handlers[#handlers+1] = handler
+  handlers[#handlers + 1] = handler
 
   return true
+
 end ---- add
 
 -- Delete handler for event.
 function unit.del (event, handler) --> (true|nil)
+
   if not event then return end
+
   local handlers = events[event]
   if not handlers then return end
 
   if type(handler) == 'number' then
     table.remove(handlers, handler)
+
     return true
+
   end
 
   -- handler is a function:
   for k = 1, #handlers do
     if handlers[k] == handler then
       table.remove(handlers, k)
+
       return true
+
     end
   end
 end ---- del
@@ -87,7 +98,9 @@ end ---- del
 
 -- Handle event calling all handlers for this event.
 local function handleEvent (event, ...) --> (true|nil)
+
   if not event then return end
+
   local handlers = events[event]
   if not handlers then return end
 
@@ -98,10 +111,12 @@ local function handleEvent (event, ...) --> (true|nil)
       farMsg(Msgs.CHandlerError,
              Msgs.SHandlerError:format(k, res or ''), nil, 'lw')
       unit.del(event, k)
+
     end
   end
 
   return true
+
 end -- handleEvent
 unit.event = handleEvent
 
@@ -116,20 +131,25 @@ do
 
 -- An __index for subtables-configs.
 local function evt_index (t, key)
+
   if key == 'type' then return rawget(t, 'type') end
 
   local keycfg = cfgDat[key] -- may be nil or no table?
   if type(keycfg) ~= 'table' then return keycfg end
+
   return keycfg[rawget(t, 'type')]
+
 end -- evt_index
 
   local evt_mt = { __index = evt_index }
 
 -- Set a __index for subtables-configs.
 local function ev_newindex (t, key, value)
+
   rawset(t, key, value)
   if type(value) == 'table' then
     setmetatable(value, evt_mt)
+
   end
 end -- ev_newindex
 
@@ -138,30 +158,37 @@ end -- ev_newindex
 
 -- Detect and return config with type for 'current'.
 local function e_index (t, key) --| for editor
+
   if key == 'current' then
     local tp = detEditorType()
     if tp then return { type = tp } end
+
   end
 end -- e_index
 
 local function v_index (t, key) --| for viewer
+
   if key == 'current' then
     local tp = detViewerType()
     if tp then return { type = tp } end
+
   end
 end -- v_index
 
   setmetatable(editors, { __newindex = ev_newindex, __index = e_index })
   setmetatable(viewers, { __newindex = ev_newindex, __index = v_index })
+
 end -- do
 
 local function reloadEditorConfig (id, kind) --| editors
+
   --logShow({ "reset", editor.GetInfo() })
 
   local current = editors[id]
   if not current or current.kind ~= 'focus' then
     editors.current = nil     -- reset
     current = editors.current -- new config via mt
+
   end
   if current then current.kind = kind end
   editors.current = current
@@ -174,6 +201,7 @@ local function reloadEditorConfig (id, kind) --| editors
   handleEvent('reloadEditor', current)
 
   --far.Message(editors.current.type, "Editor")
+
 end -- reloadEditorConfig
 
 local function reloadViewerConfig (id, kind) --| viewers
@@ -182,6 +210,7 @@ local function reloadViewerConfig (id, kind) --| viewers
   if not current or current.kind ~= 'focus' then
     viewers.current = nil     -- reset
     current = viewers.current -- new config via mt
+
   end
   if current then current.kind = kind end
   viewers.current = current
@@ -194,10 +223,12 @@ local function reloadViewerConfig (id, kind) --| viewers
   handleEvent('reloadViewer', current)
 
   --far.Message(viewers.current.type, "Viewer")
+
 end -- reloadViewerConfig
 
 -- Change type for areaid config.
 function unit.changeType (areaid, newtype, force)
+
   if not newtype then return end
 
   local oldtype = rawget(areaid, 'type')
@@ -208,6 +239,7 @@ function unit.changeType (areaid, newtype, force)
   handleEvent('changeType', newtype, true)
 
   return true
+
 end ---- changeType
 
 ---------------------------------------- Handlers
@@ -221,6 +253,7 @@ do
 
 -- Process type autodetection for editor.
 function unit.editorEvent (id, event, param)
+
   local eid = id
   if event == EE_READ then
     --logShow(eid, "EE_READ")
@@ -247,6 +280,7 @@ function unit.editorEvent (id, event, param)
     if not editors.current or
        editors.current.type == 'none' then
       reloadEditorConfig(eid, 'save')
+
     end
 
   elseif event == EE_CLOSE then
@@ -264,6 +298,7 @@ do
 
 -- Process type autodetection for viewer.
 function unit.viewerEvent (id, event, param)
+
   local vid = id
   if event == VE_READ then
     local Info = viewer.GetInfo()
@@ -278,6 +313,7 @@ function unit.viewerEvent (id, event, param)
       reloadViewerConfig(vid, 'focus')
     --else
     --  viewers.current = viewers[vid]
+    --
     --end
 
   elseif event == VE_CLOSE then

@@ -43,6 +43,7 @@ unit.ExcludeChar = nil
 --unit.ExcludeChar = '-'
 
 local Types = {
+
   ["nil"]       = 'o',
   ["boolean"]   = 'b',
   ["number"]    = 'n',
@@ -51,10 +52,12 @@ local Types = {
   ["userdata"]  = 'u',
   ["function"]  = 'f',
   ["thread"]    = 'e',
+
 } --- Types
 unit.Types = Types
 
 local Words = {
+
   -- standard modules
   ["string"] = true,
   ["package"] = true,
@@ -64,6 +67,7 @@ local Words = {
   ["debug"] = true,
   ["table"] = true,
   ["coroutine"] = true,
+
   -- additional modules
   ["_io"] = true,
   ["uio"] = true,
@@ -73,31 +77,39 @@ local Words = {
   ["far"] = true,
   ["far2"] = true,
   ["win"] = true,
+
   -- special variables
   ["_G"] = true,
   ["_M"] = true,
+
   -- special keys
   ["__index"] = true,
+
   -- special functions
   ["assert"] = true,
   ["error"] = true,
   ["print"] = true,
   ["collectgarbage"] = true,
+
   -- typing functions
   ["type"] = true,
   ["tostring"] = true,
   ["tonumber"] = true,
+
   -- module functions
   ["module"] = true,
   ["require"] = true,
   ["import"] = true,
+
   -- fenv functions
   ["getfenv"] = true,
   ["setfenv"] = true,
+
   -- iteration functions
   ["pairs"] = true,
   ["ipairs"] = true,
   ["next"] = true,
+
   -- global functions
   ["select"] = true,
   ["unpack"] = true,
@@ -106,6 +118,7 @@ local Words = {
   ["rawequal"] = true,
   ["getmetatable"] = true,
   ["setmetatable"] = true,
+
   -- load/call functions
   ["dofile"] = true,
   ["load"] = true,
@@ -120,48 +133,61 @@ local Words = {
   flags = true,
   -- RectMenu
   LMap = true,
+
 } --- Words
 unit.Words = Words
 
 local Metas = {
+
   -- LuaFAR context
   _meta_ = true,
+
 } --- Metas
 unit.Metas = Metas
 
 ---------------------------------------- Work
 -- Plain find of string.
 local function sfind (s, pat) --> (bool)
+
   return s:find(pat, 1, true)
+
 end --
 unit.sfind = sfind
 
 -- Default width for: Ox12345678
 function unit.hex8 (n, width) --> (string)
+
   return format(format("%%#0%dx", (width or 8) + 2), n or 0)
+
 end ----
 
 -- Check field type to exclude.
 local function isUnfitValType (tp, filter) --> (bool)
+
   return sfind(filter, Types[tp] or '?')
+
 end -- isUnfitValType
 unit.isUnfitValType = isUnfitValType
 
 local supper = string.upper
 
 local function isUnfitKeyType (tp, filter) --> (bool)
+
   return sfind(filter, supper(Types[tp] or '?'))
+
 end -- isUnfitKeyType
 unit.isUnfitKeyType = isUnfitKeyType
 
 -- Check field string key to exclude.
 local function isUnfitKeyName (n, filter) --> (bool)
+
   return sfind(filter, 'W') and Words[n] or
          sfind(filter, '/') and sfind(n, '/') or
          sfind(filter, '\\') and sfind(n, '\\') or
          sfind(filter, '.') and sfind(n, '.') or
          sfind(filter, ':') and sfind(n, ':') or
          sfind(filter, 'M') and (Metas[n] or n:find("^__"))
+
 end -- isUnfitKey
 unit.isUnfitKeyName = isUnfitKeyName
 
@@ -185,6 +211,7 @@ local function FuncToText (func, kind) --> (string)
     t[3] = " w/ upvalue"
     if i.nups > 1 then
       t[4] = "s"
+
     end
   end
 
@@ -195,19 +222,24 @@ local function FuncToText (func, kind) --> (string)
       t[6] = kind.indent
       t[7] = kind.shift
       t[8] = "-- "
+
     else
     --]]
       t[5] = ": "
+
     end
-    t[#t+1] = "in ("
-    t[#t+1] = i.linedefined
-    t[#t+1] = "-"
-    t[#t+1] = i.lastlinedefined
-    t[#t+1] = ") "
-    t[#t+1] = i.source
+
+    t[#t + 1] = "in ("
+    t[#t + 1] = i.linedefined
+    t[#t + 1] = "-"
+    t[#t + 1] = i.lastlinedefined
+    t[#t + 1] = ") "
+    t[#t + 1] = i.source
+
   end
 
   return tconcat(t)
+
 end ---- FuncToText
 unit.FuncToText = FuncToText
 
@@ -216,13 +248,16 @@ unit.FuncToText = FuncToText
 -- Convert special type info to pretty text.
 -- Преобразование информации о спец-типе в читабельный текст.
 local function SpecToText (value, kind) --> (string)
+
   local tp = type(value)
   if DefaultSerialTypes[tp] then return end
 
   if tp == 'function' then
     return FuncToText(value, kind)
+
   else
     return tostring(value)
+
   end
 end -- SpecToText
 unit.SpecToText = SpecToText
@@ -232,12 +267,14 @@ unit.SpecToText = SpecToText
 -- Convert field value to pretty text with special types.
 -- Преобразование значения поля в читабельный текст со спец-типами.
 function unit.ValToText (value, kind)
+
   local tp = type(value)
 
   local filter = kind.filter
   if not kind.iskey and isUnfitValType(tp, filter) then return end
 
   return BasicValToText(value, kind)
+
 end ----
 
   local BasicKeyToText = serial.KeyToText
@@ -246,6 +283,7 @@ end ----
 -- Convert field key to pretty text with special types.
 -- Преобразование ключа поля в читабельный текст со спец-типами.
 function unit.KeyToText (key, kind) --> (string[, string] | nil)
+
   local tp = type(key)
 
   local filter = kind.filter
@@ -254,13 +292,16 @@ function unit.KeyToText (key, kind) --> (string[, string] | nil)
 
   if BasicSerialTypes[tp] then
     return BasicKeyToText(key, kind)
+
   end
 
   if tp == 'table' then
     return format("[{%q}]", tostring(key))
+
   end
 
   return format("[{%q}]", SpecToText(key, kind))
+
 end ---- KeyToText
 
 -- Convert special types' information to pretty text.
@@ -273,13 +314,16 @@ function unit.TypToText (name, data, kind, write) --| (write)
   local cur_indent = kind.indent
   if kind.isarray then
     write(cur_indent, format("nil, -- %s\n", u))
+
   else
     write(cur_indent, format("%s = nil, -- %s\n", name, u))
+
   end
 
   return true
+
 end ---- TypToText
-  
+
   local select = select
 
 -- Save data to array.
@@ -315,6 +359,7 @@ end ---- TypToText
   array   (table) - array of strings.
 --]]
 function unit.toarray (name, data, kind, filter) --> (table)
+
   kind = kind or {}
   kind.filter = filter or ""
 
@@ -342,29 +387,40 @@ function unit.toarray (name, data, kind, filter) --> (table)
                       if sl ~= "" then
                         m = m + 1
                         u[m] = sl
+
                       end
+
                       -- Move collected to t:
                       if m > 0 then
                         n = n + 1
                         t[n] = tconcat(u)
                         u, m = {}, 0 -- reset
+
                       end
+
                       -- Match for next '\n':
                       if sr ~= "" then
                         s = sr
                         sl, sr = s:match("^([^\n]-)\n(.*)$")
+
                       else
                         s, sl = "", false
+
                       end
-                    end
+
+                    end -- while
+
                     -- Save string after last "\n":
                     if s ~= "" then
                       m = m + 1
                       u[m] = s
+
                     end
+
                   end -- for
 
                   return true
+
                 end -- write
 
   --logShow("Start")
@@ -374,6 +430,7 @@ function unit.toarray (name, data, kind, filter) --> (table)
   if m > 0 then
     n = n + 1
     t[n] = tconcat(u)
+
   end
   t.n = n
   --logShow("Stop")
@@ -383,6 +440,7 @@ function unit.toarray (name, data, kind, filter) --> (table)
   if res == nil then return nil, s end
 
   return t, s
+
 end -- toarray
 
 end -- do
@@ -399,8 +457,10 @@ unit.fieldwidth = 1
   6..10 - count in 18..30.
 --]]
 function unit.acount (n, t) --> (number)
+
   local l = #t
   return l > 17 and l / 3 or l > 9 and l / 2 or l
+
 end
 
 -- Get hash items count on one line.
@@ -411,8 +471,10 @@ end
   5..10 - count in 15..30.
 --]]
 function unit.hcount (n, t) --> (number)
+
   local l = #t
   return l > 14 and l / 3 or l > 5 and l / 2 or l
+
 end
 
 ---------------------------------------- Tabulize
@@ -423,8 +485,9 @@ end
   -- @return: @see unit.toarray.
 --]]
 function unit.tabulize (name, data, kind, filter) --> (table)
+
   name = name or unit.Nameless
-  local kind = kind or {}
+  kind = kind or {}
 
   -- Prettyize special types and filter all types:
   kind.KeyToStr = unit.KeyToText -- in keys
@@ -434,8 +497,10 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   -- Nesting level or empty string:
   if type(filter) == 'number' then
     filter = format("d%d", filter)
+
   else
     filter = filter or ""
+
   end
   --logShow({ filter, kind })
 
@@ -445,7 +510,9 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   if sfind(filter, 'A') then
     local tables = require 'context.utils.useTables'
     kind.pairs = tables.allpairs
+
   end
+
   local depth = filter:match("d(%d+)") -- Nesting:
   if depth then kind.nesting = tonumber(depth) end
 
@@ -492,6 +559,7 @@ function unit.tabulize (name, data, kind, filter) --> (table)
   --logShow({ filter, kind })
 
   return unit.toarray(name, data, kind, filter)
+
 end ---- tabulize
 
 ---------------------------------------- Show
@@ -500,7 +568,9 @@ do
 unit.Separ = "│"
 unit.TextFmt = "%s%s%s%s"
 --unit.TextFmt = "%s%s %s %s"
+
 unit.BKeys = {
+
   { BreakKey = 'RETURN' },
   { BreakKey = 'SPACE' },
   -- Copy to clipboard:
@@ -508,6 +578,7 @@ unit.BKeys = {
   { BreakKey = 'X', Action = "CopyEx" },  -- text with numbers
   { BreakKey = 'Z', Action = "CopyAs" },  -- text without numbers
   { BreakKey = 'V', Action = "Value" },   -- text of selected item
+
 } --- BKeys
 
   local slen  = string.len
@@ -528,11 +599,13 @@ unit.BKeys = {
   Item    (t|nil) - an item of data menu.
 --]]
 function unit.ShowData (data, name, kind) --| (item)
+
   if type(data) ~= 'table' then
     return far.Message(tostring(data), name or unit.Nameless)
+
   end
 
-  local kind = kind or {}
+  kind = kind or {}
   local ShowMenu = kind.ShowMenu or far.Menu
   local ShowLineNumber = kind.ShowLineNumber == nil or kind.ShowLineNumber
 
@@ -551,27 +624,37 @@ function unit.ShowData (data, name, kind) --| (item)
         if isnum then
           isnum = false
           sp = spaces[nlen - slen(m)]
+
         else
           m = ""
           sp = spaces[nlen]
+
         end
+
         items[#items + 1] = {
           line = k,
           text = format(TextFmt, sp, m, Separ, s),
+
         }
 
       else
         items[#items + 1] = {
           line = k,
           text = s,
+
         }
+
       end
-    end
-  end
+
+    end -- for
+
+  end -- for
 
   local props = {
+
     Title = name or unit.Nameless,
     Flags = 'FMENU_SHOWAMPERSAND',
+
   } ---
 
   local Item, Pos = ShowMenu(props, items, unit.BKeys)
@@ -591,6 +674,7 @@ function unit.ShowData (data, name, kind) --| (item)
           local t = {}
           for k, v in ipairs(items) do
             t[k] = v.text
+
           end
           s = tconcat(t, "\n")
 
@@ -600,20 +684,26 @@ function unit.ShowData (data, name, kind) --| (item)
           --logShow(f)
           for k, v in ipairs(items) do
             t[k] = v.text:gsub(f, "")
+
           end
           s = tconcat(t, "\n")
+
         end
 
         far.CopyToClipboard(s)
+
       end
 
     elseif kind.ChosenToClip and Pos then
       --logShow({ Pos, Item }, "Item")
       far.CopyToClipboard(items[Pos].text)
+
     end
-  end
+
+  end -- if Item
 
   return Item
+
 end ---- ShowData
 
   local unpack = unpack
@@ -621,7 +711,9 @@ end ---- ShowData
 -- Show data based on far.Show.
 -- Показ данных, основанный на far.Show.
 function unit.farShow (data) --| (menu)
+
   return far.Show(unpack(data))
+
 end ----
 
 -- Show data.
@@ -633,15 +725,18 @@ end ----
   -- @return: @see kind.ShowData.
 --]]
 function unit.Show (data, name, filter, kind) --| (menu)
-  local name = name or unit.Nameless
-  local kind = kind or {}
+
+  name = name or unit.Nameless
+  kind = kind or {}
 
   --logShow(data)
   --logShow(type(data))
   local ShowData = kind.ShowData or unit.ShowData
   --logShow(unit.tabulize(name, data, kind, filter))
   --logShow(type(unit.tabulize(name, data, kind, filter)))
+
   return ShowData(unit.tabulize(name, data, kind, filter), name, kind)
+
 end ---- Show
 
 end -- do
@@ -652,61 +747,81 @@ local TLogging = {} -- Logging-to-file class
 local MLogging = { __index = TLogging }
 
 function TLogging:log (...)
+
   return self.file:write(...)
+
 end ----
 
 local nowDT = os.date
 local fmtDT = "%Y-%m-%d %H:%M:%S "
 
 function TLogging:logln (...)
+
   if self.isDT then
     self:log(nowDT(self.fmtDT))
+
   end
+
   self:log(...)
   self:log('\n')
+
 end ----
 
 function TLogging:logtab (t, name) --< array
-  local name = name or ""
+
+  name = name or ""
   self:logln(name..":")
+
   for _, v in ipairs(t) do
     self:log(v)
     self:log('\n')
+
   end --
+
   self:logln("~"..name)
+
 end ---- logtab
 
 function TLogging:data (data, filter, name, kind)
+
   return self:logtab(unit.tabulize(name, data, kind, filter), name or "data")
+
 end ----
 
 function TLogging:close (s) --< (file table)
+
   self:log('\n')
   self:logln(s or "Stop logging")
 
   local f = self.file
   f:flush()
   f:close()
+
   --return true
+
 end ---- close
 
 local io_open = io.open
 local setmetatable = setmetatable
 
 function unit.open (filename, mode, s) --> (file table)
-   local self = {
-     isDT = true,   -- Show datetime before log-text
-     fmtDT = fmtDT, -- Format of datetime
 
-     name = filename,
-     file = io_open(filename, mode or "w+"),
-   } ---
-   if self.file == nil then return end
+  local self = {
 
-   setmetatable(self, MLogging)
-   self:logln(s or "Start logging")
+    isDT = true,   -- Show datetime before log-text
+    fmtDT = fmtDT, -- Format of datetime
 
-   return self
+    name = filename,
+    file = io_open(filename, mode or "w+"),
+
+  } ---
+  if self.file == nil then return end
+
+  setmetatable(self, MLogging)
+  self:logln(s or "Start logging")
+
+  return self
+
 end ---- open
 
 end -- do

@@ -33,6 +33,7 @@ unit.IdentMask = format("^[%s][%s]-$", IdentFirstChars, IdentOtherChars)
 
 ---------------------------------------- base
 unit.keywords = {
+
   ["do"] = true,
   ["end"] = true,
   ["local"] = true,
@@ -58,9 +59,11 @@ unit.keywords = {
   ["not"] = true,
   ["and"] = true,
   ["or"] = true,
+
 } -- keywords
 
 unit.types = {
+
   ["nil"] = true,
   ["boolean"] = true,
   ["number"] = true,
@@ -69,9 +72,11 @@ unit.types = {
   ["userdata"] = true,
   ["function"] = true,
   ["thread"] = true,
+
 } -- types
 
 unit.regex = {
+
   -- Lua character %-classes:
   ClassList = { '%c', '%a', '%d', '%s', '%p',
                 '%l', '%u', '%w', '%x', '%z' },
@@ -84,6 +89,7 @@ unit.regex = {
   -- Patterns:
   CharSetPat  = "[%s]",  -- for set of included characters
   NoneSetPat  = "[^%s]", -- for set of excluded characters
+
 } -- regex
 local regex = unit.regex
 
@@ -101,6 +107,7 @@ local TextOtherCharMask = format("[^%s]", IdentOtherChars)
 -- Преобразование строки в идентификатор
 -- путём замены неприемлемых символов на '_'.
 function unit.NameToIdent (name) --> (string)
+
   return name:gsub(TextOtherCharMask, "_")
              :gsub(TextFirstCharMask, "_%1")
              :gsub("_+", "_")

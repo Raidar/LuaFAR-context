@@ -34,10 +34,15 @@ do
 -- Null table implementation.
 -- Реализация таблицы Null.
 local TNull = {
+
   __newindex = function (t, k, v) --| (error)
+
     error("Attempt to update a Null table", 2)
+
   end,
+
   __metatable = "Null table",
+
 } --- TNull
 unit.Null = setmetatable({}, TNull)
 
@@ -64,8 +69,11 @@ do
 -- Create table with narr array elements and nrec non-array elements.
 -- Создание таблицы с narr элементами массива и nrec элементами не-массива.
 function unit.create (narr, nrec) --> (table)
+
   --return lenher.createtable(narr, nrec)
+
   return { nil, nil, nil, nil, nil, nil, nil, nil } -- 8
+
 --[[
   return not narr and {} or
          narr <= 1 and { nil } or
@@ -76,27 +84,33 @@ function unit.create (narr, nrec) --> (table)
          { nil, nil, nil, nil, nil, nil, nil, nil,
            nil, nil, nil, nil, nil, nil, nil, nil } -- 16
 --]]
+
 --[[
   -- Common (but slow) table creating:
   return loadstring("return {"..
                     ("nil,"):rep(narr)..
                     ("[0] = nil,"):rep(nrec).."}")()
 --]]
+
 end ---- create
 
 end -- do
 
 -- Is a table empty?
 function unit.isempty (t) --> (bool)
+
   return t == nil or next(t) == nil
+
 end ----
 
 ---------------------------------------- find
 -- Find a key for a value.
 -- Поиск ключа для значения.
 function unit.find (t, v, tpairs) --> (key | nil)
+
   for k, w in (tpairs or pairs)(t) do
     if w == v then return k end
+
   end
 end ---- find
 
@@ -114,24 +128,33 @@ do
   index (number) - fitting position for value.
 --]]
 function unit.fitfind (t, v, comp) --> (index: 1..#t+1)
+
   local min, max = 1, #t + 1
   while max - min > 0 do
     local m = modf((max + min) / 2) -- MAYBE: optimize
+
     if comp(t[m], v) then
       min = m + 1
+
     else
       max = m
+
     end
-  end
+
+  end -- while
 
   return max
+
 end ---- fitfind
 
 -- Binary find in sorted array.
 -- Двоичный поиск в отсортированном массиве.
 function unit.bfind (t, v, comp) --> (index | nil)
+
   local i = unit.fitfind(t, v, comp)
+
   return v == t[i] and i or nil
+
 end ---- bfind
 
 end -- do
@@ -141,45 +164,60 @@ end -- do
 -- Простая копия таблицы без учёта ссылок на одну и ту же таблицу.
 -- WARNING: There is no support of key-subtables and cycles!
 local function _copy (t, usemeta, tpairs) --> (table)
+
   local u = {}
   for k, v in tpairs(t) do
     u[k] = type(v) == 'table' and _copy(v, usemeta, tpairs) or v
+
   end
+
   return usemeta and setmetatable(u, getmetatable(t)) or u
+
 end --
 unit._copy = _copy
 
 function unit.copy (t, usemeta, tpairs, deep) --> (table)
+
   if t == nil then return end
 
   if deep then
     return _copy(t or {}, usemeta, tpairs or pairs)
+
   end
 
   local u = {}
   for k, v in (tpairs or pairs)(t) do u[k] = v end
 
   return usemeta and setmetatable(u, getmetatable(t)) or u
+
 end ---- copy
 
 -- Copy of table with possible saving all metatables.
 -- Копия таблицы с возможным сохранением всех метатаблиц.
 function unit.clone (t, usemeta, tpairs) --> (table)
-  local tpairs = tpairs or pairs
+
+  tpairs = tpairs or pairs
   local Lookup = {} -- Список уже скопированных таблиц
 
   local function _clone (t, usemeta)
-    if type(t) ~= 'table' then return t
-    elseif Lookup[t] then return Lookup[t] end
+    if type(t) ~= 'table' then
+      return t
+
+    elseif Lookup[t] then
+      return Lookup[t]
+
+    end
 
     local u = {}
     Lookup[t] = u -- Внесение в список / Копирование ключей и значений:
     for k, v in tpairs(t) do u[_clone(k)] = _clone(v, usemeta) end
 
     return usemeta and setmetatable(u, getmetatable(t)) or u
+
   end -- _clone
 
   return _clone(t, usemeta)
+
 end ---- clone
 
 ---------------------------------------- change
@@ -190,98 +228,132 @@ local function _update (t, u, tpairs) --|> (t)
     if type(v) == 'table' then
       if type(t[k]) == 'table' then
         _update(t[k], v, tpairs)
+
       else
         t[k] = _copy(v, false, tpairs)
+
       end
+
     else
       t[k] = v
+
     end
-  end
+
+  end -- for
 
   return t
+
 end -- _update
 unit._update = _update
 
 function unit.update (t, u, tpairs, deep) --|> (t)
+
   if u == nil then return t end
-  local t = t or {}
+
+  t = t or {}
 
   if deep then
     return _update(t, u, tpairs or pairs)
+
   end
 
   for k, v in (tpairs or pairs)(u) do t[k] = v end
 
   return t
+
 end ---- update
 
 -- Extend table t by values from u.
 -- Расширение таблицы t значениями из u.
 local function _extend (t, u, tpairs) --|> (t)
+
   for k, v in tpairs(u) do
     if t[k] == nil then
       t[k] = type(v) == 'table' and _copy(v, false, tpairs) or v
+
     end
-  end
+
+  end -- for
 
   return t
+
 end -- _extend
 unit._extend = _extend
 
 function unit.extend (t, u, tpairs, deep) --|> (t)
+
   if u == nil then return t end
-  local t = t or {}
+
+  t = t or {}
 
   if deep then
     return _extend(t, u, tpairs or pairs)
+
   end
 
   for k, v in (tpairs or pairs)(u) do
     if t[k] == nil then t[k] = v end
+
   end
 
   return t
+
 end ---- extend
 
 -- Expand table t by values from u (using subvalues).
 -- Наращение таблицы t значениями из u (с учётом подзначений).
 local function _expand (t, u, tpairs) --|> (t)
+
   for k, v in tpairs(u) do
     local w, tp = t[k], type(v)
+
     if w == nil then
       t[k] = tp == 'table' and _copy(v, false, tpairs) or v
+
     elseif tp == 'table' and type(w) == 'table' then
       _expand(w, v, tpairs)
+
     end
-  end
+
+  end -- for
 
   return t
+
 end -- _expand
 unit._expand = _expand
 
 function unit.expand (t, u, tpairs, deep) --|> (t)
+
   if u == nil then return t end
-  local t = t or {}
+
+  t = t or {}
 
   if deep then
     return _expand(t, u, tpairs or pairs)
+
   end
 
   for k, v in (tpairs or pairs)(u) do
     if t[k] == nil then t[k] = v end
+
   end
 
   return t
+
 end -- expand
 
 -- Set table u as field f of metatable for t.
 -- Установка таблицы u как поля f метатаблицы для t.
 local function _asmeta (t, u, tpairs, field, force) --|> (t)
+
   for k, v in tpairs(u) do
     if type(v) == 'table' and type(t[k]) == 'table' then
       _asmeta(t[k], v, tpairs, field)
+
     end
-  end
+
+  end -- for
+
   --if (t or {}).TabSize then logShow({ tdef = t, udef = u }, "asmeta", 3) end
   --if (t.default or {}).TabSize then logShow({ tdef = t.default, udef = u.default }, "asmeta", 3) end
 
@@ -289,70 +361,87 @@ local function _asmeta (t, u, tpairs, field, force) --|> (t)
   if m[field] and not force then return t end
 
   m[field] = u
+
   return setmetatable(t, m)
+
 end -- _asmeta
 unit._asmeta = _asmeta
 
 function unit.asmeta (t, u, tpairs, deep, field, force) --|> (t)
-  local t = t or {}
+
+  t = t or {}
   if u == nil then return t end
 
   --if (t.default or {}).TabSize then logShow({ t = t, u = u, deep = deep, field = field }, "asmeta", 3) end
   if deep then
     return _asmeta(t, u, tpairs or pairs, field or '__index')
+
   end
 
   local m = getmetatable(t) or {}
   if m[field] and not force then return t end
 
   m[field or '__index'] = u
+
   return setmetatable(t, m)
+
 end ---- asmeta
 
 -- Set table u as field f of metatable for t (expanding subvalues).
 -- Установка таблицы u как поля f метатаблицы для t (с наращением подзначений).
 local function _exmeta (t, u, tpairs, field, force) --|> (t)
+
   for k, v in tpairs(u) do
     if type(v) == 'table' then
       if t[k] == nil then t[k] = {} end
       if type(t[k]) == 'table' then
         _exmeta(t[k], v, tpairs, field)
+
       end
     end
-  end
+
+  end -- for
 
   local m = getmetatable(t) or {}
   if m[field] and not force then return t end
 
   m[field] = u
+
   return setmetatable(t, m)
+
 end -- _exmeta
 unit._exmeta = _exmeta
 
 function unit.exmeta (t, u, tpairs, deep, field, force) --|> (t)
-  local t = t or {}
+
+  t = t or {}
   if u == nil then return t end
 
   if deep then
     return _exmeta(t, u, tpairs or pairs, field or '__index')
+
   end
 
   local m = getmetatable(t) or {}
   if m[field] and not force then return t end
 
   m[field or '__index'] = u
+
   return setmetatable(t, m)
+
 end ---- exmeta
 
 do
   local kinds = {
+
     change = true,
     update = true,
     extend = true,
     expand = true,
     asmeta = true,
     exmeta = true,
-  } ---
+
+  } --- kinds
 
 -- Add data from u to t.
 -- Добавление данных из u в t.
@@ -364,11 +453,13 @@ do
     [2]  (string) - metatable field for 'asmeta' (@default = '__index').
 --]]
 function unit.add (t, u, kind, tpairs, ...) --> (table)
+
   if kind == 'change' then
     return u
+
   end
 
-  local t = t or {}
+  t = t or {}
   if u == nil then return t end
 
   kind, tpairs = kind or 'update', tpairs or pairs
@@ -376,11 +467,14 @@ function unit.add (t, u, kind, tpairs, ...) --> (table)
 
   if kind == 'asmeta' then
     return unit.asmeta(t, u, tpairs, ...)
+
   else
     return unit[kind](t, u, tpairs, ...)
+
   end --
 
   return t
+
 end ---- add
 
 end -- do
@@ -388,61 +482,80 @@ end -- do
 -- 'pairs' function for non-hole arrays.
 -- Функция 'pairs' для массивов без "дыр".
 function unit.ipairs (t) --> (func)
+
   if not t then return end
 
   local k = 0
   local function _next ()
+
     k = k + 1
     if t[k] ~= nil then
       return k, t[k]
+
     end
+
     --return nil, nil, k - 1
+
   end --
 
   return _next
+
 end ---- ipairs
 
 -- 'pairs' function for arrays with preset size.
 -- Функция 'pairs' для массивов с заданным размером.
 function unit.npairs (t, n) --> (func)
+
   if not t then return end
 
   local k, n = 0, n or #t
   local function _next ()
+
     k = k + 1
     if k <= n then
       return k, t[k]
+
     end
+
     --return nil, nil, n
+
   end --
 
   return _next
+
 end ---- npairs
 
 do
-  local ipairs = ipairs
+  local _ipairs = ipairs
 
 -- 'pairs' function for hashes only.
 -- Функция 'pairs' только для хешей.
-function unit.hpairs (t) --> (func)
+function unit.hpairs (t, ipairs) --> (func)
+
   if not t then return end
 
   local skip = {}
+  local ipairs = ipairs or _ipairs
   for i in ipairs(t) do
     skip[i] = true
+
   end
 
   local k
   local function _next ()
+
     local v
     repeat
       k, v = next(t, k)
+
     until k == nil or not skip[k]
 
     return k, v
+
   end
 
   return _next
+
 end ---- hpairs
 
 end -- do
@@ -450,12 +563,14 @@ end -- do
 -- Make list of all tables.
 -- Формирование списка из всех таблиц.
 function unit.list (t, list, field) --> (table)
-  local t, list = t, list or {}
-  local field = field or '__index'
+
+  t, list = t, list or {}
+  field = field or '__index'
   if type(t) ~= 'table' then return list end
 
   if not list[t] then
     list[t], list[#list+1] = true, t
+
   end
 
   t = getmetatable(t)
@@ -465,9 +580,11 @@ function unit.list (t, list, field) --> (table)
     list[t], list[#list+1] = true, t
     t = getmetatable(t)
     t = type(t) == 'table' and t[field]
-  end
+
+  end -- while
 
   return list
+
 end ---- list
 
 --[[ Warning:
@@ -487,6 +604,7 @@ do
   ...           - parameters to call make(t, ...).
 --]]
 function unit.allpairs (t, make, ...) --> (func)
+
   if not t then return end
   local list = (make or t_list)(t, ...) -- tables list
   --if #list == 2 and list[1].CurrentClause then ulog = true end
@@ -494,6 +612,7 @@ function unit.allpairs (t, make, ...) --> (func)
 
   local n, k, v = #list
   local function _next ()
+
     while n > 0 do
       k, v = next(list[n], k)
       --if ulog then logShow{ n, k, v } end
@@ -502,20 +621,29 @@ function unit.allpairs (t, make, ...) --> (func)
         local m = n - 1 -- Find in previous tables:
         while m > 0 and rawget(list[m], k) == nil do
           m = m - 1
+
         end
+
         if m <= 0 then
           --logShow({ n, k, v }, "next")
           return k, v, n -- Not found --> pairing
+
         end
+
       else
         n, list[n] = n - 1, nil
+
       end
-    end
+
+    end -- while
+
     --ulog = false
     --return nil, nil, 0
+
   end --
 
   return _next
+
 end ---- allpairs
 
 end -- do
@@ -523,18 +651,23 @@ end -- do
 -- Compare values for table sort.
 -- Сравнение значений для сортировки таблицы.
 function unit.sortcompare (v1, v2) --> (bool)
+
   local t1, t2 = type(v1), type(v2)
 
   -- 1 -- true/false
   if t1 == 'boolean' then
     if t2 ~= 'boolean' then return true end
+
     return v1
+
   end
 
   -- 2 -- number
   if t1 == 'number' then
     if t2 ~= 'number' then return t2 ~= 'boolean' end
+
     return v1 < v2
+
   end
 
   -- 3 -- string
@@ -545,11 +678,14 @@ function unit.sortcompare (v1, v2) --> (bool)
     if l1 == 1 then return l2 > 1 or v1 < v2 end
     if l2 == 1 then return l1 == 1 and v1 < v2 end
     -- 3.2 -- other string
+
     return v1 < v2
+
   end
 
   -- 4 -- other
   return false
+
 end ---- sortcompare
 
 do
@@ -568,9 +704,10 @@ do
   ...           - parameters to call kind.pairs(t, ...).
 --]]
 function unit.sortpairs (t, kind, ...) --> (func)
+
   if not t then return end
 
-  local kind = kind or {}
+  kind = kind or {}
   local compare = kind.compare or unit.sortcompare
 
   local names = {}
@@ -580,18 +717,22 @@ function unit.sortpairs (t, kind, ...) --> (func)
     values[k] = v
     local i = t_find(names, k, compare)
     t_insert(names, i, k)
-  end
+
+  end -- for
 
   local k = 0
   local function _next ()
+
     k = k + 1
     local m = names[k]
     if m ~= nil then
       return m, values[m]
+
     end
   end --
 
   return _next
+
 end ---- sortpairs
 
 -- Gather simple statistics.
@@ -606,6 +747,7 @@ end ---- sortpairs
     stats (table) - required statistics.
 --]]
 function unit.gatherstat (k, v, kind) --| kind.stats
+
   if k == nil then
     local stats = kind.stats or {}
     kind.stats = stats
@@ -617,23 +759,30 @@ function unit.gatherstat (k, v, kind) --| kind.stats
       for k, _ in pairs(lua.types) do
         if gathered then
           stats[k] = stats[k] or 0
+
         else
           stats[k] = 0
+
         end
-      end
+
+      end -- for
 
     else
       -- Done --
       stats.main = stats["boolean"] + stats["number"] +
                    stats["string"] + stats["table"]
+
     end -- Init/Done
 
     return
-  end
+
+  end -- if
 
   local tp = type(v)
   kind.stats[tp] = kind.stats[tp] + 1
+
   --return tp
+
 end ---- gatherstat
 
 -- 'sortpairs' function with gathering some statistics.
@@ -652,6 +801,7 @@ end ---- gatherstat
     -- @return in kind: @see unit.gatherstat.kind.
 --]]
 function unit.statpairs (t, kind, ...) --| kind --> (func)
+
   if not t then return end
 
   assert(type(kind) == 'table')
@@ -670,20 +820,24 @@ function unit.statpairs (t, kind, ...) --| kind --> (func)
 
     local i = t_find(names, k, compare)
     t_insert(names, i, k)
-  end
+
+  end -- for
 
   gather(nil, nil, kind) -- Done
 
   local k = 0
   local function _next ()
+
     k = k + 1
     local m = names[k]
     if m ~= nil then
       return m, values[m]
+
     end
   end --
 
   return _next
+
 end ---- statpairs
 
 end -- do
@@ -692,32 +846,38 @@ end -- do
 -- Fill values in array with value.
 -- Заполнение значений в массиве значением value.
 function unit.fillwith (t, count, value) --|> t
-  local value = value
 
   if type(value) ~= 'function' then
     for k = 1, count or #t do t[k] = value end
+
   else
     for k = 1, count or #t do t[k] = value(t, k) end
+
   end
 
   return t
+
 end -- fillwith
 
 -- Fill nil values in array with value.
 -- Заполнение значений nil в массиве значением value.
 function unit.fillnils (t, count, value) --|> t
-  --local value = value
+
   for k = 1, count or #t do
     if t[k] == nil then t[k] = value end
-  end
+
+  end -- for
 
   return t
+
 end -- fillnils
 
 -- Fill nil values in { ... } with value.
 -- Заполнение значений nil в { ... } значением value.
 function unit.fillargs (value, ...)
+
   return unit.fillnils({ ... }, select('#', ...), value)
+
 end ----
 
 ---------------------------------------- Lines
@@ -731,7 +891,9 @@ end ----
   count (number) - count of lines.
 --]]
 function unit.linecount (t) --> (number)
+
   return #t
+
 end ----
 
 -- Maximal length (and line) in specified table.
@@ -745,17 +907,22 @@ end ----
   line (string) - line with max length.
 --]]
 function unit.linemax (t, count) --> (number, string | 0, nil)
+
   local max, x = 0
 
   -- Цикл по линиям таблицы:
   for line = 1, count or #t do
+
     local len = line:len()
     if len > max then
       max, x = len, line
+
     end
-  end
+
+  end -- for
 
   return max, x
+
 end ---- linemax
 
 ---------------------------------------- others
@@ -763,6 +930,7 @@ end ---- linemax
 -- Get value t[k] checking field of metatable.
 -- Получение значения t[k] проверкой поля метатаблицы.
 function unit.t_index (t, k, field) --> (value)
+
   if t == nil then return end
   local u = (getmetatable(t) or Null)[field or '__index']
   if u == nil then return end
@@ -772,12 +940,15 @@ function unit.t_index (t, k, field) --> (value)
   if tp == 'function' then return u(t, k) end
 
   return u
+
 end ---- t_index
 
 -- Concat args-strings to string.
 -- Соединение списка параметров-строк в строку.
 function unit.concat (...) --> (string)
+
   return table.concat(unit.fillargs('', ...), '\n')
+
 end ----
 
 --------------------------------------------------------------------------------

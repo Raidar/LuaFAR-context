@@ -8,6 +8,7 @@ local BackInheritSign = '->' -- U(0x2192)
 
 ----------------------------------------
 local Data = {
+
     -- config formation
     CWrongMerge  = "Неизвестный режим слияния",
     SWrongMerge  = [[

@@ -31,15 +31,18 @@ local function Execute ()
 
   --[[
   local sortkind = {
+
     --compare = sortcompare,
     --pairs = ipairs, -- Test: array fields
     --pairs = tables.hpairs, -- Test: hash fields
     pairs = pairs, -- Test: array + hash fields
     --pairs = allpairs, -- Test: all fields including from metas
+
   } ---
   --]]
 
   local kind = {
+
     localret = true, -- Test: local + return instead of global
     tnaming = true, -- Test: temporary name of table to access fields
     astable = true, -- Test: serialize as one table
@@ -106,6 +109,7 @@ local function Execute ()
     TabToStr = serial.TabToText,
     --]]
     serialize = serial.prettyize,
+
   } ---
 
   --logShow(data, "test")

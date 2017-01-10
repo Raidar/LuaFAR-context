@@ -33,6 +33,7 @@ local Flag_FarColor = F.FCF_4BITMASK
 --------------------------------------------------------------------------------
 -- Color handling class
 local unit = {
+
   Mask      = 0xF,
   Shift     = 0x4,
   Default   = 0xF0,
@@ -46,6 +47,7 @@ local unit = {
   Flags     = 'Flags',
   FGName    = 'ForegroundColor',
   BGName    = 'BackgroundColor',
+
 } ---
 unit.FGMask =      unit.Mask
 unit.BGMask = bshl(unit.Mask, unit.Shift)
@@ -59,6 +61,7 @@ do
   -- Base colors.
   -- Основные цвета.
   local BaseColors = {
+
   -- name = Console -- Default   Real  | Nearest         | Standard name
     black    = 0x0, -- 000000 | 000000 | 000000          | black
     navy     = 0x1, -- 000080 | 0000AA | 000080 / 0000FF | navy blue / blue
@@ -76,6 +79,7 @@ do
     pink     = 0xD, -- FF00FF | FF55FF | FF00FF / FFC0CB | fuchsia+magenta / pink
     yellow   = 0xE, -- FFFF00 | FFFF55 | FFFF00 / FFFDD0 | yellow / cream
     white    = 0xF, -- FFFFFF | FFFFFF | FFFFFF          | white
+
   } ---
 
   --logShow(BaseColors, "BaseColors")
@@ -99,13 +103,16 @@ do
       --Colors["deep"..k]   = v
       Colors["light"..k]  = v + 0x8
       --Colors["bright"..k] = v + 0x8
+
     elseif v >= 0x9 and v <= 0xE then
       Colors["dark"..k]   = v - 0x8
       --Colors["deep"..k]   = v - 0x8
       --Colors["light"..k]  = v
       --Colors["bright"..k] = v
+
     end
-  end
+
+  end -- for
 
   -- Специальные цвета:
   Colors.darkgray = Colors.gray
@@ -117,6 +124,7 @@ do
 
   unit.__index = Colors
   setmetatable(unit, unit)
+
 end -- do
 
 ---------------------------------------- functions
@@ -124,135 +132,170 @@ end -- do
 -- Number value of table-color.
 -- Численное значение цвета-таблицы.
 function unit.tonumber (color) --> (number)
+
   if type(color) ~= 'table' then return color end
   local self = unit
 
   return bor(     band(color[self.FGName], self.FGMask),
              bshl(band(color[self.BGName], self.BGMask), self.Shift))
+
 end ---- tonumber
 
 -- Table value of number-color.
 -- Табличное значение цвета-числа.
 function unit.totable (color) --> (table)
+
   if type(color) == 'table' then return color end
 
   local self = unit
   return {
+
     [self.Flags]  = Flag_FarColor,
     [self.FGName] = band(     color, self.FGMask             ),
     [self.BGName] = band(bshl(color, self.Shift), self.BGMask),
-  }
+
+  } ----
+
 end ---- totable
 
 -- Required value of color.
 -- Требуемое значение цвета.
 function unit.tocolor (color, kind) --> (table|number)
+
   local self, tp = unit, type(color)
   if tp == 'number' then
     return kind ~= 'table' and color or self.totable(color)
+
   elseif tp == 'table' then
     return kind == 'table' and color or self.tonumber(color)
+
   end
 
   return color
+
 end ---- tocolor
 
 -- Get foreground color for color.
 -- Получение цвета символа для цвета.
 function unit.getFG (color) --> (number)
+
   if type(color) == 'table' then
     return color[unit.FGName]
+
   end
 
   return band(color, unit.FGMask)
+
 end ---- getFG
 
 -- Get background color for color.
 -- Получение цвета фона для цвета.
 function unit.getBG (color) --> (number)
+
   if type(color) == 'table' then
     return color[unit.BGName]
+
   end
 
   return bshr(color, unit.Shift)
+
 end ---- getBG
 
 -- Set foreground color for color.
 -- Установка цвета символа для цвета.
 function unit.setFG (color, fg) --> (number)
+
   local self = unit
 
   if type(color) == 'table' then
     color[self.FGName] = fg
 
     return color
+
   end
 
   return bor(band(color, self.BGMask), band(fg, self.Mask))
+
 end ---- setFG
 
 -- Set background color for color.
 -- Установка цвета фона для цвета.
 function unit.setBG (color, bg) --> (number)
+
   local self = unit
 
   if type(color) == 'table' then
     color[self.BGName] = bg
 
     return color
+
   end
 
   return bor(band(color, self.FGMask),
              bshl(band(bg, self.Mask), self.Shift))
+
 end ---- setBG
 
 -- Make color (by values).
 -- Формирование цвета (по значениям).
 function unit.make (fg, bg, kind) --> (color)
+
   local self = unit
 
   if (kind or 'table') == 'table' then
     return {
+
       [self.Flags]  = Flag_FarColor,
       [self.FGName] = fg,
       [self.BGName] = bg,
-    }
+
+    } ----
+
   end
 
   return bor(fg, bshl(bg, self.Shift))
+
 end ---- make
 
 -- Make color (by colors).
 -- Формирование цвета (по цветам).
 function unit.cmake (fg, bg, kind) --> (color)
+
   local self = unit
 
   if (kind or 'table') == 'table' then
     return {
+
       [self.Flags]  = Flag_FarColor,
       [self.FGName] = type(fg) == 'table' and fg[self.FGName] or fg,
       [self.BGName] = type(bg) == 'table' and bg[self.FGName] or bg,
-    }
+
+    } ----
+
   end
 
   return bor(band(fg, self.FGMask), band(bg, self.BGMask))
+
 end ---- cmake
 
 ---------------------------------------- methods
 -- Make new color (by values).
 -- Формирование нового цвета (по значениям).
 function unit:newColor (fg, bg, kind) --> (color)
-  local self = self
 
   if (kind or 'table') == 'table' then
     return {
+
       [self.Flags]  = Flag_FarColor,
       [self.FGName] = fg,
       [self.BGName] = bg,
-    }
+
+    } ----
+
   end
 
   return bor(fg, bshl(bg, self.Shift))
+
 end ---- newColor
 
 do
@@ -266,12 +309,13 @@ do
   kind   (string) - color format kind: 'table' | 'number'.
 --]]
 function unit:getColor (color, kind) --> (color)
-  local self = self
+
   -- TODO: Копировать self.Default, если это таблица!
-  local color = color or self.Default
+  color = color or self.Default
 
   if type(color) ~= 'string' then
     return self.tocolor(color, kind)
+
   end
 
   local fg, bg = color:match(ColorFormat)
@@ -279,6 +323,7 @@ function unit:getColor (color, kind) --> (color)
   bg = bg and self[bg] or self.DefBG
 
   return self:newColor(fg, bg, kind)
+
 end ---- getColor
 
 end -- do
@@ -293,18 +338,20 @@ end -- do
   kind   (string) - color format kind: 'table' | 'number'.
 --]]
 function unit:dataColor (data, name, prefix, kind) --> (color)
-  --local data, name = data, name
-  local prefix = prefix or '_'
-  local color = data[prefix..name]
 
+  prefix = prefix or '_'
+
+  local color = data[prefix..name]
   if color ~= nil and type(color) ~= 'string' then
     return self.tocolor(color, kind or 'table')
+
   end
 
   color = self:getColor(data[name], kind)
   data[prefix..name] = color
 
   return color
+
 end ---- dataColor
 
 --------------------------------------------------------------------------------

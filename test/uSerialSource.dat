@@ -6,36 +6,46 @@ local up_value = 5
 local up_valstr = "string"
 
 local function f_w_up ()
+
   return up_value
+
 end -- f_w_up
 
 function f_w_ups ()
+
   return up_value, up_valstr
+
 end -- f_w_ups
 
 ----------------------------------------
 local Data = {
+
   Vocal = {
     -- Test array with items:
     'a', 'e', 'i', 'o', 'u';
+
   },
 
   Konal = {
+
   },
 
   Sonor = {
     -- Test array with many items:
     'b', 'd', 'v', 'q', 'z', 'g', 'l', 'm', 'n', 'r';
+
   },
 
   Sinel = {
     -- Test array with many items:
     'p', 't', 'f', 'x', 's', 'k', 'c', 'h',
+
   },
 
   Hemil = {
     'j', 'y', 'w',
     Test = 1, -- Test order for string with len > 1
+
   },
 
   Hemal = {
@@ -43,12 +53,14 @@ local Data = {
     _Lawel_ = 'w',
     _Yocal_ = 'y',
     _Jonal_ = 'j',
+
   },
 
   Order = {
     -- Test table with subarrays:
     Liter = { 'Vocal', 'Konal', 'Hemil' },
     Konal = { 'Sonor', 'Sinel' },
+
   },
 
   Liter = {
@@ -58,6 +70,7 @@ local Data = {
     Sonor = true,
     Sinel = true,
     Hemil = true,
+
   },
 
   Yocal = {},

@@ -13,6 +13,7 @@
 --]]
 --------------------------------------------------------------------------------
 local types = {
+
   _meta_ = { basis = 'base', merge = 'update', },
 
   -- types for localization test
@@ -23,6 +24,7 @@ local types = {
   -- ADD new types here!
   --newlang   = { inherit = 'main', desc = 'New language',
   --              masks = {'%.newlang$'}, firstline = {'^#!%s-%S*new-lang'}, },
+
 } --- types
 
 return types

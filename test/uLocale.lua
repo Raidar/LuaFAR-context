@@ -20,12 +20,14 @@ local scriptPath = "context\\test\\"
 --} ---
 
 local DefCustom = {
+
   name = "uLocale",
   path = scriptPath,
 
   label = "mL",
 
   locale = { kind = 'require' },
+
 } ---
 
 ---------------------------------------- main
@@ -35,6 +37,7 @@ loc.b = loc.button
 
 if loc == nil then
   ShowInfo({ error1, error2 }, 'Error')
+
   return
 end
 

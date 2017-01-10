@@ -41,20 +41,25 @@ local unit = {}
 
 ----------------------------------------
 local Custom = {
+
   label = "mDet",
   name = "scripts",
   path = "context.scripts.",
   locale = { kind = 'require' },
+
 } ---
 local L, e1, e2 = locale.create(Custom)
 if L == nil then
   return locale.showError(e1, e2)
+
 end
 
 -- Messages
 local Msgs = {
+
   UnknownType = 'none',
   UnknownArea = 'unknown',
+
 } ---
 
 ---------------------------------------- Base
@@ -66,10 +71,12 @@ local sfind = ('').cfind -- Slow but char positions return
 -- Protected find of pattern in string for file type.
 -- Защищённый поиск паттерна в строке для типа файла.
 local function pfind (s, pattern) --> (number, number | nil)
+
   if not s then return end
 
   local isOk, findpos, findend = pcall(sfind, s, pattern)
   if isOk then return findpos, findend end -- Успешный поиск
+
 end -- pfind
 
 --local pfind = sfind -- TEST
@@ -77,11 +84,13 @@ end -- pfind
 -- Check skipped lines of file.
 -- Проверка на пропускаемые линии файла.
 local function checkSkipLines (line) --> (string | nil)
+
   local skiplines = (types.ignore or Null).skiplines
   if not skiplines then return end
 
   for k, v in pairs(skiplines) do
     if pfind(line, k) then return v end
+
   end
 end --
 unit.checkSkipLines = checkSkipLines
@@ -89,7 +98,9 @@ unit.checkSkipLines = checkSkipLines
 -- Read a first line from file.
 -- Чтение первой линии из файла.
 function unit.readFileFirstLine (filename) --> (string, string|nil | nil)
+
   --far.Message(filename)
+
   local f = io.open(filename)
   if not f then return end
 
@@ -97,14 +108,17 @@ function unit.readFileFirstLine (filename) --> (string, string|nil | nil)
   repeat
     line = f:read("*l")
     if not line then break end
+
     local check = checkSkipLines(line)
     if check and not assumed then assumed = check end
+
   until check == nil
 
   f:close()
   --far.Message(line, assumed)
 
   return line, assumed
+
 end -- readFileFirstLine
 
 do
@@ -113,17 +127,22 @@ do
 -- Read a first line from file in editor.
 -- Чтение первой линии из файла в редакторе.
 function unit.readEditorFirstLine () --> (string, string|nil | nil)
+
   local k, line, assumed = 1
 
   repeat
     line = EditorGetLine(nil, k, 0)
     if not line then break end
+
     local check = checkSkipLines(line.StringText)
     if check and not assumed then assumed = check end
+
     k = k + 1
+
   until check == nil
 
   return line and line.StringText, assumed
+
 end -- readEditorFirstLine
 
 end -- do
@@ -131,9 +150,11 @@ end -- do
 ---------------------------------------- Pass
 --[[ -- TEST
 local function lenfind (s, pat)
+
   local findpos, findend = pfind(s, pat)
   if findpos then
     return findend - findpos + 1 -- real length
+
   end
 end -- lenfind
 --]]
@@ -141,6 +162,7 @@ end -- lenfind
 -- Check a value by values table.
 -- Проверка значения по таблице значений.
 local function checkValueOver (value, values) --> (number | nil)
+
   if not values then return nil end
   if type(values) == 'string' then values = { values } end
 
@@ -150,12 +172,15 @@ local function checkValueOver (value, values) --> (number | nil)
     local findpos, findend = pfind(value, v)
     if findpos then
       return findend - findpos + 1, v -- + 1 for real length
+
     end
     --]]
+
     --[[
     local l = lenfind(value, v)
     if l then return l, v end
     --]]
+
   end
 end -- checkValueOver
 unit.checkValueOver = checkValueOver
@@ -197,17 +222,20 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     local mlen, mask
     if w >= bmaskwei or w >= dtypewei then
       mlen, mask = checkValueOver(fname, v.masks)   -- Маска
+
     end
 
     local sines, slen, sine = v.strongline  -- Учёт строгих линий
     if fsine and sines and w >= blinewei then
       slen, sine = checkValueOver(fsine, sines)     -- Строгая линия
+
     end
 
     --local t = { k, mlen, mask, llen, line } -- DEBUG
     --[[
     if checkname and fname == checkname and (mlen or llen) then
       logShow(t, "Types: pass ["..fname.."]", 1)
+
     end
     --]]
 
@@ -215,11 +243,13 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
       local lines, llen, line = v.firstline   -- Учёт обычных линий
       if fline and lines and w >= blinewei then
         llen, line = checkValueOver(fline, lines)     -- Обычная линия
+
       end
 
       -- Учёт только маски:
       if not (sines or lines) and mlen > bmasklen then
         bmasklen, bmask, bmaskwei, bmaskidx = mlen, mask, w, k
+
       end
 
       -- Учёт сразу маски и 1-й линии:
@@ -234,12 +264,15 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
         if not (slen or llen) and dlinelen <= 0 then
           dmasklen, dmask, dtypewei = mlen, mask, w-1 -- (вес ниже! - maxdrfl)
           dlinelen, dline, dtypeidx = 0, "", k
+
         elseif slen and slen > dlinelen then        -- Учёт длины строгой линии
           dmasklen, dmask, dtypewei = mlen, mask, w
           dlinelen, dline, dtypeidx = slen, sine, k
+
         elseif llen and llen > dlinelen then        -- Учёт длины обычной линии
           dmasklen, dmask, dtypewei = mlen, mask, w
           dlinelen, dline, dtypeidx = llen, line, k
+
         end
       end
     end -- if mlen
@@ -247,6 +280,7 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     if sines and slen and slen > blinelen then      -- Учёт только строгой линии:
       --if checkname and fname == checkname then logShow(t, "Types: pass ["..fname.."]", 1) end
       blinelen, bline, blinewei, blineidx = slen, sine, w, k
+
     end -- if llen
   end -- for
 
@@ -262,29 +296,40 @@ local function detTypePass (f) --> (typeName, detKind, detValues) or
     t.bline = { blinelen, bline, blinewei, blineidx }
     t.dtype = { dmasklen, dmask, dtypewei, dlinelen, dline, dtypeidx }
     logShow(t, "Types: pass ["..fname.."]", 1)
+
   end -- if
   --]]
 
   -- 2. Отбор из трёх вариантов:
   if dmasklen <= 0 --[[and dlinelen <= 0]] and blinelen > 0 then
     return blineidx, 'pass+byline', bline, blinelen
+
   end
+
   if (bmasklen <= 0 or fline and dtypewei >= bmaskwei) and dmasklen > 0 then
     return dtypeidx, 'pass+best', dmask, dline
+
   end
+
   if bmasklen > 0 then
     return bmaskidx, 'pass+bymask', bmask, bmasklen
+
   end
+
   if f.assumed then
     return f.assumed, 'read+line', f_ext, 0
+
   end
+
   return 'none', 'pass+worse', f_ext, 1 -- It is possible!
+
 end -- detTypePass
 unit.TypePass = detTypePass
 
 -- Detect a type by filename and first line.
 -- Определяет тип по имени файла и первой линии.
 local function detectType (f) --> (see detTypePass)
+
   --logShow(f, "detType", 1)
   if not types then return end
 
@@ -301,6 +346,7 @@ local function detectType (f) --> (see detTypePass)
   --               not fname:find('.', 1, true) or fname:sub(1, 1) == '.')
 
   return detTypePass(ff)
+
 end --
 unit.FileType = detectType
 
@@ -312,7 +358,8 @@ local PathNamePattern = '^(.-)([^\\/]+)$'
 
 -- Detect a type of file in active panel.
 function areaFileType.panels (f)
-  local f = f or {}
+
+  f = f or {}
   local Info
 
   if not f.filename then
@@ -325,9 +372,12 @@ function areaFileType.panels (f)
     --far.Message(f.name, "Current item name")
     if Item.FileAttributes:find('d', 1, true) then
       return f.name == '..' and 'back' or 'dir'
+
     end
+
   else
     f.name = f.filename
+
   end
 
   if f.firstline == true then
@@ -337,70 +387,87 @@ function areaFileType.panels (f)
     if not utils.isPluginPanel(Info) then
       f.firstline, f.assumed =
           unit.readFileFirstLine((f.path or '.')..'/'..f.name)
+
     end
   end
 
   return detectType(f)
+
 end -- panels
 
 -- Detect a type of edited file.
 function areaFileType.editor (f)
-  local f = f or {}
+
+  f = f or {}
 
   --if useprofiler then profiler.start("detectType.log") end
   if not f.filename then
     local Info = editor.GetInfo()
     if not Info then return end
+
     local fullname = Info.FileName
     f.path, f.name = fullname:match(PathNamePattern)
+
   end
 
   if not f.firstline then
     f.firstline, f.assumed = unit.readEditorFirstLine()
+
   end
   --if useprofiler then profiler.stop() end
 
   return detectType(f)
+
 end -- editor
 
 -- Detect a type of viewed file.
 function areaFileType.viewer (f)
-  local f = f or {}
+
+  f = f or {}
   local Info = viewer.GetInfo()
   if not Info then return end
+
   local fullname = Info.FileName
 
   if not f.filename then
     f.path, f.name = fullname:match(PathNamePattern)
+
   end
 
   if f.firstline == true then
     f.firstline, f.assumed = unit.readFileFirstLine(fullname)
+
   end
 
   return detectType(f)
+
 end -- viewer
 
 do
   local F = far.Flags
 
 local areas = { -- FAR areas:
+
   [F.WTYPE_PANELS] = 'panels',
   [F.WTYPE_VIEWER] = 'viewer',
   [F.WTYPE_EDITOR] = 'editor',
   --[F.WTYPE_DIALOG] = 'dialog',
   --[F.WTYPE_VMENU]  = 'vmenu',
   --[F.WTYPE_HELP]   = 'help',
+
 } --- areas
 
 for k, v in pairs(areas) do
   areaFileType[k] = areaFileType[v]
+
 end
 
 function areaFileType.current (f)
+
   local area = far.AdvControl(F.ACTL_GETWINDOWINFO, 0).Type
   if areaFileType[area] then
     return areaFileType[area](f)
+
   else
     return nil, L:t1("SNoAreaFunction",
                      L:t((areas[area] or Msgs.UnknownArea)..'Area'))
@@ -415,38 +482,53 @@ unit.use = useType
 
 -- Next field type of ctype.
 local function nextType (ctype, field) --> (string|nil)
-  return ctype and types[ctype] and types[ctype][field or 'inherit']
+
+  local t = ctype and types[ctype]
+
+  return t and t[field or 'inherit']
+
 end --
 useType.nextType = nextType
 
 -- Parent type of ctype.
 local function parentType (ctype) --> (string|nil)
+
   return nextType(ctype, 'inherit')
+
 end --
 useType.parentType = parentType
 
 -- Group type of ctype.
 function useType.groupType (ctype) --> (string|nil)
+
   return nextType(ctype, 'group')
+
 end ----
 
 -- Check ctype as Type or as inheritor from Type.
 function useType.isType (ctype, Type, field) --> (bool)
+
   local tp = ctype
   while tp do
     if tp == Type then return true end
     tp = nextType(tp, field)
+
   end
+
   return false
+
 end ----
 
 -- Find abstract config table for cfg.
 function useType.abstractConfig (cfg) --> (table)
+
   if type(cfg) ~= 'table' then return end
+
   local t = datas.cfglist(cfg) -- all config tables!
   for k = 1, #t do
     local u = t[k]
     if u and u._meta_ and u._meta_.abstract then return u end
+
   end
 end ----
 
@@ -455,20 +537,28 @@ ctxdata.abstypes = abstypes
 
 -- Find nomask supertype of ctype for cfg.
 function useType.nomaskType (ctype, cfg, field) --> (string | nil)
+
   local tp, cfg, field = ctype, cfg or types, field or 'inherit'
   while tp and types[tp] and types[tp].masks do
     tp = (cfg[tp] or Null)[field] or types[tp][field]
+
   end
+
   return tp -- any nomask type
+
 end ----
 
 -- Find abstract supertype of ctype for cfg.
 function useType.abstractType (ctype, cfg, field) --> (string | nil)
+
   local tp, cfg, field = ctype, cfg or types, field or 'inherit'
   while tp and types[tp] and not abstypes[tp] do
     tp = (cfg[tp] or Null)[field] or types[tp][field]
+
   end
+
   return tp and abstypes[tp] and tp -- abstract type only
+
 end ----
 
 --[[ Warning:
@@ -479,35 +569,48 @@ end ----
 
 -- Find ctype as cfg type with inheritance and equivalence.
 local function nextConfigType (ctype, cfg, equiv, field)
+
   local tp, eqtp = ctype
   local eq = equiv and cfg[equiv] -- equivalence section
   while tp do
     if eq then
       eqtp = eq[tp] -- equivalent type
       if eqtp and cfg[eqtp] then tp = eqtp end
+
     end
+
     if cfg[tp] then return tp end -- is in Config
+
     tp = nextType(tp, field)
+
   end
 end --
 useType.nextConfigType = nextConfigType
 
 -- Retrieve first ctype as cfg type.
 function useType.configType (ctype, cfg, equiv, field) --> (string)
+
   --assert(not cfg, "No config for configType")
+
   if cfg[ctype] then return ctype end -- by cfg
+
   return nextConfigType(ctype, cfg, equiv, field or 'inherit')
+
 end --
 
 -- Retrieve next type (for ctype) as cfg type.
 function useType.configNextType (ctype, cfg, equiv, field) --> (string)
+
   --assert(not cfg, "No config for configNextType")
+
   local field = field or 'inherit'
   local tp = ctype and cfg[ctype] and -- by cfg
                type(cfg[ctype]) == 'table' and
                cfg[ctype][field] or -- by cfg field
              nextType(ctype, field) -- by types (find next by default)
+
   return nextConfigType(tp, cfg, equiv, field)
+
 end ----
 
 ---------------------------------------- Check
@@ -526,7 +629,8 @@ local isError = false -- One warning per action!
   v[field] (string) - supertype for ctype.
 --]]
 local function checkItself (ctype, v, field) --> (string | nil)
-  local field = field or 'inherit'
+
+  field = field or 'inherit'
   if ctype ~= v[field] then return v[field] end
 
   if not isError then
@@ -535,7 +639,9 @@ local function checkItself (ctype, v, field) --> (string | nil)
         L:t1('SInheritDirect', ctype, field)..
         L:t1('SInheritReset', ctype, ctype))
   end
+
   v[field] = nil
+
 end -- checkItself
 checkType.itself = checkItself
 
@@ -550,7 +656,9 @@ checkType.itself = checkItself
   v[field] - supertype for ctype.
 --]]
 local function superType (ctype, v, cfg, field) --> (string | nil)
-  local field = field or 'inherit'
+
+  field = field or 'inherit'
+
   local super = v[field]
   if super == nil then return end
 
@@ -562,7 +670,9 @@ local function superType (ctype, v, cfg, field) --> (string | nil)
           L:t1('SInheritDirect', ctype, field)..
           L:t1('SInheritReset', ctype, ctype))
     end
+
     v[field] = nil
+
     return
 
   elseif cfg[super] == nil then -- Unknown
@@ -572,11 +682,15 @@ local function superType (ctype, v, cfg, field) --> (string | nil)
           L:t1('SInheritUnknown', ctype, super, field)..
           L:t1('SInheritReset', ctype, super))
     end;
+
     v[field] = nil
+
     return
+
   end
 
   return super
+
 end -- superType
 checkType.superType = superType
 
@@ -584,12 +698,15 @@ local tconcat = table.concat
 
 -- Check inheritance for config type.
 local function checkInherit (ctype, v, cfg, field)
+
   if v._checked_ then return end
-  local field = field or 'inherit'
+
+  field = field or 'inherit'
 
   local super = superType(ctype, v, cfg, field)
   if not super then
     v._checked_ = true
+
     return
   end
 
@@ -606,26 +723,33 @@ local function checkInherit (ctype, v, cfg, field)
           tconcat(chain, L:t'SInheritChainSep'),
           L:t'SInheritChainEnd',
           L:t1('SInheritReset', last, super),
+
         }
         L:w(L:t'CInheritError', tconcat(message, '\n'))
+
       end
+
       cfg[last][field] = nil
+
       break
     end -- if
 
     chain[#chain+1] = super
     chain[super] = true
     super = superType(super, cfg[super], cfg, field)
-  end
+
+  end -- while
 
   -- Remember checked types:
   for k = 1, #chain do
     if cfg[chain[k]] then
       cfg[chain[k]]._checked_ = true
+
     else -- Check for 'asmeta'
       if not isError then
         isError = true
         L:w1('CInheritError', 'SInheritLostType', chain[k])
+
       end
     end
   end
@@ -639,34 +763,42 @@ do
 
 -- Check inheritance for all config types.
 function checkType.types (cfg) --| cfg --> (true | nil)
-  local cfg = cfg or types
+
+  cfg = cfg or types
   if not cfg or checked[cfg] then return end
 
   isError = false
   for k, v in cfgpairs(cfg) do
     checkInherit(k, v, cfg, 'inherit')
+
   end
   isError = false
 
   checked[cfg] = true
+
   return true
+
 end ---- types
 
 -- Check inheritance reset.
 function checkType.reset (cfg) --| cfg
-  local cfg = cfg or types
+
+  cfg = cfg or types
   if not cfg then return end
 
   for _, v in cfgpairs(cfg) do
     v._checked_ = false -- nil
+
   end
   checked[cfg] = false
 
   isError = false
+
 end ---- reset
 
 if not checked[types] then
   checkType.types(types)
+
 end
 
 end -- do

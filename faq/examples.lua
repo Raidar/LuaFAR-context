@@ -40,6 +40,7 @@ local Default = { x = 10, y = 10 }
 local Result  = { z = 25 }
 setmetatable(Result, { __index = Default })
 far.Message(Result.x,  "Result.x") --> 10
+
 -- 2. Сохранение значений по умолчанию:
 Result.x = 20 --> Default.x = 10
 far.Message(Result.x,  "Result.x") --> 20

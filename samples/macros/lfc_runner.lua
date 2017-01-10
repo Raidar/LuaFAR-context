@@ -17,6 +17,7 @@ do
   local ProfilePath = GetSysEnv("FARPROFILE")
   if not ProfilePath then
     ProfilePath = GetSysEnv("FARHOME").."\\Profile"
+
   end
 
   -- Путь к пакету
@@ -25,6 +26,7 @@ do
   local PackPath = package.path
   if not PackPath:find(ModulePath, 1, true) then
     package.path = ModulePath..PackPath
+
   end
 
   -- Инициализация пакета
@@ -38,27 +40,39 @@ do
     group       = "EditorEvent",
     description = "LuaFAR context ProcessEditorEvent",
     priority    = Priority,
+
     action      = function (id, event, param)
+
       return resident.ProcessEditorEvent(id, event, param)
+
     end,
+
   } ---
 
   Event {
     group       = "ViewerEvent",
     description = "LuaFAR context ProcessViewerEvent",
     priority    = Priority,
+
     action      = function (id, event, param)
+
       return resident.ProcessViewerEvent(id, event, param)
+
     end,
+
   } ---
 
   Event {
     group       = "ExitFAR",
     description = "LuaFAR context ExitScript",
     priority    = Priority,
+
     action      = function ()
+
       return resident.ExitScript()
+
     end,
+
   } ---
 
 end

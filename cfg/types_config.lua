@@ -20,6 +20,7 @@
 
 ---------------------------------------- Used parts
 local lines = { -- firstlines:
+
   ini = '^[;%[]',
   ini_ext = '^[;#%[]',
   assa = '%[Script Info%]',
@@ -34,24 +35,30 @@ local lines = { -- firstlines:
   -- firstlines' common parts:
   lang = 'language%s*=.-',
   dtd_xhtml = 'DTD XHTML%s.-',
+
 } --- lines
 
 local masks = { -- masks:
+
   inc = '%.inc$',
   html = '%.[^ptr]?html?$',
   xhtml = '%.x?html?$',
   asp_as = '%.as[pa]$',
   asp_ht = '%.ht[rxa]$',
+
 } --- masks
 
 local msets = { -- masks' sets:
+
   xhtml  = {masks.xhtml},
   asp    = {masks.asp_as, masks.asp_ht, masks.inc},
   modula = {'[%(<]%*', 'MODULE', 'DEFINITION', 'IMPLEMENTATION'},
+
 } --- msets
 
 ---------------------------------------- Abstract types
 local abstract_types = {
+
   _meta_  = { abstract = true },
       -- They usually haven't masks field!
 
@@ -98,10 +105,12 @@ local abstract_types = {
   mixed   = { inherit = 'default', desc = 'Mixed type', },
     doc     = { inherit = 'mixed', desc = 'Document data', },   -- 3.1.
     font    = { inherit = 'mixed', desc = 'Font data', },       -- 3.2.
+
 } --- abstract_types
 
 ---------------------------------------- Available types
 local types = {
+
   _meta_  = { basis = 'base', merge = 'update', },
   -- They usually are real or auxiliary types.
 
@@ -292,7 +301,7 @@ local types = {
   ps_font   = { inherit = 'postscript', desc = 'Postscript Font',
                 group = 'font', masks = {'%.pf[ab]$'},
                 firstline = {'^%%!','^%%!PS'}, },
-                
+
   yaml      = { inherit = 'markup', desc = 'YAML', masks = {'%.ya?ml$'}, },
   json      = { inherit = 'yaml', desc = 'JSON', masks = {'%.json$'}, },
 
@@ -915,6 +924,7 @@ local types = {
   link      = { inherit = 'mixed', desc = 'Link', },
     lnk       = { inherit = 'link', desc = 'Link file', masks = {'%.lnk$'}, },
   -- end
+
 } --- types
 
 ---------------------------------------- main

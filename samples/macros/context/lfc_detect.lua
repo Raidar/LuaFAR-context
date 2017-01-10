@@ -27,8 +27,11 @@ local logShow = debugs.Show
 local debugs
 
 local function doShow (...)
+
   debugs = debugs or require "context.utils.useDebugs"
+
   return debugs.Show(...)
+
 end -- doShow
 
 ----------------------------------------
@@ -43,16 +46,22 @@ Macro {
   key = "RCtrlD",
   flags = "EmptyCommandLine",
   description = "LFc: detect type",
+
   action = function ()
+
     local f = { matchcase = false, forceline = true, }
     --local f = { matchcase = true, }
     local info = { curFileType(f), }
 
     if #info > 0 then
       doShow(info, "detType", "d2 _")
+
     else
       doShow("No types to detect\n\n'LuaFAR context' pack is required\n", "detType")
+
     end
+
   end, ---
+
 } ---
 --------------------------------------------------------------------------------

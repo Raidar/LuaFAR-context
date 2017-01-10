@@ -12,6 +12,7 @@ local count = 0
 for k, _ in pairs(VKeys) do
   if type(k) == 'number' and k > count then
     count = k
+
   end
 end
 
@@ -22,6 +23,7 @@ for k = 1, count do
   local v = VKeys[k]
   if v then
     local Input = {
+
       EventType       = F.KEY_EVENT,
       --KeyDown         = true,
       --RepeatCount     = 1,
@@ -29,7 +31,9 @@ for k = 1, count do
       --VirtualScanCode = 0x00,
       --UnicodeChar     = "",
       ControlKeyState = 0x00,
+
     } ---
+
     local s = InputRecordToName(Input) or ""
     if s:len() <= 1 or s ~= s:upper() then
       t[#t + 1] = format("%s -> %s", v, s)
@@ -38,6 +42,7 @@ for k = 1, count do
       local s = format("%s -> %s", v, s)
       if s ~= t[#t] then
         t[#t + 1] = s.." (enhanced)"
+
       end
     end
   end

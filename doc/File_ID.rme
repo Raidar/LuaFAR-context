@@ -26,12 +26,12 @@ Link : http://raidar.github.com/Programs/FarScripts.htm#LF_context
 Repo : https://github.com/Raidar/LuaFAR-context
 
 [Anons]
-  LuaFAR context is a package of scripts for detecting file type
-and working with parameter configuration files linked to file types.
-  LuaFAR context — пакет для определения типов файлов и работы
-с файлами конфигураций параметров, связанных с типами файлов.
-
+  A package of scripts for detecting file type and working
+with parameter configuration files linked to file types.
   LuaFAR context is used in fl_scripts set and Rh_Scripts pack.
+
+  Пакет для определения типов файлов и работы с файлами
+конфигураций параметров, связанных с типами файлов.
   LuaFAR context используется в наборе fl_scripts и пакете Rh_Scripts.
 
 ―――――――

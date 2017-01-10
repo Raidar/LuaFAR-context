@@ -32,7 +32,7 @@ local modf, frexp = math.modf, math.frexp
 local string = string
 local format = string.format
 
---local uuid = (rawget(_G, 'win') or {}).Uuid 
+--local uuid = (rawget(_G, 'win') or {}).Uuid
 
 ----------------------------------------
 --local context = context
@@ -64,8 +64,11 @@ local BasicSerialTypes = {
 unit.BasicSerialTypes = BasicSerialTypes
 
 local DefaultSerialTypes = {
+
   __index = BasicSerialTypes,
+
   ["table"]     = true,
+
 } --- DefaultSerialTypes
 setmetatable(DefaultSerialTypes, DefaultSerialTypes)
 unit.DefaultSerialTypes = DefaultSerialTypes
@@ -74,6 +77,7 @@ unit.DefaultSerialTypes = DefaultSerialTypes
 -- Convert field value to string.
 -- Преобразование значения поля в строку.
 local function ValToStr (value) --> (string | nil, type)
+
   if value == nil then return 'nil' end
 
   local tp = type(value)
@@ -83,39 +87,48 @@ local function ValToStr (value) --> (string | nil, type)
   if tp == 'number' then
     if value == mhuge then
       return "math.huge"
+
     elseif -value == mhuge then
       return "-math.huge"
+
     elseif value ~= value then
       return "0/0"
+
     end
 
     -- integer:
     if value == modf(value) and value <= MaxNumberInt then
       return tostring(value)
+
     end
 
     -- real:
     return format("(%.17f * 2^%d)", frexp(value)) -- preserve accuracy
     --return format("math.ldexp(%.17f, %d)", frexp(value)) -- preserve accuracy
+
   end
 
   if tp == 'string' then
     return squote(value) -- "string"
     --return ("%q"):format(value) -- "string"
+
   end
 
   return nil, tp
+
 end -- ValToStr
 unit.ValToStr = ValToStr
 
 -- Convert key name to string.
 -- Преобразование имени ключа в строку.
 local function KeyToStr (key) --> (string[, string] | nil)
+
   local tp = type(key)
   if tp ~= 'string' then
     local key = ValToStr(key)
     if key then
       return format("[%s]", key)
+
     end
 
     return
@@ -123,9 +136,11 @@ local function KeyToStr (key) --> (string[, string] | nil)
 
   if key:find(luaIdentMask) and not luaKeywords[key] then
     return "."..key, key -- .string
+
   end
 
   return ("[%q]"):format(key) -- ["string"]
+
 end -- KeyToStr
 unit.KeyToStr = KeyToStr
 
@@ -146,10 +161,13 @@ local function TabToStr (name, data, kind, write) --| (write)
     local value = kind.saved[data]
     if value then -- saved name as value
       write(kind.indent, name, " = ", value, "\n")
+
       return
     end
+
     kind.saved[data] = name
     --logShow({ name, kind, data or "nil" }, "kind", 3)
+
   end
 
   -- 2. Settings to write current table:
@@ -179,24 +197,31 @@ local function TabToStr (name, data, kind, write) --| (write)
         write(cur_indent, format("do local %s = {}; %s = %s\n",
                                  tname, name, tname)) -- do
       end
+
       if u then
         -- boolean, number or string:
         write(new_indent, format("%s%s = %s\n", tname, s, u))
+
       else
         -- subtable or special type:
         if tp == 'table' then
           TabToStr(name..s, v, kind, write)
+
         elseif TypToStr then
           TypToStr(name..s, v, kind, write)
+
         end
       end
     end
+
   end -- for
 
   if isnull then
     write(cur_indent, name, " = {}")
+
   else
     write(cur_indent, "end") -- end
+
   end
   write(cur_indent, "\n")
 
@@ -205,6 +230,7 @@ local function TabToStr (name, data, kind, write) --| (write)
   kind.indent = cur_indent
 
   return true
+
 end -- TabToStr
 unit.TabToStr = TabToStr
 
@@ -241,21 +267,26 @@ local i2s, r2s = numbers.i2s, numbers.r2s
   (s | nil,tp)  - string representation of value.
 --]]
 local function ValToText (value, kind) --> (string | nil, type)
+
   local tp = type(value)
 
   --far.Message(tostring(value), tp)
   -- boolean:
   if tp == 'boolean' then
     return tostring(value)
+
   end
 
   if tp == 'number' then
     if value == mhuge then
       return "math.huge"
+
     elseif -value == mhuge then
       return "-math.huge"
+
     elseif value ~= value then
       return "0/0"
+
     end
 
     local iskey, f = kind.iskey
@@ -269,21 +300,26 @@ local function ValToText (value, kind) --> (string | nil, type)
       if iskey then w = kind.keyhex else w = kind.valhex end
       if w then -- hex:
         return hex(value, type(w) == 'number' and w or nil)
+
       end
 
       local s = i2s(value, f)
       w = (kind.numwidth or 0) - s:len()
       if w > 0 then -- align:
         return format("%s%s", spaces[w], s)
+
       end
 
       return s
+
     end -- integer
 
     -- real:
     if iskey then f = kind.keyreal else f = kind.valreal end
+
     return r2s(value, f)
-  end -- number
+
+  end -- 'number'
 
   -- string:
   if tp == 'string' then
@@ -297,14 +333,17 @@ local function ValToText (value, kind) --> (string | nil, type)
        not value:find("[[", 1, true) and
        not value:find("]]", 1, true) then
       return format("[[\n%s]]", value) -- [[string]]
+
     end
 
     -- quoted:
     return squote(value) -- "string"
     --return ("%q"):format(value) -- "string"
-  end
+
+  end -- 'string'
 
   return nil, tp
+
 end -- ValToText
 unit.ValToText = ValToText
 
@@ -321,6 +360,7 @@ unit.ValToText = ValToText
   (s | nil,tp)  - string representation of value.
 --]]
 local function KeyToText (key, kind) --> (string[, string] | nil)
+
   local tp = type(key)
 
   -- boolean & number:
@@ -330,6 +370,7 @@ local function KeyToText (key, kind) --> (string[, string] | nil)
     kind.iskey = false
     if key then
       return format("[%s]", key)
+
     end
 
     return
@@ -338,9 +379,11 @@ local function KeyToText (key, kind) --> (string[, string] | nil)
   -- string:
   if key:find(luaIdentMask) and not luaKeywords[key] then
     return "."..key, key -- .string
+
   end
 
   return ("[%q]"):format(key) -- ["string"]
+
 end -- KeyToText
 unit.KeyToText = KeyToText
 
@@ -390,6 +433,7 @@ local function TabToText (name, data, kind, write) --| (write)
 
   --far.Message(tostring(data), name)
   --logShow(name)
+
   local level = kind.level -- Prior level
   local fname = kind.fname or name
   local cur_indent = kind.indent
@@ -399,11 +443,13 @@ local function TabToText (name, data, kind, write) --| (write)
     kind.nestless = {}
     local nesting = kind.nesting
     if nesting then
-       if type(nesting) ~= 'number' or nesting < 0 then
-         kind.nesting = 0
-       end
+      if type(nesting) ~= 'number' or nesting < 0 then
+        kind.nesting = 0
+
+      end
     end
-  end
+
+  end -- if
 
   -- 1. Write self-references:
   do
@@ -418,11 +464,15 @@ local function TabToText (name, data, kind, write) --| (write)
         saved[fname] = data
         if kind.isarray then
           write(cur_indent, format("false, -- %s\n", value))
+
         else
           write(cur_indent, format("%s = false, -- %s\n", name, value))
+
         end
+
       else
         write(cur_indent, format("%s = %s\n", name, value))
+
       end
 
       return
@@ -438,14 +488,20 @@ local function TabToText (name, data, kind, write) --| (write)
         if kind.isarray then
           --logShow(kind, name, 1)
           write(cur_indent, format("{}, -- skip\n"))
+
         else
           write(cur_indent, format("%s = {}, -- skip\n", name))
+
         end
+
       else
         write(cur_indent, format("%s = {} -- skip\n", name))
+
       end
+
       return
     end
+
   end -- do
 
   -- 2. Settings to write current table:
@@ -487,11 +543,13 @@ local function TabToText (name, data, kind, write) --| (write)
       alimit, acount = kind.alimit, kind.acount
       awidth = kind.awidth
       avalth, avarth = kind.avalth, kind.avarth
+
       if type(alimit) == 'function' then alimit = alimit(name, data) end
       if type(acount) == 'function' then acount = acount(name, data) end
       if type(awidth) == 'function' then awidth = awidth(name, data) end
       if type(avalth) == 'function' then avalth = avalth(name, data) end
       if type(avarth) == 'function' then avarth = avarth(name, data) end
+
     end
 
     local l = 0 -- New line count-flag
@@ -509,8 +567,10 @@ local function TabToText (name, data, kind, write) --| (write)
         isnull = false
         if isarray then
           write(cur_indent, "{\n") -- {
+
         else
           write(cur_indent, name, " = {\n") -- {
+
         end
       end
 
@@ -525,11 +585,14 @@ local function TabToText (name, data, kind, write) --| (write)
           if lw > 0 then
             ulen = ulen + lw
             lsp = spaces[lw]
+
           end
+
           local rw, rsp = (avarth or 0) - ulen, ""
           if rw > 0 then
             ulen = ulen + rw
             rsp = spaces[rw]
+
           end
 
           len = len + ulen + 2 -- for ' ' + ','
@@ -537,6 +600,7 @@ local function TabToText (name, data, kind, write) --| (write)
           if w > 0 then
             len = len + w
             wsp = spaces[w]
+
           end
 
           -- Write field:
@@ -548,11 +612,15 @@ local function TabToText (name, data, kind, write) --| (write)
             if l > 1 then write("\n") end
             write(new_indent,
                   format("%s%s%s,%s", lsp, u, rsp, wsp))
+
           else      -- Other fields in same line:
             write(format(" %s%s%s,%s", lsp, u, rsp, wsp))
+
           end
+
         else
           write(new_indent, u, ",\n")
+
         end
 
       else
@@ -563,19 +631,24 @@ local function TabToText (name, data, kind, write) --| (write)
           if l > 1 then write("\n") end
           l = 0
           --l = -1
+
         end
 
         local s = KeyToStr(k, kind)
         kind.fname = fname..s
         if tp == 'table' then
           TabToText(s, v, kind, write)
+
         elseif TypToStr and tp ~= nil then
           TypToStr(s, v, kind, write)
+
         end
+
       end -- if u -- value
 
       k = k + 1
       v = data[k]
+
     end -- while
 
     if not isnull then
@@ -583,11 +656,14 @@ local function TabToText (name, data, kind, write) --| (write)
       if islining then write("\n") end
       -- Separate array and hash parts by empty line:
       if sortkind.stats.main >= k then write("\n") end
+
     end
 
     kind.isarray = isarray -- Restore value
+
   end -- if nestless
-  -- 3.1. --
+
+  -- 3.1. -- END
 
   -- 3.2. Write hash/table fields:
   do
@@ -606,12 +682,14 @@ local function TabToText (name, data, kind, write) --| (write)
       hlimit, hcount = kind.hlimit, kind.hcount
       hwidth = kind.hwidth
       hkeyth, hvalth, hvarth = kind.hkeyth, kind.hvalth, kind.hvarth
+
       if type(hlimit) == 'function' then hlimit = hlimit(name, data) end
       if type(hcount) == 'function' then hcount = hcount(name, data) end
       if type(hwidth) == 'function' then hwidth = hwidth(name, data) end
       if type(hkeyth) == 'function' then hkeyth = hkeyth(name, data) end
       if type(hvalth) == 'function' then hvalth = hvalth(name, data) end
       if type(hvarth) == 'function' then hvalth = hvarth(name, data) end
+
     end
 
     local l = 0 -- New line count-flag
@@ -635,9 +713,12 @@ local function TabToText (name, data, kind, write) --| (write)
             if nestless then
               if isarray then
                 write(cur_indent, "{\n") -- {
+
               else
                 write(cur_indent, name, " = {\n") -- {
+
               end
+
             else
               write(cur_indent, format("do local %s = {}; %s = %s\n",
                                        tname, name, tname)) -- do
@@ -660,6 +741,7 @@ local function TabToText (name, data, kind, write) --| (write)
                 if kw > 0 then
                   clen = clen + kw
                   ksp = spaces[kw]
+
                 end
 
                 local ulen = u:len()
@@ -667,11 +749,14 @@ local function TabToText (name, data, kind, write) --| (write)
                 if lw > 0 then
                   ulen = ulen + lw
                   lsp = spaces[lw]
+
                 end
+
                 local rw, rsp = (hvarth or 0) - ulen, ""
                 if rw > 0 then
                   ulen = ulen + rw
                   rsp = spaces[rw]
+
                 end
 
                 local culen = clen + ulen
@@ -680,6 +765,7 @@ local function TabToText (name, data, kind, write) --| (write)
                 if w > 0 then
                   len = len + w
                   wsp = spaces[w]
+
                 end
 
                 -- Write field:
@@ -694,19 +780,24 @@ local function TabToText (name, data, kind, write) --| (write)
 
                 else      -- Other fields in same line:
                   write(format(" %s%s = %s%s%s,%s", c, ksp, lsp, u, rsp, wsp))
+
                 end
-                
+
                 if hlimit and
                    ( (zeroln and k == 0) or
                      (hstrln and type(v) == 'string') ) then
                   len = hlimit + 1
+
                 end
 
               else
                 write(new_indent, format("%s = %s,\n", c, u))
+
               end
+
             else
               write(new_indent, format("%s%s = %s\n", tname, c, u))
+
             end
 
           else
@@ -716,6 +807,7 @@ local function TabToText (name, data, kind, write) --| (write)
             if islining then
               if l > 0 then write("\n") end
               l = 0
+
             end
             kind.fname = fname..s
 
@@ -724,41 +816,54 @@ local function TabToText (name, data, kind, write) --| (write)
 
             if tp == 'table' then
               TabToText(n, v, kind, write)
+
             elseif TypToStr and tp ~= nil then
               TypToStr(n, v, kind, write)
+
             end
           end -- if u -- value
 
           if isspec then kind.indent = new_indent end
+
         end -- if s -- key
       end
+
     end -- for
 
     if not isnull then
       -- Set '}' of hash/table to new line:
       if islining and l > 0 then write("\n") end
+
     end
+
   end -- do
-  -- 3.2. --
+
+  -- 3.2. -- END
 
   if isnull then
     write(cur_indent, name, " = {}")
+
   else
     if nestless then
       write(cur_indent, "}") -- }
+
     else
       write(cur_indent, "end") -- end
+
     end
+
   end
+
   if level > 1 and (kind.astable or kind.nestless[level - 1]) then
     write(",")
+
   end
   write("\n")
 
   -- 3.3. Write self-references:
   if level == 1 then
     local isnull = true
-  
+
     local saved = kind.saved
     for k, v in sortpairs(saved) do
       if type(k) == 'string' and type(v) == 'table' then
@@ -766,12 +871,20 @@ local function TabToText (name, data, kind, write) --| (write)
           isnull = false
           write("\n")
           --write("\n-- self-references:\n")
+
         end
+
         write(cur_indent, k, " = ", saved[v] or 'nil', "\n")
+
       end
-    end
+
+    end -- for
+
     --if not isnull then write("--\n") end
+
   end
+
+  -- 3.3. -- END
 
   -- 4. Restore settings
   kind.level = kind.level - 1
@@ -781,6 +894,7 @@ local function TabToText (name, data, kind, write) --| (write)
   -- 5. Done serialize:
 
   return true
+
 end -- TabToText
 unit.TabToText = TabToText
 
@@ -815,27 +929,33 @@ local luaNameToIdent = lua.NameToIdent
   isOk   (bool) - operation success flag.
 --]]
 function unit.serialize (name, data, kind, write) --> (bool)
+
   --logShow(data)
   --if data == nil then return end
 
   -- Fix name as lua identifier:
-  local name, tp = name, type(name)
+  local tp = type(name)
   if tp == 'string' then
     name = luaNameToIdent(name)
+
   else
     if tp == 'boolean' or tp == 'number' then
       name = "n_"..tostring(name)
+
     else
       name = "n_"..tp
+
     end
   end
+
   -- Fix name as non-keyword:
   if luaKeywords[name] then
     name = "n_"..name
+
   end
 
   -- Prepare basic kind fields:
-  local kind = kind or {}
+  kind = kind or {}
   kind.KeyToStr = kind.KeyToStr or KeyToStr
   kind.ValToStr = kind.ValToStr or ValToStr
 
@@ -845,9 +965,13 @@ function unit.serialize (name, data, kind, write) --> (bool)
   if s then
     if kind.localret then
       return write(format("local %s = %s\nreturn %s\n", name, s, name))
+
     end
+
     return write(name, " = ", s, "\n")
+
   end
+
   if tp ~= 'table' then return end
 
   -- Fill kind with defaults:
@@ -868,12 +992,14 @@ function unit.serialize (name, data, kind, write) --> (bool)
   if kind.localret then write(kind.indent, "\nreturn ", name, "\n") end
 
   return true
+
 end -- serialize
 
 -- Serialize data to pretty text.
 -- Сериализация данных в читабельный текст.
 function unit.prettyize (name, data, kind, write) --> (bool)
-  local kind = kind or {}
+
+  kind = kind or {}
   --logShow(kind, "kind")
 
   -- Fill kind to pretty text:
@@ -888,6 +1014,7 @@ function unit.prettyize (name, data, kind, write) --> (bool)
   --logShow(kind)
 
   return unit.serialize(name, data, kind, write)
+
 end ---- prettyize
 
 --------------------------------------------------------------------------------

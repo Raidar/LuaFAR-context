@@ -13,6 +13,7 @@
 --------------------------------------------------------------------------------
 ---------------------------------------- Abstract type descs
 local abstract_type_descs = {
+
   _meta_  = { abstract = true },
       -- They usually haven't masks field!
 
@@ -24,10 +25,12 @@ local abstract_type_descs = {
     none    = "Unknown/undefined type",
     common  = "Common predefined data (for any type)",
     ignore  = "Private store for ignored data",
+
 } --- abstract_type_descs
 
 ---------------------------------------- Available type descs
 local type_descs = {
+
   _meta_ = { basis = 'base', merge = 'update', },
 
   -- 0. special
@@ -212,6 +215,7 @@ local type_descs = {
   tfm   = "TeX Font Metric",
 
       -- 3.3. others
+
 } --- type_descs
 
 ---------------------------------------- main
