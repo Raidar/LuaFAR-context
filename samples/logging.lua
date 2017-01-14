@@ -24,9 +24,10 @@ function unit.StrToTab (s) --> (table)
 
   local t, n = {}, 0
 
-  s:gsub("[^\n]+", function (s)
+  s:gsub("[^\n]+", function (v)
                      n = n + 1
-                     t[n] = s
+                     t[n] = v
+
                    end)
   t.n = n
 

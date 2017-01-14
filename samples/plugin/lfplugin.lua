@@ -41,14 +41,14 @@ local _FirstRun = not _LFP -- Первый запуск
 
 --far.OnError = require "far2.errormessage"
 
-if _FirstRun then -- Check version:
+--if _FirstRun then -- Check version:
   -- TODO: Replace code to use version of FAR Manager!
   --local v1, v2 = far.LuafarVersion(true)
   --local r1, r2 = _ReqLuafarVer[1], _ReqLuafarVer[2]
   --local OK = (v1 > r1) or (v1 == r1 and v2 >= r2)
   --if not OK then error("LuaFAR version "..r1.."."..r2.." is required", 2) end
 
-end --
+--end --
 
 if _FirstRun then -- Assign unicode:
   ----

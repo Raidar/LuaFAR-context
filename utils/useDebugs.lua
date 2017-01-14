@@ -147,12 +147,12 @@ unit.Metas = Metas
 
 ---------------------------------------- Work
 -- Plain find of string.
-local function sfind (s, pat) --> (bool)
+local function pfind (s, pat) --> (bool)
 
   return s:find(pat, 1, true)
 
 end --
-unit.sfind = sfind
+unit.sfind = pfind
 
 -- Default width for: Ox12345678
 function unit.hex8 (n, width) --> (string)
@@ -164,7 +164,7 @@ end ----
 -- Check field type to exclude.
 local function isUnfitValType (tp, filter) --> (bool)
 
-  return sfind(filter, Types[tp] or '?')
+  return pfind(filter, Types[tp] or '?')
 
 end -- isUnfitValType
 unit.isUnfitValType = isUnfitValType
@@ -173,7 +173,7 @@ local supper = string.upper
 
 local function isUnfitKeyType (tp, filter) --> (bool)
 
-  return sfind(filter, supper(Types[tp] or '?'))
+  return pfind(filter, supper(Types[tp] or '?'))
 
 end -- isUnfitKeyType
 unit.isUnfitKeyType = isUnfitKeyType
@@ -181,12 +181,12 @@ unit.isUnfitKeyType = isUnfitKeyType
 -- Check field string key to exclude.
 local function isUnfitKeyName (n, filter) --> (bool)
 
-  return sfind(filter, 'W') and Words[n] or
-         sfind(filter, '/') and sfind(n, '/') or
-         sfind(filter, '\\') and sfind(n, '\\') or
-         sfind(filter, '.') and sfind(n, '.') or
-         sfind(filter, ':') and sfind(n, ':') or
-         sfind(filter, 'M') and (Metas[n] or n:find("^__"))
+  return pfind(filter, 'W') and Words[n] or
+         pfind(filter, '/') and pfind(n, '/') or
+         pfind(filter, '\\') and pfind(n, '\\') or
+         pfind(filter, '.') and pfind(n, '.') or
+         pfind(filter, ':') and pfind(n, ':') or
+         pfind(filter, 'M') and (Metas[n] or n:find("^__"))
 
 end -- isUnfitKey
 unit.isUnfitKeyName = isUnfitKeyName
@@ -506,8 +506,8 @@ function unit.tabulize (name, data, kind, filter) --> (table)
 
   -- Common:
   kind.localret = false
-  if sfind(filter, 'w') then kind.astable = true end
-  if sfind(filter, 'A') then
+  if pfind(filter, 'w') then kind.astable = true end
+  if pfind(filter, 'A') then
     local tables = require 'context.utils.useTables'
     kind.pairs = tables.allpairs
 
@@ -616,11 +616,13 @@ function unit.ShowData (data, name, kind) --| (item)
   local nlen = slen(tostring(n))
 
   for k = 1, #data do
-    local m, sp = tostring(k)
+    local m = tostring(k)
     local isnum = true
 
     for s in data[k]:gmatch("[^\n]+") do
       if ShowLineNumber then
+        local sp
+
         if isnum then
           isnum = false
           sp = spaces[nlen - slen(m)]

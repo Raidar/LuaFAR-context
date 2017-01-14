@@ -218,7 +218,8 @@ end -- do
 function unit.Execute (Data) --> (bool | nil)
 
 --[[ 1. Analyzing ]]
-  local Data = Data or {}
+  Data = Data or {}
+
   Data.SourceFile = Data.SourceFile or "uSerialSource.dat"
   Data.ResultFile = Data.ResultFile or "uSerialResult.dat"
 

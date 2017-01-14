@@ -538,7 +538,10 @@ ctxdata.abstypes = abstypes
 -- Find nomask supertype of ctype for cfg.
 function useType.nomaskType (ctype, cfg, field) --> (string | nil)
 
-  local tp, cfg, field = ctype, cfg or types, field or 'inherit'
+  cfg   = cfg or types
+  field = field or 'inherit'
+
+  local tp = ctype
   while tp and types[tp] and types[tp].masks do
     tp = (cfg[tp] or Null)[field] or types[tp][field]
 
@@ -551,7 +554,10 @@ end ----
 -- Find abstract supertype of ctype for cfg.
 function useType.abstractType (ctype, cfg, field) --> (string | nil)
 
-  local tp, cfg, field = ctype, cfg or types, field or 'inherit'
+  cfg   = cfg or types
+  field = field or 'inherit'
+
+  local tp = ctype
   while tp and types[tp] and not abstypes[tp] do
     tp = (cfg[tp] or Null)[field] or types[tp][field]
 
@@ -603,7 +609,8 @@ function useType.configNextType (ctype, cfg, equiv, field) --> (string)
 
   --assert(not cfg, "No config for configNextType")
 
-  local field = field or 'inherit'
+  field = field or 'inherit'
+
   local tp = ctype and cfg[ctype] and -- by cfg
                type(cfg[ctype]) == 'table' and
                cfg[ctype][field] or -- by cfg field

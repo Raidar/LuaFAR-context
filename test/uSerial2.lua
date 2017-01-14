@@ -11,7 +11,7 @@
 --local context = context
 local logShow = context.ShowInfo
 
-local tables = require 'context.utils.useTables'
+--local tables = require 'context.utils.useTables'
 local datas = require 'context.utils.useDatas'
 --local locale = require 'context.utils.useLocale'
 local serial = require 'context.utils.useSerial'

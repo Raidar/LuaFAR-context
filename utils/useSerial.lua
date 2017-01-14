@@ -76,7 +76,7 @@ unit.DefaultSerialTypes = DefaultSerialTypes
 ---------------------------------------- ValToStr/KeyToStr
 -- Convert field value to string.
 -- Преобразование значения поля в строку.
-local function ValToStr (value) --> (string | nil, type)
+function unit.ValToStr (value) --> (string | nil, type)
 
   if value == nil then return 'nil' end
 
@@ -116,18 +116,17 @@ local function ValToStr (value) --> (string | nil, type)
 
   return nil, tp
 
-end -- ValToStr
-unit.ValToStr = ValToStr
+end ---- ValToStr
 
 -- Convert key name to string.
 -- Преобразование имени ключа в строку.
-local function KeyToStr (key) --> (string[, string] | nil)
+function unit.KeyToStr (key) --> (string[, string] | nil)
 
   local tp = type(key)
   if tp ~= 'string' then
-    local key = ValToStr(key)
-    if key then
-      return format("[%s]", key)
+    local skey = unit.ValToStr(key)
+    if skey then
+      return format("[%s]", skey)
 
     end
 
@@ -141,8 +140,7 @@ local function KeyToStr (key) --> (string[, string] | nil)
 
   return ("[%q]"):format(key) -- ["string"]
 
-end -- KeyToStr
-unit.KeyToStr = KeyToStr
+end ---- KeyToStr
 
 ---------------------------------------- TabToStr
 -- Convert table to string.
@@ -266,7 +264,7 @@ local i2s, r2s = numbers.i2s, numbers.r2s
   -- @return:
   (s | nil,tp)  - string representation of value.
 --]]
-local function ValToText (value, kind) --> (string | nil, type)
+function unit.ValToText (value, kind) --> (string | nil, type)
 
   local tp = type(value)
 
@@ -344,8 +342,7 @@ local function ValToText (value, kind) --> (string | nil, type)
 
   return nil, tp
 
-end -- ValToText
-unit.ValToText = ValToText
+end ---- ValToText
 
 -- Convert field key to pretty text.
 -- Преобразование ключа поля в читабельный текст.
@@ -359,17 +356,18 @@ unit.ValToText = ValToText
   -- @return:
   (s | nil,tp)  - string representation of value.
 --]]
-local function KeyToText (key, kind) --> (string[, string] | nil)
+function unit.KeyToText (key, kind) --> (string[, string] | nil)
 
   local tp = type(key)
 
   -- boolean & number:
   if tp ~= 'string' then
     kind.iskey = true
-    local key = ValToText(key, kind)
+    local skey = unit.ValToText(key, kind)
     kind.iskey = false
-    if key then
-      return format("[%s]", key)
+
+    if skey then
+      return format("[%s]", skey)
 
     end
 
@@ -384,8 +382,7 @@ local function KeyToText (key, kind) --> (string[, string] | nil)
 
   return ("[%q]"):format(key) -- ["string"]
 
-end -- KeyToText
-unit.KeyToText = KeyToText
+end ---- KeyToText
 
 ---------------------------------------- TabToText
 local sortpairs = tables.sortpairs
@@ -429,7 +426,7 @@ local statpairs = tables.statpairs
   -- @return:
   isOk   (bool) - operation success flag.
 --]]
-local function TabToText (name, data, kind, write) --| (write)
+function unit.TabToText (name, data, kind, write) --| (write)
 
   --far.Message(tostring(data), name)
   --logShow(name)
@@ -637,7 +634,7 @@ local function TabToText (name, data, kind, write) --| (write)
         local s = KeyToStr(k, kind)
         kind.fname = fname..s
         if tp == 'table' then
-          TabToText(s, v, kind, write)
+          unit.TabToText(s, v, kind, write)
 
         elseif TypToStr and tp ~= nil then
           TypToStr(s, v, kind, write)
@@ -729,7 +726,7 @@ local function TabToText (name, data, kind, write) --| (write)
           if isspec then kind.indent = cur_indent..'--' end
 
           if u then
-            local new_indent = kind.indent
+            local str_indent = kind.indent
             -- boolean, number or string:
             if nestless then
               if islining then
@@ -775,7 +772,7 @@ local function TabToText (name, data, kind, write) --| (write)
                   cnt = 1 -- First field in new line:
                   len = indlen + culen + 4 -- for ' = ' + ','
                   if l > 1 then write("\n") end
-                  write(new_indent,
+                  write(str_indent,
                         format("%s%s = %s%s%s,%s", c, ksp, lsp, u, rsp, wsp))
 
                 else      -- Other fields in same line:
@@ -791,12 +788,12 @@ local function TabToText (name, data, kind, write) --| (write)
                 end
 
               else
-                write(new_indent, format("%s = %s,\n", c, u))
+                write(str_indent, format("%s = %s,\n", c, u))
 
               end
 
             else
-              write(new_indent, format("%s%s = %s\n", tname, c, u))
+              write(str_indent, format("%s%s = %s\n", tname, c, u))
 
             end
 
@@ -815,7 +812,7 @@ local function TabToText (name, data, kind, write) --| (write)
             --if c == "subsubtable" then logShow(kind, name, 1) end
 
             if tp == 'table' then
-              TabToText(n, v, kind, write)
+              unit.TabToText(n, v, kind, write)
 
             elseif TypToStr and tp ~= nil then
               TypToStr(n, v, kind, write)
@@ -862,13 +859,14 @@ local function TabToText (name, data, kind, write) --| (write)
 
   -- 3.3. Write self-references:
   if level == 1 then
-    local isnull = true
+    local isfirst = true
 
     local saved = kind.saved
     for k, v in sortpairs(saved) do
       if type(k) == 'string' and type(v) == 'table' then
-        if isnull then
-          isnull = false
+        if isfirst then
+          isfirst = false
+
           write("\n")
           --write("\n-- self-references:\n")
 
@@ -880,7 +878,7 @@ local function TabToText (name, data, kind, write) --| (write)
 
     end -- for
 
-    --if not isnull then write("--\n") end
+    --if not isfirst then write("--\n") end
 
   end
 
@@ -895,8 +893,7 @@ local function TabToText (name, data, kind, write) --| (write)
 
   return true
 
-end -- TabToText
-unit.TabToText = TabToText
+end ---- TabToText
 
 ---------------------------------------- serialize
 local luaNameToIdent = lua.NameToIdent
@@ -956,8 +953,8 @@ function unit.serialize (name, data, kind, write) --> (bool)
 
   -- Prepare basic kind fields:
   kind = kind or {}
-  kind.KeyToStr = kind.KeyToStr or KeyToStr
-  kind.ValToStr = kind.ValToStr or ValToStr
+  kind.KeyToStr = kind.KeyToStr or unit.KeyToStr
+  kind.ValToStr = kind.ValToStr or unit.ValToStr
 
   -- Serialize data as simple value:
   local s
@@ -1003,9 +1000,9 @@ function unit.prettyize (name, data, kind, write) --> (bool)
   --logShow(kind, "kind")
 
   -- Fill kind to pretty text:
-  kind.KeyToStr = kind.KeyToStr or KeyToText
-  kind.ValToStr = kind.ValToStr or ValToText
-  kind.TabToStr = kind.TabToStr or TabToText
+  kind.KeyToStr = kind.KeyToStr or unit.KeyToText
+  kind.ValToStr = kind.ValToStr or unit.ValToText
+  kind.TabToStr = kind.TabToStr or unit.TabToText
 
   -- Fill kind with defaults:
   if kind.localret == nil then kind.localret = true end

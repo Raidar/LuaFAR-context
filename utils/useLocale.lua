@@ -246,7 +246,7 @@ end -- do
 -- Подготовка данных локализации для скрипта по его установкам.
 function unit.prepare (Custom, ...) --> (table)
 
-  local Custom = unit.customize(Custom) -- Localization customizing
+  Custom = unit.customize(Custom) -- Localization customizing
 
   return unit.getData(Custom, ...)  -- Localization data for Custom
 
@@ -256,7 +256,7 @@ end ----
 -- Локализация данных для скрипта по его установкам.
 function unit.localize (Custom, defCustom, ...) --> (table)
 
-  local Custom = datas.customize(Custom, defCustom) -- Common customize
+  Custom = datas.customize(Custom, defCustom) -- Common customize
 
   return unit.prepare(Custom, ...)  -- Prepare localization data
 
@@ -328,6 +328,7 @@ function TLocale:free () --| (object)
 
   self.Data = nil
   self.Custom = nil
+
   self = nil
 
 end ---- free

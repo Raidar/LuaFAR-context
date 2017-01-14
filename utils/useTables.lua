@@ -199,20 +199,21 @@ function unit.clone (t, usemeta, tpairs) --> (table)
   tpairs = tpairs or pairs
   local Lookup = {} -- Список уже скопированных таблиц
 
-  local function _clone (t, usemeta)
-    if type(t) ~= 'table' then
-      return t
+  local function _clone (q, _usemeta)
 
-    elseif Lookup[t] then
-      return Lookup[t]
+    if type(q) ~= 'table' then
+      return q
+
+    elseif Lookup[q] then
+      return Lookup[q]
 
     end
 
     local u = {}
-    Lookup[t] = u -- Внесение в список / Копирование ключей и значений:
-    for k, v in tpairs(t) do u[_clone(k)] = _clone(v, usemeta) end
+    Lookup[q] = u -- Внесение в список / Копирование ключей и значений:
+    for k, v in tpairs(q) do u[_clone(k)] = _clone(v, _usemeta) end
 
-    return usemeta and setmetatable(u, getmetatable(t)) or u
+    return _usemeta and setmetatable(u, getmetatable(q)) or u
 
   end -- _clone
 
@@ -224,6 +225,7 @@ end ---- clone
 -- Update table t by values from u.
 -- Обновление таблицы t значениями из u.
 local function _update (t, u, tpairs) --|> (t)
+
   for k, v in tpairs(u) do
     if type(v) == 'table' then
       if type(t[k]) == 'table' then
@@ -473,7 +475,7 @@ function unit.add (t, u, kind, tpairs, ...) --> (table)
 
   end --
 
-  return t
+  --return t
 
 end ---- add
 
@@ -508,7 +510,10 @@ function unit.npairs (t, n) --> (func)
 
   if not t then return end
 
-  local k, n = 0, n or #t
+  n = n or #t
+
+  local k = 0
+
   local function _next ()
 
     k = k + 1
@@ -534,8 +539,9 @@ function unit.hpairs (t, ipairs) --> (func)
 
   if not t then return end
 
+  ipairs = ipairs or _ipairs
+
   local skip = {}
-  local ipairs = ipairs or _ipairs
   for i in ipairs(t) do
     skip[i] = true
 
@@ -751,17 +757,18 @@ function unit.gatherstat (k, v, kind) --| kind.stats
   if k == nil then
     local stats = kind.stats or {}
     kind.stats = stats
+
     if v ~= nil then
       -- Init --
       local gathered = kind.gathered
       local lua = require 'context.utils.useLua'
 
-      for k, _ in pairs(lua.types) do
+      for i, _ in pairs(lua.types) do
         if gathered then
-          stats[k] = stats[k] or 0
+          stats[i] = stats[i] or 0
 
         else
-          stats[k] = 0
+          stats[i] = 0
 
         end
 

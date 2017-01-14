@@ -261,7 +261,7 @@ local types = {
                   firstline = {'^diff','^Index',
                                '^%-%-%-','^%+%+%+','^%*%*%*',
                                '^%d+,%d+%w%d ','^ %d+%w%d',
-                               '^cvs','^comparing with'}, },
+                               '^cvs','^comparing with','^changeset:'}, },
                   -- FAR Manager & plugins:
   def_far   = { inherit = 'scriptdata', desc = 'FAR define', },
   airbrush  = { inherit = 'def_far', desc = 'FAR Airbrush',

@@ -178,7 +178,9 @@ function unit.numFlag (flags, numflags) --> (flags number)
   if type(flags) == 'string' then flags = { [flags] = 1 } end
   if type(flags) ~= 'table' then return flags end
 
-  local n, numflags = 0, numflags or numFlags
+  numflags = numflags or numFlags
+
+  local n = 0
 
   for k, v in pairs(flags) do
     --if type(v) == 'boolean' then v = b2n(v) end

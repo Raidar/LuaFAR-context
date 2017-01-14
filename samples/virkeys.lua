@@ -34,12 +34,12 @@ for k = 1, count do
 
     } ---
 
-    local s = InputRecordToName(Input) or ""
-    if s:len() <= 1 or s ~= s:upper() then
-      t[#t + 1] = format("%s -> %s", v, s)
+    local Name = InputRecordToName(Input) or ""
+    if Name:len() <= 1 or Name ~= Name:upper() then
+      t[#t + 1] = format("%s -> %s", v, Name)
       Input.ControlKeyState = 0x0100 -- ENHANCED_KEY
-      s = InputRecordToName(Input) or ""
-      local s = format("%s -> %s", v, s)
+      Name = InputRecordToName(Input) or ""
+      local s = format("%s -> %s", v, Name)
       if s ~= t[#t] then
         t[#t + 1] = s.." (enhanced)"
 

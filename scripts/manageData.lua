@@ -88,22 +88,24 @@ function unit.showTypes (selected)
   end
 
   -- Menu items for categories and owned types.
-  local item, selcat, selitem, flag
+  local selcat, selitem
   for i = 1, #categories do
     local cat = categories[i]
     cat.text = itemFormat:format(i, ' ', cat.desc)
     cat.id = i
+
     for j = 1, #cat do
-      item, flag = cat[j], ' '
+      local item, flag = cat[j], ' '
       if item.type == selected then
         catMenuProps.SelectIndex = j
-        selcat, selitem, flag = cat, j, '*'
+        flag =  '*'
+        selcat, selitem = cat, j
 
       end
 
       item.text = itemFormat:format(j, flag, item.desc)
 
-    end
+    end -- for
 
   end -- for
 
@@ -117,6 +119,7 @@ function unit.showTypes (selected)
   while result and result.BreakKey do
     local cat, flag = far.Menu(menuProps, categories)
     if not cat then return selected end
+
     menuProps.SelectIndex = flag
     catMenuProps.Title = cat.desc or cat.type
     catMenuProps.SelectIndex = selcat and flag == selcat.id and selitem or nil
@@ -172,24 +175,26 @@ do
                 "manageData script", nil, nil)
   end
 
-  local s = tostring
+  local str = tostring
   local LineFmt = '%s| %#2s %#8s - %s'
   local LineSep = ('-'):rep(1+2+2+1+8+3+15)
   local LineCap = LineFmt:format('-', '#', 'type', 'description')
 
 function unit.showFileList ()
 
-  local types, tp = types
+  local types = types
+
+  local tp
   local t = { LineCap, LineSep }
   -- current open file:
   if rawget(editors, 'current') then
     tp = editors.current.type
-    t[3] = LineFmt:format('e', '*', s(tp), s(types[tp].desc))
+    t[3] = LineFmt:format('e', '*', str(tp), str(types[tp].desc))
     t[4] = LineSep
 
   elseif rawget(viewers, 'current') then
     tp = viewers.current.type
-    t[3] = LineFmt:format('v', '*', s(tp), s(types[tp].desc))
+    t[3] = LineFmt:format('v', '*', str(tp), str(types[tp].desc))
     t[4] = LineSep
 
   end
@@ -198,7 +203,7 @@ function unit.showFileList ()
   for k, v in pairs(editors) do
     if k ~= 'current' then
       tp = v.type
-      t[#t + 1] = LineFmt:format('e', s(k), s(tp), s(types[tp].desc))
+      t[#t + 1] = LineFmt:format('e', str(k), str(tp), str(types[tp].desc))
 
     end
   end
@@ -206,7 +211,7 @@ function unit.showFileList ()
   for k, v in pairs(viewers) do
     if k ~= 'current' then
       tp = v.type
-      t[#t + 1] = LineFmt:format('v', s(k), s(tp), s(types[tp].desc))
+      t[#t + 1] = LineFmt:format('v', str(k), str(tp), str(types[tp].desc))
 
     end
   end

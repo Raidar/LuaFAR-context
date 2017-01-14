@@ -14,7 +14,7 @@
 local _G = _G
 
 --------------------------------------------------------------------------------
-local unit = {}
+--local unit = {}
 
 ----------------------------------------
 context = rawget(_G, 'context') or {}
@@ -69,10 +69,10 @@ do -- Load special modules & Register types.
 end -- do
 
 ---------------------------------------- Configs
-do -- Register other configuration files.
+--do -- Register other configuration files.
   --registerConfig{ key = 'key name', name = 'file base name' } -- Sample
 
-end
+--end
 
 ---------------------------------------- Modules
 do

@@ -403,6 +403,7 @@ function unit.load (regdata) --> (config table)
 
   if type(cfg) ~= 'table' then
     --far.Message(cfg, key)
+    local key = type(regdata) == 'table' and regdata.name or "unknown"
     L:w1('CNoCfgTable', 'SNoCfgTable', key)
 
     return

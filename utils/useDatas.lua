@@ -101,16 +101,16 @@ local function _cfglist (t, list, index) --> (table)
   list[t][index or ""] = true -- Save used index
 
   -- Analyze all metaindexes:
-  local t = getmetatable(t)
-  if type(t) ~= 'table' then return list end
+  local mt = getmetatable(t)
+  if type(mt) ~= 'table' then return list end
 
-  local u = t.__cfgMT     -- Merged __index
+  local u = mt.__cfgMT  -- Merged __index
   if type(u) == 'table' then _cfglist(u, list, "__cfgMT") end
 
-  u = t.__oldindex        -- Saved __index
+  u = mt.__oldindex     -- Saved __index
   if type(u) == 'table' then _cfglist(u, list, "__oldindex") end
 
-  u = t.__index           -- Default __index
+  u = mt.__index        -- Default __index
   if type(u) == 'table' then _cfglist(u, list, "__index") end
 
   return list
@@ -187,7 +187,7 @@ end -- do
 --]]
 function unit.find (name, path) --> (string)
 
-  path = path or package.path
+  --path = path or package.path
 
   return nil -- TODO: !!!
 
@@ -250,13 +250,13 @@ function unit.make (path, name, ext, t, kind) --> (table | nil, error)
   end
 
   local fullname = utils.fullname(path, name, ext)
-  local u, loadError, reqError = unit.load(fullname, t, kind)
+  local u, loadError = unit.load(fullname, t, kind)
   --if u then logShow(u, 'loadData', '#qd1') end
   if u ~= nil then return u end
 
-  u, reqError = unit.require(name, t, kind)
-  --if u then logShow(u, 'requireData', '#qd1') end
-  if u ~= nil then return u end
+  local v, reqError = unit.require(name, t, kind)
+  --if v then logShow(v, 'requireData', '#qd1') end
+  if v ~= nil then return v end
 
   return nil, ('%s\n%s'):format(loadError, reqError)
 
@@ -295,13 +295,14 @@ function unit.save (fullname, name, data, kind) --> (bool)
 
   kind = kind or {}
 
-  local f, s, res = io_open(fullname, 'w')
+  local f, s = io_open(fullname, 'w')
   if f == nil then return nil, s end
 
   local write = function (...)
                   return f:write(...)
                 end -- write
 
+  local res
   res, s = getSerialize(kind.serialize)(name, data, kind, write)
 
   f:close()
@@ -470,8 +471,9 @@ local defCustom = {
 --]]
 function unit.customize (Custom, defCustom) --> (table)
 
-  local t, u = addData(Custom or {}, defCustom, 'extend', pairs, true)
+  local t = addData(Custom or {}, defCustom, 'extend', pairs, true)
   --logShow(t, "data")
+
   local name, path = t.name, to_path(t.path)
   t.path = path
   --logShow(t, "data")
@@ -484,6 +486,8 @@ function unit.customize (Custom, defCustom) --> (table)
   t.file    = t.file    or name
   t.base    = t.base    or utils.PluginWorkPath
   t.profile = t.profile or utils.PluginDataPath
+
+  local u
 
   -- History:
   u = t.history or {}; t.history = u

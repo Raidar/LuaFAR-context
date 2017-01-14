@@ -121,7 +121,9 @@ local function cmpFilesType (t, FilesType, kind) --> (table | nil, error)
 
   if not FilesType then return nil, 'no file types' end
 
-  local t, tp, exp, cmp = t or {}
+  t = t or {}
+
+  local tp, exp, cmp
   t[#t + 1] = "--- "..DetKindsInfo[kind].." ---"
   for k, v in pairs(FilesType) do
     tp = type(v) == "string" and v or type(v) == "table" and v[1] or ""

@@ -112,7 +112,7 @@ function unit.n2s (n, fmt, separator, force) --> (string)
   local s = format(fmt or "%.f", n)
   if n < 1000 or (not force and n < 10000) then return s end
 
-  local separator = separator or " "
+  separator = separator or " "
   s = s:reverse():gsub("...", "%0"..separator)
 
   return s:reverse():gsub(format("^[%s]+", separator), "")
