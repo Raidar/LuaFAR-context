@@ -6,7 +6,7 @@ Date : 2017-01-14
 Ware : Freeware
 Lic. : MIT
 Reqs : FAR + LuaFAR v.3.0.4575,
-       UM Adapter v.3.0.0.5.
+       UM Adapter v.3.0.2.0.
 Type : Plugin for FAR Manager (Script package)
 Desc : LuaFAR context package for LuaFAR plugins and scripts
 
