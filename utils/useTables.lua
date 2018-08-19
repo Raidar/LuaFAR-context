@@ -60,7 +60,7 @@ local Null = unit.Null -- Empty read-only table
   field (string) - (meta)table field name.
   usemeta (bool) - metatable using flag.
   tpairs  (func) - pairs-function to get fields values.
-  deep    (bool) - table deep viewing falg.
+  deep    (bool) - table deep viewing flag.
 --]]
 ---------------------------------------- base
 do

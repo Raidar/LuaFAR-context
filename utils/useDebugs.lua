@@ -154,6 +154,7 @@ local function pfind (s, pat) --> (bool)
 end --
 unit.sfind = pfind
 
+-- @see useNumbers.
 -- Default width for: Ox12345678
 function unit.hex8 (n, width) --> (string)
 
