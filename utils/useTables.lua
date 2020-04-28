@@ -121,19 +121,20 @@ do
 -- Двоичный поиск подходящей позиции в отсортированном массиве.
 --[[
   -- @params:
-  t     (table) - table to find in.
-  v      (~nil) - value to find for.
-  comp   (func) - function to compare.
+  t      (table) - table to find in.
+  v       (~nil) - value to find for.
+  compare (func) - function to compare
+                   (@see `unit.sortcompare`).
   -- @return:
   index (number) - fitting position for value.
 --]]
-function unit.fitfind (t, v, comp) --> (index: 1..#t+1)
+function unit.fitfind (t, v, compare) --> (index: 1..#t+1)
 
   local min, max = 1, #t + 1
   while max - min > 0 do
     local m = modf((max + min) / 2) -- MAYBE: optimize
 
-    if comp(t[m], v) then
+    if compare(t[m], v) then
       min = m + 1
 
     else
@@ -149,9 +150,9 @@ end ---- fitfind
 
 -- Binary find in sorted array.
 -- Двоичный поиск в отсортированном массиве.
-function unit.bfind (t, v, comp) --> (index | nil)
+function unit.bfind (t, v, compare) --> (index | nil)
 
-  local i = unit.fitfind(t, v, comp)
+  local i = unit.fitfind(t, v, compare)
 
   return v == t[i] and i or nil
 
@@ -570,7 +571,7 @@ end -- do
 -- Формирование списка из всех таблиц.
 function unit.list (t, list, field) --> (table)
 
-  t, list = t, list or {}
+  list = list or {}
   field = field or '__index'
   if type(t) ~= 'table' then return list end
 
@@ -614,7 +615,7 @@ function unit.allpairs (t, make, ...) --> (func)
   if not t then return end
   local list = (make or t_list)(t, ...) -- tables list
   --if #list == 2 and list[1].CurrentClause then ulog = true end
-  --if ulog then logShow(list) end
+  --if ulog then logShow(list, "l_"..#list) end
 
   local n, k, v = #list
   local function _next ()
@@ -656,6 +657,8 @@ end -- do
 ---------------------------------------- sortpairs
 -- Compare values for table sort.
 -- Сравнение значений для сортировки таблицы.
+-- @return:
+-- boolean: true if v1 less than v2.
 function unit.sortcompare (v1, v2) --> (bool)
 
   local t1, t2 = type(v1), type(v2)
@@ -679,12 +682,13 @@ function unit.sortcompare (v1, v2) --> (bool)
   -- 3 -- string
   if t1 == 'string' then
     if t2 ~= 'string' then return t2 ~= 'boolean' and t2 ~= 'number' end
+
     -- 3.1 -- one letter string
     local l1, l2 = v1:len(), v2:len()
     if l1 == 1 then return l2 > 1 or v1 < v2 end
     if l2 == 1 then return l1 == 1 and v1 < v2 end
-    -- 3.2 -- other string
 
+    -- 3.2 -- other string
     return v1 < v2
 
   end
@@ -703,7 +707,7 @@ do
 --[[
   -- @params:
   t     (table) - table for pairing.
-  make (func) - function for make all tables related to t.
+  make   (func) - function for make all tables related to t.
   kind  (table) - additional parameters for sort:
     pairs    (func) - pairs-function to get fields.
     compare  (func) - function to compare field names.
